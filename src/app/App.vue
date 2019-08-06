@@ -78,9 +78,9 @@
     <v-btn bottom color="pink" dark fab fixed right @click="dialog = !dialog">
       <v-icon>add</v-icon>
     </v-btn>
-    <div v-if="dialog = true">
+    <!-- <div v-if="dialog = true">
       <NewOrderDialog :dialog="dialog"/>
-    </div>
+    </div> -->
 
     <!-- <v-dialog v-model="dialog" width="800px">
       <v-card>
@@ -125,19 +125,19 @@
 
 <script>
 // import HelloWorld from "./helloworld/HelloWorld";
-import NewOrderDialog from './shared/dialogNewOrder'
+// import NewOrderDialog from './shared/dialogNewOrder'
 
 export default {
   name: "App",
-  components: {
-    NewOrderDialog
-  },
+  // components: {
+  //   NewOrderDialog
+  // },
   props: {
     source: String
   },
   methods: {
     doAction: function(command) {
-      console.log("HEY " + command)
+      // console.log("HEY " + command)
       window.location.href='#/'+command.toLowerCase().replace(/ /g,'')
     }
   },

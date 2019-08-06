@@ -9,55 +9,66 @@ import AppWithdraw from '@/app/withdraw/AppWithdraw.vue'
 import AppOrderbooks from '@/app/orderbooks/AppOrderbooks.vue'
 import AppHistory from '@/app/history/AppHistory.vue'
 import AppSettings from '@/app/settings/AppSettings.vue'
+import AppBinance from '@/app/cexprices/AppBinance.vue'
+import AppPaprika from '@/app/aggregators/AppPaprika.vue'
 
 Vue.use(Router)
 
 export default new Router({
-    routes: [
-      {
-        path: '/',
-        name: 'AppHome',
-        component: AppHome
-      },
-      {
-        path: '/console',
-        name: 'Console',
-        component: AppConsole
-      },
-      {
-        path: '/coins',
-        name: 'Coins',
-        component: AppCoins
-      },
-      {
-        path: '/withdraw',
-        name: 'Withdraw',
-        component: AppWithdraw
-      },
-      {
-        path: '/orderbooks',
-        name: 'Orderbooks',
-        component: AppOrderbooks
-      },
-      {
-        path: '/history',
-        name: 'History',
-        component: AppHistory
-      },
-      {
-        path: '/settings',
-        name: 'Settings',
-        component: AppSettings
-      },
-      {
-        path: '/api',
-        name: 'API',
-        component: AppHome
-      },
-      {
-        path: '/help',
-        name: 'Help',
-        component: AppHome
-      }
-    ]
-  })
+  routes: [{
+      path: '/',
+      name: 'AppHome',
+      component: AppHome
+    },
+    {
+      path: '/console',
+      name: 'Console',
+      component: AppConsole
+    },
+    {
+      path: '/coins',
+      name: 'Coins',
+      component: AppCoins
+    },
+    {
+      path: '/withdraw',
+      name: 'Withdraw',
+      component: AppWithdraw
+    },
+    {
+      path: '/orderbooks',
+      name: 'Orderbooks',
+      component: AppOrderbooks
+    },
+    {
+      path: '/history',
+      name: 'History',
+      component: AppHistory
+    },
+    {
+      path: '/settings',
+      name: 'Settings',
+      component: AppSettings
+    },
+    {
+      path: '/cexprices',
+      name: 'Binance',
+      component: AppBinance
+    },
+    {
+      path: '/aggregatorprices',
+      name: 'Paprika',
+      component: AppPaprika
+    },
+    {
+      path: '/api',
+      name: 'API',
+      component: AppHome
+    },
+    {
+      path: '/help',
+      name: 'Help',
+      component: AppHome
+    }
+  ]
+})
