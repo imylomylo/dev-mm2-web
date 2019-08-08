@@ -41,7 +41,7 @@ export default new Router({
       component: AppOrderbooks
     },
     {
-      path: '/history',
+      path: '/completedswaps',
       name: 'History',
       component: AppHistory
     },

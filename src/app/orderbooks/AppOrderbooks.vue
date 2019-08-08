@@ -17,7 +17,7 @@
                 class="ma-2"
                 color="red"
                 outlined
-                @click="newAsk(marketData.base, marketData.rel)"
+                @click.stop="newAsk(marketData.base, marketData.rel)"
               >
                 <v-icon left>mdi-server-plus</v-icon>
                 SELL {{ marketData.base}}
@@ -59,10 +59,11 @@
                 <v-chip
                   color="green"
                   dark
-                  @click="takerAsk(marketData.base, marketData.rel, item.price)"
+                  @click.stop.prevent="takerAsk(marketData.base, marketData.rel, item.price)"
                 >
                   {{ item.taker }}
-                  <v-icon left>swap_horiz</v-icon>Taker
+                  <v-icon left>swap_horiz</v-icon>
+                  Taker (buy {{marketData.base}})
                 </v-chip>
               </template>
             </v-data-table>
@@ -75,7 +76,7 @@
                 class="ma-2"
                 color="success"
                 outlined
-                @click="newBid(marketData.base, marketData.rel)"
+                @click.stop="newBid(marketData.base, marketData.rel)"
               >
                 <v-icon left>mdi-server-plus</v-icon>
                 BUY {{ marketData.base}}
@@ -103,7 +104,8 @@
                   @click="takerBid(marketData.base, marketData.rel, item.price)"
                 >
                   {{ item.taker }}
-                  <v-icon left>swap_horiz</v-icon>Taker
+                  <v-icon left>swap_horiz</v-icon>
+                  Taker (sell {{marketData.base}})
                 </v-chip>
               </template>
             </v-data-table>
@@ -157,46 +159,40 @@
     <div v-else>Enable two coins to view the market data for that pair.</div>
 
     <v-layout justify-center>
-      <v-dialog v-model="dialog" persistent max-width="600px">
+      <v-dialog v-model="makerDialog" persistent max-width="600px">
         <v-card>
           <v-card-title>
-            <span class="headline">User Profile</span>
+            <span class="headline">Maker Order Creation</span>
           </v-card-title>
           <v-card-text>
             <v-container grid-list-md>
               <v-layout wrap>
-                <v-flex xs12 sm6 md4>
-                  <v-text-field label="Legal first name*" required></v-text-field>
+                <v-flex xs12 sm6>
+                  <v-text-field v-bind:value="trade.base" label="Base*" required>{{ trade.base }}</v-text-field>
                 </v-flex>
-                <v-flex xs12 sm6 md4>
+                <v-flex xs12 sm6>
                   <v-text-field
-                    label="Legal middle name"
+                    v-bind:value="trade.rel"
+                    label="Rel*"
                     hint="example of helper text only on focus"
-                  ></v-text-field>
+                  >{{ trade.rel }}</v-text-field>
                 </v-flex>
-                <v-flex xs12 sm6 md4>
+                <v-flex xs12 sm6>
                   <v-text-field
-                    label="Legal last name*"
-                    hint="example of persistent helper text"
+                    v-model="trade.price"
+                    label="Price* 1 base = this price rel"
+                    type="text"
+                    required
+                  >{{ trade.price}}</v-text-field>
+                </v-flex>
+                <v-flex xs12 sm6>
+                  <v-text-field
+                    v-model="trade.amount"
+                    label="Amount*"
+                    hint="Max Available"
                     persistent-hint
                     required
-                  ></v-text-field>
-                </v-flex>
-                <v-flex xs12>
-                  <v-text-field label="Email*" required></v-text-field>
-                </v-flex>
-                <v-flex xs12>
-                  <v-text-field label="Password*" type="password" required></v-text-field>
-                </v-flex>
-                <v-flex xs12 sm6>
-                  <v-select :items="['0-17', '18-29', '30-54', '54+']" label="Age*" required></v-select>
-                </v-flex>
-                <v-flex xs12 sm6>
-                  <v-autocomplete
-                    :items="['Skiing', 'Ice hockey', 'Soccer', 'Basketball', 'Hockey', 'Reading', 'Writing', 'Coding', 'Basejump']"
-                    label="Interests"
-                    multiple
-                  ></v-autocomplete>
+                  >{{ trade.amount }}</v-text-field>
                 </v-flex>
               </v-layout>
             </v-container>
@@ -204,8 +200,65 @@
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="blue darken-1" text @click="dialog = false">Close</v-btn>
-            <v-btn color="blue darken-1" text @click="dialog = false">Save</v-btn>
+            <v-btn color="blue darken-1" text @click="makerDialog = false">No, Go Back</v-btn>
+            <v-btn
+              color="blue darken-1"
+              text
+              @click="doMarketMaker(trade.base, trade.rel, trade.price, trade.amount)"
+            >Yes! Send Order</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </v-layout>
+
+    <v-layout justify-center>
+      <v-dialog v-model="takerDialog" persistent max-width="600px">
+        <v-card>
+          <v-card-title>
+            <span class="headline">Taker Order Creation</span>
+          </v-card-title>
+          <v-card-text>
+            <v-container grid-list-md>
+              <v-layout wrap>
+                <v-flex xs12 sm6>
+                  <v-text-field v-bind:value="trade.base" label="Base*" required>{{ trade.base }}</v-text-field>
+                </v-flex>
+                <v-flex xs12 sm6>
+                  <v-text-field
+                    v-bind:value="trade.rel"
+                    label="Rel*"
+                    hint="example of helper text only on focus"
+                  >{{ trade.rel }}</v-text-field>
+                </v-flex>
+                <v-flex xs12 sm6>
+                  <v-text-field
+                    v-model="trade.price"
+                    label="Price* 1 base = this price rel"
+                    type="text"
+                    required
+                  >{{ trade.price}}</v-text-field>
+                </v-flex>
+                <v-flex xs12 sm6>
+                  <v-text-field
+                    v-model="trade.amount"
+                    label="Amount*"
+                    hint="Max Available"
+                    persistent-hint
+                    required
+                  >{{ trade.amount }}</v-text-field>
+                </v-flex>
+              </v-layout>
+            </v-container>
+            <small>*indicates required field</small>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="blue darken-1" text @click="takerDialog = false">No, Go Back</v-btn>
+            <v-btn
+              color="blue darken-1"
+              text
+              @click="doMarketTaker(trade.base, trade.rel, trade.price, trade.amount)"
+            >Yes! Send Order</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -220,11 +273,12 @@ export default {
   // props: ['rows'],
   data: function() {
     return {
-      dialog: false,
+      takerDialog: false,
+      makerDialog: false,
       activeCoins: "",
       walletBalance: { base: 0, rel: 0 },
       marketData: "",
-      market: null,
+      trade: { base: "", rel: "", price: "", amount: "0" },
       appName: "Orderbooks",
       customerrors: [],
       headers: [
@@ -264,21 +318,86 @@ export default {
           this.customerrors.push(e);
         });
     },
+    doMarketTaker: function(base, rel, price, volume) {
+      console.log("base/rel: " + base + "/" + rel + " " + volume + "@" + price);
+      axios
+        .post(
+          "http://127.0.0.1:7780/doMaker?base=" +
+            base +
+            "&rel=" +
+            rel +
+            "&price=" +
+            price +
+            "&volume=" +
+            volume
+        )
+        .then(response => {
+          this.makerDialog = false;
+          // if response.data.result == "success"
+          // console.log(response.data);
+          buyResponse = response.data;
+          console.log("Buy Response: " + buyResponse);
+        })
+        .catch(e => {
+          this.takerDialog = false;
+
+          this.customerrors.push(e);
+        });
+    },
+    doMarketMaker: function(base, rel, price, volume) {
+      console.log("base/rel: " + base + "/" + rel + " " + volume + "@" + price);
+            axios
+        .post(
+          "http://127.0.0.1:7780/doMaker?base=" +
+            base +
+            "&rel=" +
+            rel +
+            "&price=" +
+            price +
+            "&volume=" +
+            volume
+        )
+        .then(response => {
+          this.makerDialog = false;
+          // if response.data.result == "success"
+          // console.log(response.data);
+          makerResponse = response.data;
+          console.log("Maker Response: " + makerResponse);
+        })
+        .catch(e => {
+          this.makerDialog = false;
+
+          this.customerrors.push(e);
+        });
+    },
     takerBid: function(base, rel, price) {
       console.log("Taker Bid" + base + "/" + rel + " price: " + price);
+      this.trade.base = base;
+      this.trade.rel = rel;
+      this.trade.price = price;
+      this.takerDialog = true;
     },
     takerAsk: function(base, rel, price) {
       console.log("Taker Ask" + base + "/" + rel + " price: " + price);
+      this.trade.base = base;
+      this.trade.rel = rel;
+      this.trade.price = price;
+      this.takerDialog = true;
     },
     soon: function() {
       console.log("Placeholder");
     },
     newAsk: function(base, rel) {
       console.log("new ask " + base + "/" + rel);
-      this.dialog = true;
+      this.trade.base = base;
+      this.trade.rel = rel;
+      this.makerDialog = true;
     },
     newBid: function(base, rel) {
       console.log("new bid " + base + "/" + rel);
+      this.trade.base = base;
+      this.trade.rel = rel;
+      this.makerDialog = true;
     },
     getAvailableMarkets: function(ticker) {
       console.log("Making links for orderbooks of coin: " + ticker);
