@@ -66,11 +66,11 @@
       <v-btn icon>
         <v-icon>notifications</v-icon>
       </v-btn>
-      <v-btn icon large>
+      <!-- <v-btn icon large>
         <v-avatar size="64px" item>
           <v-img src="https://atomicdex.io/assets/images/logo_light.svg" alt="AtomicDEX"></v-img>
         </v-avatar>
-      </v-btn>
+      </v-btn> -->
     </v-app-bar>
     <v-content>
       <router-view></router-view>
@@ -142,7 +142,7 @@ export default {
     }
   },
   data: () => ({
-    appName: "DEX MVP",
+    appName: "Marketmaker Club",
     dialog: false,
     drawer: null,
     items: [

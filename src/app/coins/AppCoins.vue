@@ -14,7 +14,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="row in activeCoins" v-bind:key="row.ticker">
+            <tr v-for="row in activeCoins" v-bind:key="row.id">
               <td>{{ row.ticker }}</td>
               <td>{{ row.address }}</td>
               <td>{{ row.balance }}</td>
@@ -164,7 +164,7 @@ export default {
       .catch(e => {
         this.customerrors.push(e);
       });
-    console.log("AppCoins Finished Created");
+    console.log("AppCoins Finished Created " + JSON.stringify(this.activeCoins))
     this.getServiceConfig();
   },
   computed: {

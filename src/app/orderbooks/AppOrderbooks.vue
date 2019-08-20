@@ -158,6 +158,54 @@
     </div>
     <div v-else>Enable two coins to view the market data for that pair.</div>
 
+    <h2>My Market Maker Orders</h2>
+
+    <div v-if="myOrders.maker">
+      <div>
+        <v-layout>
+          <v-flex md6 lg6>
+            <v-data-table
+              :headers="orderHeaders"
+              :items="myOrders.maker"
+              :items-per-page="5"
+              class="elevation-1"
+            >
+              <template v-slot:item.taker="{ item }">
+                <v-chip color="green" dark @click.stop.prevent="soon()">
+                  Cancel
+                  <v-icon left>swap_horiz</v-icon>Cancel
+                </v-chip>
+              </template>
+            </v-data-table>
+          </v-flex>
+        </v-layout>
+      </div>
+    </div>
+    <div v-else>No current maker orders to display.</div>
+    <div v-if="myOrders.taker">
+      <div>
+        <v-layout>
+          <v-flex md6 lg6>
+            <h2>My Market Taker Orders</h2>
+            <v-data-table
+              :headers="takerOrderHeaders"
+              :items="myOrders.taker"
+              :items-per-page="5"
+              class="elevation-1"
+            >
+              <template v-slot:item.taker="{ item }">
+                <v-chip color="green" dark @click.stop.prevent="soon()">
+                  Cancel
+                  <v-icon left>swap_horiz</v-icon>Cancel
+                </v-chip>
+              </template>
+            </v-data-table>
+          </v-flex>
+        </v-layout>
+      </div>
+    </div>
+    <div v-else>No current taker orders to display.</div>
+
     <v-layout justify-center>
       <v-dialog v-model="makerDialog" persistent max-width="600px">
         <v-card>
@@ -278,6 +326,7 @@ export default {
       activeCoins: "",
       walletBalance: { base: 0, rel: 0 },
       marketData: "",
+      myOrders: {},
       trade: { base: "", rel: "", price: "", amount: "0" },
       appName: "Orderbooks",
       customerrors: [],
@@ -292,6 +341,52 @@ export default {
         { text: "Age", value: "age" },
         { text: "Coin", value: "coin" },
         { text: "Trade As", value: "taker" }
+      ],
+      orderHeaders: [
+        {
+          text: "Base",
+          align: "left",
+          sortable: true,
+          value: "base"
+        },
+        {
+          text: "Rel",
+          align: "left",
+          sortable: true,
+          value: "rel"
+        },
+        {
+          text: "Price",
+          align: "left",
+          sortable: true,
+          value: "price"
+        },
+        { text: "Created At", value: "created_at" },
+        { text: "Avail. Amount", value: "available_amount" },
+        { text: "Can Cancel", value: "cancellable" }
+      ],
+      takerOrderHeaders: [
+        {
+          text: "Base",
+          align: "left",
+          sortable: true,
+          value: "base"
+        },
+        {
+          text: "Rel",
+          align: "left",
+          sortable: true,
+          value: "rel"
+        },
+        {
+          text: "Price",
+          align: "left",
+          sortable: true,
+          value: "price"
+        },
+        { text: "Created At", value: "created_at" },
+        { text: "Base Amount", value: "request.base_amount" },
+        { text: "Can Cancel", value: "cancellable" }
       ]
     };
   },
@@ -322,7 +417,7 @@ export default {
       console.log("base/rel: " + base + "/" + rel + " " + volume + "@" + price);
       axios
         .post(
-          "http://127.0.0.1:7780/doMaker?base=" +
+          "http://127.0.0.1:7780/doTaker?base=" +
             base +
             "&rel=" +
             rel +
@@ -346,7 +441,7 @@ export default {
     },
     doMarketMaker: function(base, rel, price, volume) {
       console.log("base/rel: " + base + "/" + rel + " " + volume + "@" + price);
-            axios
+      axios
         .post(
           "http://127.0.0.1:7780/doMaker?base=" +
             base +
@@ -410,15 +505,16 @@ export default {
       axios
         .post("http://127.0.0.1:7780/getMarket?base=" + base + "&rel=" + rel)
         .then(response => {
-          // if response.data.result == "success"
-          // console.log(response.data);
           this.marketData = response.data;
-          console.log(
-            "Asks: " +
-              this.marketData.numasks +
-              " | Bids: " +
-              this.marketData.numbids
-          );
+
+          // console.log(
+          //   "Asks: " +
+          //     this.marketData.numasks +
+          //     " | Bids: " +
+          //     this.marketData.numbids
+          // );
+
+          // ** TO DO **
           // to even out the columns nicely, pad
           // while( this.marketData.numasks % 5 !== 0){
           //   this.marketData.asks.push({})
@@ -431,10 +527,38 @@ export default {
           this.customerrors.push(e);
         });
       this.myBalance(base, rel);
+    },
+    getMyOrders: function() {
+      axios
+        .get("http://127.0.0.1:7780/getOrders")
+        .then(response => {
+          // if response.data.result == "success"
+          // console.log(response.data);
+          this.myOrders.maker = this.objectArrayByKeys(
+            response.data.result.maker_orders
+          );
+          this.myOrders.taker = this.objectArrayByKeys(
+            response.data.result.taker_orders
+          );
+          console.log(
+            "MY TAKER ORDERS: " + JSON.stringify(this.myOrders.taker)
+          );
+        })
+        .catch(e => {
+          this.customerrors.push(e);
+        });
+    },
+    objectArrayByKeys: function(obj) {
+      let toArray = [];
+      Object.keys(obj).forEach(function(key) {
+        toArray.push(obj[key]);
+      });
+      return toArray;
     }
   },
   created: function() {
     console.log(this.appName + " Created");
+    this.getMyOrders();
     axios
       .get(`http://127.0.0.1:7780/coinsenabled`)
       .then(response => {
