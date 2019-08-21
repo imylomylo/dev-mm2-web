@@ -94,7 +94,7 @@ export default {
     },
     getServiceConfig: function() {
       axios
-        .get(`http://127.0.0.1:7780/config2`)
+        .get('http://' + process.env.VUE_APP_WEBHOST + ':7780/config2')
         .then(response => {
           // console.log(response.data);
           // JSON responses are automatically parsed.
@@ -114,7 +114,7 @@ export default {
     getBalance: function(coin) {
       console.log("getBalance " + coin);
       return axios
-        .get("http://127.0.0.1:7780/getBalance?coin=" + coin)
+        .get("http://" + process.env.VUE_APP_WEBHOST + ":7780/getBalance?coin=" + coin)
         .then(response => {
           // if response.data.result == "success"
           console.log(response.data);
@@ -125,12 +125,12 @@ export default {
         });
     },
     enableCoin: function(coin) {
-      console.log("Enable " + JSON.stringify(this.supportedCoins[coin].papid));
+      console.log("Enable " + JSON.stringify(this.supportedCoins[coin].ticker));
       console.log(JSON.stringify(this.supportedCoins[coin].servers));
       let coinservers = this.supportedCoins[coin].servers;
       axios
         .post(
-          "http://127.0.0.1:7780/connectcoin?coin=" +
+          "http://" + process.env.VUE_APP_WEBHOST + ":7780/connectcoin?coin=" +
             this.supportedCoins[coin].ticker +
             "&servers=" +
             JSON.stringify(coinservers)
@@ -152,12 +152,12 @@ export default {
   created: function() {
     console.log("AppCoins Created");
     axios
-      .get(`http://127.0.0.1:7780/coinsenabled`)
+      .get("http://" + process.env.VUE_APP_WEBHOST + ":7780/coinsenabled")
       .then(response => {
         // console.log(response.data);
         // JSON responses are automatically parsed.
         if (response.data !== undefined) {
-          // console.log(response.data.result)
+          console.log(response.data.result)
           this.activeCoins = response.data.result;
         }
       })
@@ -171,7 +171,8 @@ export default {
     coinCount: function() {
       return this.activeCoins.length;
     }
-  },
+  }
+  ,
   watch: {
     coinCount: function(newVal, oldVal) {
       // watch it
