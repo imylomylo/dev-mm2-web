@@ -80,7 +80,7 @@ export default {
       this.binanceMarketData = base + "/BTC";
       axios
         .get(
-          "http://127.0.0.1:7780/getbinancemarketprice?base=" +
+          "http://" + process.env.VUE_APP_WEBHOST + ":7780/getbinancemarketprice?base=" +
             base +
             "&rel=BTC"
         )
@@ -97,7 +97,7 @@ export default {
       this.bittrexMarketData = base + "/BTC";
       axios
         .get(
-          "http://127.0.0.1:7780/getbittrexmarketprice?base=" +
+          "http://" + process.env.VUE_APP_WEBHOST + ":7780/getbittrexmarketprice?base=" +
             base +
             "&rel=BTC"
         )
@@ -117,7 +117,7 @@ export default {
   created: function() {
     console.log(this.appName + " Created");
     axios
-      .get(`http://127.0.0.1:7780/coinsenabled`)
+      .get("http://" + process.env.VUE_APP_WEBHOST + ":7780/coinsenabled")
       .then(response => {
         // console.log(response.data);
         // JSON responses are automatically parsed.

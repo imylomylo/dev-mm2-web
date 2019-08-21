@@ -80,7 +80,7 @@ export default {
       this.paprikaMarketData = base + "/BTC";
       axios
         .get(
-          "http://127.0.0.1:7780/getpaprkiamarketprice?base=" +
+           "http://" + process.env.VUE_APP_WEBHOST + ":7780/getpaprkiamarketprice?base=" +
             base +
             "&rel=BTC"
         )
@@ -97,7 +97,7 @@ export default {
       this.cmcMarketData = base + "/BTC";
       axios
         .get(
-          "http://127.0.0.1:7780/getcmcmarketprice?base=" +
+           "http://" + process.env.VUE_APP_WEBHOST + ":7780/getcmcmarketprice?base=" +
             base +
             "&rel=BTC"
         )
@@ -114,7 +114,7 @@ export default {
   created: function() {
     console.log(this.appName + " Created");
     axios
-      .get(`http://127.0.0.1:7780/coinsenabled`)
+      .get( "http://" + process.env.VUE_APP_WEBHOST + ":7780/coinsenabled")
       .then(response => {
         // console.log(response.data);
         // JSON responses are automatically parsed.

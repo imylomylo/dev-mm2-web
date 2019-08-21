@@ -129,7 +129,7 @@ export default {
     },
     getServiceConfig: function() {
       axios
-        .get(`http://127.0.0.1:7780/config2`)
+        .get( "http://" + process.env.VUE_APP_WEBHOST + ":7780/config2")
         .then(response => {
           // console.log(response.data);
           // JSON responses are automatically parsed.

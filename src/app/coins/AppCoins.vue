@@ -78,6 +78,7 @@ export default {
   data: function() {
     return {
       activeCoins: [],
+      coinCount: 0,
       supportedCoins: [], // reads from serviceConfig, in prod fill this with data from configService
       inactiveCoins: [],
       configService: "",
@@ -87,7 +88,7 @@ export default {
   },
   methods: {
     isEnabled: function(coin) {
-      console.log("Checking " + coin);
+      console.log("isEnabled(): Checking " + coin);
       if (this.activeCoins.some(e => e.ticker === coin)) {
         return true;
       }
@@ -101,7 +102,7 @@ export default {
           if (response.data !== undefined) {
             // console.log(response.data.result)
             this.configService = response.data;
-            console.log("configService: " + JSON.stringify(this.configService));
+            console.log("getServiceConfig(): configService: " + JSON.stringify(this.configService));
             this.supportedCoins = this.configService;
             // this.supportedCoins = Object.keys(this.configService)
             console.log(this.supportedCoins);
@@ -117,7 +118,7 @@ export default {
         .get("http://" + process.env.VUE_APP_WEBHOST + ":7780/getBalance?coin=" + coin)
         .then(response => {
           // if response.data.result == "success"
-          console.log(response.data);
+          console.log("getBalance() response: " + response.data);
           return response.data.balance;
         })
         .catch(e => {
@@ -137,9 +138,9 @@ export default {
         )
         .then(response => {
           // if response.data.result == "success"
-          console.log(response.data);
+          console.log("enableCoin() response data: " + response.data);
           let newCoin = response.data;
-          newCoin.papid = this.supportedCoins[coin].papid;
+          newCoin.papid = this.supportedCoins[coin].ticker;
           console.log("New PAPID: " + newCoin);
           this.activeCoins.push(newCoin);
           this.$parent.$forceUpdate();
@@ -159,6 +160,7 @@ export default {
         if (response.data !== undefined) {
           console.log(response.data.result)
           this.activeCoins = response.data.result;
+          console.log("this.activeCoins: " + this.activeCoins)
         }
       })
       .catch(e => {
@@ -167,12 +169,12 @@ export default {
     console.log("AppCoins Finished Created " + JSON.stringify(this.activeCoins))
     this.getServiceConfig();
   },
-  computed: {
-    coinCount: function() {
-      return this.activeCoins.length;
-    }
-  }
-  ,
+  // computed: {
+  //   coinCount: function() {
+  //     return this.activeCoins.length;
+  //   }
+  // }
+  // ,
   watch: {
     coinCount: function(newVal, oldVal) {
       // watch it

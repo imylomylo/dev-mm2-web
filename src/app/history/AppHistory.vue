@@ -58,7 +58,7 @@ export default {
   data: function() {
     return {
       appName: "Recent Swaps",
-      history: null,
+      history: {},
       dialog: false,
       customerrors: []
     };
@@ -67,7 +67,7 @@ export default {
   created: function() {
     console.log(this.appName + " Created");
     axios
-      .get(`http://127.0.0.1:7780/recentswaps`)
+      .get( "http://" + process.env.VUE_APP_WEBHOST + ":7780/recentswaps")
       .then(response => {
         // console.log(response.data);
         // JSON responses are automatically parsed.
