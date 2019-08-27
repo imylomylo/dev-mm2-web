@@ -12,6 +12,9 @@ import AppSettings from '@/app/settings/AppSettings.vue'
 import AppBinance from '@/app/cexprices/AppBinance.vue'
 import AppPaprika from '@/app/aggregators/AppPaprika.vue'
 
+import AppTraderView from '@/app/traderview/AppTraderView.vue'
+
+
 Vue.use(Router)
 
 export default new Router({
@@ -69,6 +72,11 @@ export default new Router({
       path: '/help',
       name: 'Help',
       component: AppHome
+    },
+    {
+      path: '/traderview',
+      name: 'TraderView',
+      component: AppTraderView
     }
   ]
 })
