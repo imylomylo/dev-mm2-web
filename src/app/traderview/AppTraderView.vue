@@ -1,7 +1,7 @@
 <template>
   <div>
     <div>
-      <Description />
+      <Description v-on:mmenable="mmenable()"/>
       <v-divider class="mx-4 pb-5"></v-divider>
       <v-layout>
         <v-flex md6 lg6>
@@ -13,7 +13,7 @@
 
           <v-row class="px-4">
             <v-col>
-              <AutomatedMarketMaking />
+              <AutomatedMarketMaking :overlay="true" ref="amm"/>
             </v-col>
           </v-row>
 
@@ -41,6 +41,7 @@ import WalletInfo from "./WalletInfo";
 import AutomatedMarketMaking from "./AutomatedMarketMaking";
 import SingleOrder from "./SingleOrder";
 import MarketData from "./MarketData";
+import { log } from 'util';
 
 export default {
   name: "TraderView",
@@ -61,7 +62,7 @@ export default {
       marketData: "",
       myOrders: {},
       trade: { base: "", rel: "", price: "", amount: "0" },
-      appName: "Orderbooks",
+      appName: "TraderVue",
       customerrors: [],
       headers: [
         {
@@ -124,6 +125,10 @@ export default {
     };
   },
   methods: {
+    mmenable: function(){
+      console.log("mmenable received");
+      this.$refs.amm.enable(true)
+},
     myBalance: function(base, rel) {
       console.log("My balance");
       axios
@@ -312,21 +317,21 @@ export default {
   },
   created: function() {
     console.log(this.appName + " Created");
-    this.getMyOrders();
-    axios
-      .get("http://" + process.env.VUE_APP_WEBHOST + ":7780/coinsenabled")
-      .then(response => {
-        // console.log(response.data);
-        // JSON responses are automatically parsed.
-        if (response.data !== undefined) {
-          // console.log(response.data.result)
-          this.activeCoins = response.data.result;
-          console.log("ACTIVE COINS: " + JSON.stringify(this.activeCoins));
-        }
-      })
-      .catch(e => {
-        this.customerrors.push(e);
-      });
+    // this.getMyOrders();
+    // axios
+    //   .get("http://" + process.env.VUE_APP_WEBHOST + ":7780/coinsenabled")
+    //   .then(response => {
+    //     // console.log(response.data);
+    //     // JSON responses are automatically parsed.
+    //     if (response.data !== undefined) {
+    //       // console.log(response.data.result)
+    //       this.activeCoins = response.data.result;
+    //       console.log("ACTIVE COINS: " + JSON.stringify(this.activeCoins));
+    //     }
+    //   })
+    //   .catch(e => {
+    //     this.customerrors.push(e);
+    //   });
     // this.showMarket("RICK", "MORTY");
     console.log(this.appName + " Finished Created");
   },

@@ -55,7 +55,7 @@ disable-pagination
 import axios from "axios";
 
 export default {
-  name: "Orderbooks",
+  // name: "MarketData",
   props: ["myOrders"],
   data: function() {
     return {
@@ -65,7 +65,7 @@ export default {
       walletBalance: { base: 0, rel: 0 },
       marketData: "",
       trade: { base: "", rel: "", price: "", amount: "0" },
-      appName: "Orderbooks",
+      appName: "MarketData",
       customerrors: [],
       headers: [
         {
@@ -291,25 +291,25 @@ export default {
   created: function() {
     console.log(this.appName + " Created");
     this.getMyOrders();
-    axios
-      .get("http://" + process.env.VUE_APP_WEBHOST + ":7780/coinsenabled")
-      .then(response => {
-        // console.log(response.data);
-        // JSON responses are automatically parsed.
-        if (response.data !== undefined) {
-          // console.log(response.data.result)
-          this.activeCoins = response.data.result;
-          console.log("ACTIVE COINS: " + JSON.stringify(this.activeCoins));
-        }
-      })
-      .catch(e => {
-        this.customerrors.push(e);
-      });
+    // axios
+    //   .get("http://" + process.env.VUE_APP_WEBHOST + ":7780/coinsenabled")
+    //   .then(response => {
+    //     // console.log(response.data);
+    //     // JSON responses are automatically parsed.
+    //     if (response.data !== undefined) {
+    //       // console.log(response.data.result)
+    //       this.activeCoins = response.data.result;
+    //       console.log("ACTIVE COINS: " + JSON.stringify(this.activeCoins));
+    //     }
+    //   })
+    //   .catch(e => {
+    //     this.customerrors.push(e);
+    //   });
     // this.showMarket("RICK", "MORTY");
     console.log(this.appName + " Finished Created");
   },
   computed: {
-    coinCount: function(row) {
+    coinCount: function() {
       return this.activeCoins.length;
     }
   }

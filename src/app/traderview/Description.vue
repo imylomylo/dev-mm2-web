@@ -19,8 +19,8 @@
 
           <v-toolbar-items class="hidden-sm-and-down">
             <v-divider vertical></v-divider>
-            <v-btn rounded depressed dark large color="red">
-              <h3>Disable Asset Pair</h3>
+            <v-btn rounded depressed dark large color="red" @click="enable">
+              <h3>Disable Automation</h3>
             </v-btn>
             <v-divider vertical></v-divider>
           </v-toolbar-items>
@@ -43,12 +43,17 @@ export default {
   },
   data: function() {
     return {
+      overlay: false,
       market: { base: "RICK", rel: "MORTY", price: "1.557" }
     };
   },
   methods: {
     invertbase: function(base) {
       console.log("Invert base " + base )
+    },
+    enable: function(){
+      this.$emit("mmenable")
+      this.overlay = false
     }
   }
 };

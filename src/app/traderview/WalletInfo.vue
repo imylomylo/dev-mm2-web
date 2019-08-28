@@ -17,10 +17,10 @@
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td>{{ base.ticker }}</td>
-          <td>{{ base.balance }}</td>
-          <td>{{ base.delta24h }}</td>
+        <tr v-for="row in activeCoins" v-bind:key="row.id">
+          <td>{{ row.ticker }}</td>
+          <td>{{ row.balance }}</td>
+          <td>{{ row.address }}</td>
           <td>
             <div class="text-left">
               <v-chip class="ma-2" color="success" @click="deposit(121)">
@@ -32,41 +32,103 @@
             </div>
           </td>
         </tr>
-        <tr>
-          <td>{{ rel.ticker }}</td>
-          <td>{{ rel.balance }}</td>
-          <td>{{ rel.delta24h }}</td>
-          <td>
-            <div class="text-left">
-              <v-chip class="ma-2" color="success" @click="deposit(123)">
-                <v-icon left>mdi-server-plus</v-icon>Deposit
-              </v-chip>
-              <v-chip class="ma-2" color="red" dark @click="withdraw(124)">
-                <v-icon left>mdi-server-plus</v-icon>Withdraw
-              </v-chip>
-            </div>
-          </td>
-        </tr>
       </tbody>
     </v-simple-table>
   </v-card>
 </template>
 <script>
+import WalletActions from './lib/wallet.js'
 export default {
   data: function() {
     return {
       base: { ticker: "KMD", balance: "105.2429", delta24h: "+9.59%" },
       rel: { ticker: "BTC", balance: "0.0891", delta24h: "+12.59%" },
+      activeCoins: [],
 
       extra: "Some extra description"
     };
   },
   methods: {
-    deposit: function(rel){
-      console.log("Deposit: " + rel)
+    isEnabled: function(coin) {
+      console.log("isEnabled(): Checking " + coin);
+      if (this.activeCoins.some(e => e.ticker === coin)) {
+        return true;
+      }
     },
-    withdraw: function(rel){
-      console.log("Withdraw: " + rel)
+    deposit: function(rel) {
+      console.log("Deposit: " + rel);
+    },
+    withdraw: function(rel) {
+      console.log("Withdraw: " + rel);
+    },
+    enableCoin: function(coin) {
+      console.log("Enable " + JSON.stringify(this.supportedCoins[coin].ticker));
+      console.log(JSON.stringify(this.supportedCoins[coin].servers));
+      let coinservers = this.supportedCoins[coin].servers;
+      axios
+        .post(
+          "http://" +
+            process.env.VUE_APP_WEBHOST +
+            ":7780/connectcoin?coin=" +
+            this.supportedCoins[coin].ticker +
+            "&servers=" +
+            JSON.stringify(coinservers)
+        )
+        .then(response => {
+          // if response.data.result == "success"
+          console.log("enableCoin() response data: " + response.data);
+          let newCoin = response.data;
+          newCoin.papid = this.supportedCoins[coin].ticker;
+          console.log("New PAPID: " + newCoin);
+          this.activeCoins.push(newCoin);
+          this.$parent.$forceUpdate();
+        })
+        .catch(e => {
+          this.customerrors.push(e);
+        });
+    },
+    getServiceConfig: function() {
+      axios
+        .get("http://" + process.env.VUE_APP_WEBHOST + ":7780/config2")
+        .then(response => {
+          // console.log(response.data);
+          // JSON responses are automatically parsed.
+          if (response.data !== undefined) {
+            // console.log(response.data.result)
+            this.configService = response.data;
+            console.log(
+              "getServiceConfig(): configService: " +
+                JSON.stringify(this.configService)
+            );
+            this.supportedCoins = this.configService;
+            // this.supportedCoins = Object.keys(this.configService)
+            console.log(this.supportedCoins);
+          }
+        })
+        .catch(e => {
+          this.customerrors.push(e);
+        });
+    },
+    created: function() {
+      console.log("WalletInfo Created");
+      axios
+        .get("http://" + process.env.VUE_APP_WEBHOST + ":7780/coinsenabled")
+        .then(response => {
+          // console.log(response.data);
+          // JSON responses are automatically parsed.
+          if (response.data !== undefined) {
+            console.log(response.data.result);
+            this.activeCoins = response.data.result;
+            console.log("this.activeCoins: " + this.activeCoins);
+          }
+        })
+        .catch(e => {
+          this.customerrors.push(e);
+        });
+      console.log(
+        "WalletInfo Finished Created " + JSON.stringify(this.activeCoins)
+      );
+      this.getServiceConfig();
     }
   }
 };

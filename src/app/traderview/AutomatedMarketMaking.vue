@@ -1,5 +1,12 @@
 <template>
   <v-card class="mx-auto" max-width="auto" outlined>
+    <v-row justify="center">
+      <!-- <v-btn color="success" class="mt-12" @click="overlay = !overlay">Show Overlay</v-btn> -->
+
+      <v-overlay opacity="0.88" :absolute="absolute" :value="overlay">
+        <v-btn color="success" @click="enable(false)">Enable Automation</v-btn>
+      </v-overlay>
+    </v-row>
     <div>
       <v-toolbar flat dense color="blue-grey lighten-5">
         <v-toolbar-title>
@@ -19,7 +26,7 @@
             <v-fade-transition>
               <v-avatar
                 v-if="isPlaying"
-                :color="color"
+                :color="mmcolor"
                 :style="{
                 animationDuration: animationDuration
               }"
@@ -29,7 +36,7 @@
             </v-fade-transition>
           </v-col>
           <v-col class="text-right">
-            <v-btn :color="color" dark depressed fab @click="toggle">
+            <v-btn :color="mmcolor" dark depressed fab @click="toggle">
               <v-icon large>{{ isPlaying ? 'pause' : 'play_arrow' }}</v-icon>
             </v-btn>
           </v-col>
@@ -38,7 +45,7 @@
         <v-slider
           label="Set Spread"
           v-model="spread"
-          :color="color"
+          :color="mmcolor"
           track-color="grey"
           always-dirty
           min="40"
@@ -48,7 +55,7 @@
           label="Order Size"
           thumb-label="always"
           v-model="ordersize"
-          :color="color"
+          :color="mmcolor"
           track-color="grey"
           always-dirty
           min="5"
@@ -76,17 +83,20 @@ export default {
   components: {
     CurrentStrategies
   },
+  props: ["overlay"],
   data: function() {
     return {
+      absolute: true,
       selection: 1,
       spread: 50,
       ordersize: 10,
       interval: null,
-      isPlaying: false
+      isPlaying: false,
+      mmcolor: "indigo"
     };
   },
   computed: {
-    color() {
+    mmcolor: function() {
       // if (this.spread / 100 + this.ordersize < 30) return "teal";
       if (this.spread / 100 + this.ordersize < 50) return "indigo";
       if (this.spread / 100 + this.ordersize < 80 || this.spread < 170)
@@ -98,11 +108,20 @@ export default {
     }
   },
   methods: {
+    enable: function(change) {
+      this.overlay = change;
+    },
     toggle() {
       this.isPlaying = !this.isPlaying;
     },
     onlybuyrel: function(rel) {
       console.log("Only buy rel: " + rel);
+    }
+  },
+  computed: {
+    isEnabled: function() {
+      // add more logic here for controlling gui disable overlay
+      return this.overlay;
     }
   }
 };
