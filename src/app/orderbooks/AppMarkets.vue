@@ -1,63 +1,86 @@
 <template>
-
-<div>  <div>
-    <v-card class="mx-auto" max-width="auto" outlined>
-      <v-toolbar flat dense color="blue-grey lighten-5">
-        <v-toolbar-title>
-          <span class="subheading">Single Order</span>
-        </v-toolbar-title>
-        <div class="flex-grow-1"></div>
-      </v-toolbar>
-
-      <v-divider class="mx-4"></v-divider>
-
-      <v-form ref="form">
-        <v-text-field v-model="price" label="Price" required></v-text-field>
-        <v-text-field v-model="amount" label="Amount" required></v-text-field>
-        <v-card-text>
-          <v-chip-group class="justify-space-around" active-class="deep-purple accent-4 white--text" column>
-            <v-chip @click="ordersize_pc(5)">5%</v-chip>
-            <v-chip @click="ordersize_pc(10)">10%</v-chip>
-            <v-chip @click="ordersize_pc(125)">25%</v-chip>
-            <v-chip @click="ordersize_pc(50)">50%</v-chip>
-            <v-chip @click="ordersize_pc(100)">100%</v-chip>
-          </v-chip-group>
-        </v-card-text>
-        <v-text-field v-model="total" label="Total" required></v-text-field>
-        <div class="text-center">
-          <v-chip class="ma-2" color="success" @click="onlybuyrel(114)">
-            <v-icon left>mdi-server-plus</v-icon>Only buy rel
-          </v-chip>
-          <v-chip class="ma-2" color="red" dark @click="onlybuyrel(115)">
-            <v-icon left>mdi-server-plus</v-icon>Only sell rel
-          </v-chip>
-        </div>
-      </v-form>
-    </v-card>
-  </div>
- 
-  <v-row align="center">
-    <v-col class="text-center" cols="12" sm="4">
-                  <v-btn-toggle v-model="toggle_exclusive">
-
-      <div class="my-2">
-        <v-btn depressed>Normal</v-btn>
-      </div>
-      <div class="my-2">
-        <v-btn depressed color="primary" outlined>Primary</v-btn>
-      </div>
-      <div class="my-2">
-        <v-btn depressed color="error">Error</v-btn>
-      </div>
-      <div class="my-2">
-        <v-btn depressed disabled>Disabled</v-btn>
-      </div>
-                  </v-btn-toggle>
-    </v-col>
-  </v-row>
-
   <div>
-    <div v-if="activeCoins !== undefined && activeCoins.length > 0">
+    <v-row>
+      {{ newmarket.base }} / {{ newmarket.rel }}
+      <v-btn
+        v-if="newmarket.rel != 0"
+        width="256"
+        depressed
+        color="primary"
+        outlined
+        @click="gotoMarketView(newmarket.base.ticker, newmarket.rel.ticker)"
+      >Go to market</v-btn>
+    </v-row>
+    <v-row align="center">
+      <v-col class="text-center" cols="12" sm="4">
+        <div v-for="coin in mmccoins" v-bind:key="coin.id">
+          <div class="my-2">
+            <v-btn width="128" depressed color="primary" outlined @click="base(coin)">{{coin}}</v-btn>
+          </div>
+        </div>
+      </v-col>
+      <v-col v-if="newmarket.base != 0" class="text-center" cols="12" sm="4">
+        <div v-for="coin in mmccoins" v-bind:key="coin.id">
+          <div class="my-2">
+            <v-btn width="128" depressed color="primary" outlined @click="rel(coin)">{{coin}}</v-btn>
+          </div>
+        </div>
+      </v-col>
+    </v-row>
+
+    <div>
+      <div v-if="activeCoins !== undefined && activeCoins.length > 0">
+        <div>
+          <h2>
+            Enabled Coin Markets
+            <v-chip
+              v-if="marketData"
+              class="ma-2"
+              color="blue"
+              outlined
+              @click="showDEXMarket(marketData.rel, marketData.base)"
+            >
+              <v-icon left>shuffle</v-icon>Inverse
+            </v-chip>
+          </h2>
+          <v-simple-table>
+            <thead>
+              <tr>
+                <th class="text-left">Base</th>
+                <th class="text-left">Rel</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="row in activeCoins" v-bind:key="row.id">
+                <td>
+                  <v-btn depressed color="primary" outlined>{{ row.ticker }}</v-btn>
+                </td>
+                <td>
+                  <!-- {{getMarkets(row)}} -->
+                  <v-chip
+                    class="ma-2"
+                    v-for="market in getAvailableMarkets(row.ticker)"
+                    v-bind:key="row.id"
+                    @click="gotoMarketView(row.ticker, market.ticker)"
+                  >{{ market.ticker }}</v-chip>
+                  <v-btn
+                    depressed
+                    color="primary"
+                    outlined
+                    v-for="market in getAvailableMarkets(row.ticker)"
+                    v-bind:key="row.id"
+                    @click="gotoMarketView(row.ticker, market.ticker)"
+                  >{{ market.ticker }}</v-btn>
+                </td>
+              </tr>
+            </tbody>
+          </v-simple-table>
+        </div>
+      </div>
+      <div v-else>Enable two coins to view the market data for that pair.</div>
+    </div>
+
+    <div v-if="activeCoins !== undefined && activeCoins.length > 0 && newmarket.base !== undefined">
       <div>
         <h2>
           Enabled Coin Markets
@@ -81,7 +104,7 @@
           <tbody>
             <tr v-for="row in activeCoins" v-bind:key="row.id">
               <td>
-                <a href="#">{{ row.ticker }}</a>
+                <v-btn depressed color="primary" outlined>{{ row.ticker }}</v-btn>
               </td>
               <td>
                 <!-- {{getMarkets(row)}} -->
@@ -91,6 +114,14 @@
                   v-bind:key="row.id"
                   @click="gotoMarketView(row.ticker, market.ticker)"
                 >{{ market.ticker }}</v-chip>
+                <v-btn
+                  depressed
+                  color="primary"
+                  outlined
+                  v-for="market in getAvailableMarkets(row.ticker)"
+                  v-bind:key="row.id"
+                  @click="gotoMarketView(row.ticker, market.ticker)"
+                >{{ market.ticker }}</v-btn>
               </td>
             </tr>
           </tbody>
@@ -99,8 +130,6 @@
     </div>
     <div v-else>Enable two coins to view the market data for that pair.</div>
   </div>
-   </div>
-
 </template>
 <script>
 import axios from "axios";
@@ -110,6 +139,18 @@ export default {
   // props: ['rows'],
   data: function() {
     return {
+      componentKey: 0,
+      newmarket: { 
+        base: { 
+          ticker: '',
+          balance: 0
+        },
+        rel: {
+          ticker: '',
+          balance: 0
+        }
+      },
+      mmccoins: ["KMD", "BTC", "DGB", "DOGE", "LTC", "BAT", "RICK", "MORTY"],
       takerDialog: false,
       makerDialog: false,
       activeCoins: [],
@@ -180,6 +221,14 @@ export default {
     };
   },
   methods: {
+    base: function(base) {
+      this.newmarket.base.ticker = base;
+      console.log("base: " + this.newmarket.base);
+    },
+    rel: function(rel) {
+      this.newmarket.rel.ticker = rel;
+      console.log("rel -" + rel);
+    },
     myBalance: function(base, rel) {
       console.log("My balance");
       axios
@@ -304,16 +353,30 @@ export default {
       });
     },
     gotoMarketView: function(base, rel) {
-      console.log("Show market:" + base + "/" + rel);
-      this.$emit('closeDialog')
-      window.location.href= "/#/traderview?base="+base+"&rel="+rel
-          // "http://" +
-          //   process.env.VUE_APP_WEBHOST +
-          //   // "localhost:8000/#/traderview?base="+
-          //   ":8000/#/traderview?base=" +
-          //   base +
-          //   "&rel=" +
-          //   rel
+      this.newmarket.base.ticker = base
+      this.newmarket.rel.ticker = rel
+      console.log("market se.eect going to trader view: " + this.newmarket.base.ticker + "/" + this.newmarket.rel.ticker);
+      this.$emit("closeDialog");
+      // window.location.href = "/#/traderview?base=" + base + "&rel=" + rel;
+      // this.$router.push("/traderview?base=" + base + "&rel=" + rel);
+      // this.$router.push({
+      //   name: "TraderView",
+      //   query: {
+      //     base: base,
+      //     rel: rel
+      //   }
+      // });
+      window.location.href='#/traderview?base='+base+'&rel='+rel
+      this.$router.go(this.$router.currentRoute)
+
+      // this.forceRerender();
+      // "http://" +
+      //   process.env.VUE_APP_WEBHOST +
+      //   // "localhost:8000/#/traderview?base="+
+      //   ":8000/#/traderview?base=" +
+      //   base +
+      //   "&rel=" +
+      //   rel
     },
     showDEXMarket: function(base, rel) {
       console.log("Show market:" + base + "/" + rel);
@@ -360,6 +423,9 @@ export default {
         toArray.push(obj[key]);
       });
       return toArray;
+    },
+    forceRerender: function() {
+      this.componentKey += 1;
     }
   },
   created: function() {
@@ -385,6 +451,11 @@ export default {
   computed: {
     coinCount: function(row) {
       return this.activeCoins.length;
+    }
+  },
+  watch: {
+    "this.$route"(to, from) {
+      // react to route changes...
     }
   }
 };

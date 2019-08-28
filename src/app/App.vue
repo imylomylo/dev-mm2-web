@@ -3,7 +3,6 @@
     <v-navigation-drawer v-model="drawer" :clipped="$vuetify.breakpoint.lgAndUp" app>
       <v-list dense>
         <template v-for="item in items">
-          
           <v-layout v-if="item.heading" :key="item.heading" align-center>
             <v-flex xs6>
               <v-subheader v-if="item.heading">{{ item.heading }}</v-subheader>
@@ -65,7 +64,6 @@
       </v-btn>
     </v-app-bar>
 
-
     <v-dialog v-model="dialog" fullscreen hide-overlay transition="dialog-bottom-transition">
       <v-card>
         <v-toolbar dark color="indigo">
@@ -84,15 +82,17 @@
             <v-list-item-content>
               <v-list-item-title>Content filtering</v-list-item-title>
               <v-list-item-subtitle>Set the content filtering level to restrict apps that can be downloaded</v-list-item-subtitle>
-                  <AppMarkets v-on:closeDialog="dialog = !dialog" />
+
+
+              <AppMarkets v-on:closeDialog="gotoMarket" :key="componentKey" />
+
 
             </v-list-item-content>
           </v-list-item>
-        <v-divider></v-divider>
+          <v-divider></v-divider>
         </v-list>
       </v-card>
     </v-dialog>
-
 
     <v-content>
       <router-view></router-view>
@@ -105,17 +105,29 @@ import AppMarkets from "./orderbooks/AppMarkets";
 
 export default {
   name: "App",
-  components: {AppMarkets},
+  components: { AppMarkets },
   props: {
     source: String
   },
   methods: {
+    gotoMarket: function() {
+      // console.log("Going to new market..." + base + "/")// + rel)
+      console.log(this.componentKey)
+      this.componentKey += 1
+      this.dialog = !this.dialog
+      // this.$router.push("#")
+      // this.$router.push("/traderview?base=" + base + "&rel=KMD")// + rel);
+
+// window.location.href = "#/" + command.toLowerCase().replace(/ /g, "");
+    },
     doAction: function(command) {
       window.location.href = "#/" + command.toLowerCase().replace(/ /g, "");
     }
   },
   data: () => ({
     appName: "Marketmaker Club",
+    base: '',
+    componentKey: 0,
     dialog: false,
     drawer: null,
     items: [

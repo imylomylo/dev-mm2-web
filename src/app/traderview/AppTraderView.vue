@@ -1,19 +1,66 @@
 <template>
   <div>
     <div>
-      <Description v-on:mmenable="mmenable()"/>
+      <!-- <Description v-on:mmenable="mmenable()" v-bind="wallets" /> -->
+
+      <div class="top-spaced">
+        <div>
+          <v-row no-gutters>
+            <v-toolbar color="white" flat>
+              <v-toolbar-title>Trading</v-toolbar-title>
+
+              <v-divider class="mx-4" vertical></v-divider>
+              <h2>{{ wallets.base.ticker + " / " + wallets.rel.ticker}}</h2>
+              <v-chip
+                class="ma-2"
+                color="success"
+                outlined
+                @click="invertbase(wallets.base.ticker, wallets.rel.ticker)"
+              >
+                <v-icon left>mdi-server-plus</v-icon>BASE PAIR
+              </v-chip>
+              <v-btn depressed small color="success">Enabled</v-btn>
+
+              <div class="flex-grow-1">
+                <v-divider class="mx-4" vertical></v-divider>
+                <v-btn depressed small>Global Average Price: 777</v-btn>
+              </div>
+
+              <v-toolbar-items class="hidden-sm-and-down">
+                <v-divider vertical></v-divider>
+                <v-btn rounded depressed dark large color="red" @click="mmenable">
+                  <h3>Disable Automation</h3>
+                </v-btn>
+                <v-divider vertical></v-divider>
+              </v-toolbar-items>
+
+              <v-app-bar-nav-icon></v-app-bar-nav-icon>
+            </v-toolbar>
+          </v-row>
+        </div>
+        <v-card-text color="blue">
+          <div>
+            CURRENT STRATEGY: {{ currentStrategyInfo}}
+            <!-- <v-btn text color="deep-purple accent-4">Learn More</v-btn> -->
+          </div>
+          <!-- <v-card-title> {{ currentStrategyInfo }} </v-card-title>
+          <p class="display-1 text--primary">{{currentStrategyInfo}}</p>-->
+        </v-card-text>
+        <!-- <CurrentStrategies /> -->
+      </div>
+
       <v-divider class="mx-4 pb-5"></v-divider>
       <v-layout>
         <v-flex md6 lg6>
           <v-row class="px-4">
             <v-col>
-              <WalletInfo />
+              <WalletInfo v-bind="wallets" />
             </v-col>
           </v-row>
 
           <v-row class="px-4">
             <v-col>
-              <AutomatedMarketMaking :overlay="true" ref="amm"/>
+              <AutomatedMarketMaking :overlay="true" ref="amm" />
             </v-col>
           </v-row>
 
@@ -41,7 +88,7 @@ import WalletInfo from "./WalletInfo";
 import AutomatedMarketMaking from "./AutomatedMarketMaking";
 import SingleOrder from "./SingleOrder";
 import MarketData from "./MarketData";
-import { log } from 'util';
+import { log } from "util";
 
 export default {
   name: "TraderView",
@@ -55,14 +102,23 @@ export default {
   // props: ['rows'],
   data: function() {
     return {
-      takerDialog: false,
-      makerDialog: false,
+      wallets: { 
+        base: { 
+          ticker: '',
+          balance: 0
+        },
+        rel: {
+          ticker: '',
+          balance: 0
+        }
+      },
+      currentStrategyInfo: "ONLY BUY KMD, 1.8% SPREAD WITH 10% ORDER SIZE",
       activeCoins: [],
       walletBalance: { base: 0, rel: 0 },
       marketData: "",
       myOrders: {},
       trade: { base: "", rel: "", price: "", amount: "0" },
-      appName: "TraderVue",
+      appName: "VueCryptoTrader",
       customerrors: [],
       headers: [
         {
@@ -125,12 +181,30 @@ export default {
     };
   },
   methods: {
-    mmenable: function(){
+    // base: function() {
+    //   console.log("base");
+    //   return "BTC";
+    // },
+    // rel: function(rel) {
+    //   console.log("rel -" + rel);
+    //   return "KMD";
+    // },
+    invertbase: function(base, rel) {
+      console.log("Invert base " + base);
+      window.location.href='#/traderview?base='+rel+'&rel='+base
+      this.$router.go(this.$router.currentRoute)
+    },
+    mmenable: function() {
       console.log("mmenable received");
-      this.$refs.amm.enable(true)
-},
+      this.$refs.amm.enable(true);
+    },
     myBalance: function(base, rel) {
-      console.log("My balance");
+      console.log(
+        "My balance: " +
+          this.wallets.base.ticker +
+          " & " +
+          this.wallets.rel.ticker
+      );
       axios
         .get(
           "http://" +
@@ -140,7 +214,7 @@ export default {
         )
         .then(response => {
           console.log(response.data);
-          this.walletBalance.base = response.data.balance;
+          this.wallets.base.balance = response.data.balance;
         })
         .catch(e => {
           this.customerrors.push(e);
@@ -155,11 +229,13 @@ export default {
         )
         .then(response => {
           console.log(response.data);
-          this.walletBalance.rel = response.data.balance;
+          this.wallets.rel.balance = response.data.balance;
         })
         .catch(e => {
           this.customerrors.push(e);
         });
+      console.log(this.wallets.base.balance);
+      console.log(this.wallets.rel.balance);
     },
     doMarketTaker: function(base, rel, price, volume) {
       console.log("base/rel: " + base + "/" + rel + " " + volume + "@" + price);
@@ -252,6 +328,39 @@ export default {
         return obj.ticker !== ticker;
       });
     },
+    getDEXMarket: function(base, rel) {
+      axios
+        .post(
+          "http://" +
+            process.env.VUE_APP_WEBHOST +
+            ":7780/getMarket?base=" +
+            base +
+            "&rel=" +
+            rel
+        )
+        .then(response => {
+          this.marketData = response.data;
+
+          // console.log(
+          //   "Asks: " +
+          //     this.marketData.numasks +
+          //     " | Bids: " +
+          //     this.marketData.numbids
+          // );
+
+          // ** TO DO **
+          // to even out the columns nicely, pad
+          // while( this.marketData.numasks % 5 !== 0){
+          //   this.marketData.asks.push({})
+          // }
+          // while( this.marketData.numbids % 5 !== 0){
+          //   this.marketData.bids.push({})
+          // }
+        })
+        .catch(e => {
+          this.customerrors.push(e);
+        });
+    },
     showDEXMarket: function(base, rel) {
       console.log("Show market:" + base + "/" + rel);
       axios
@@ -317,6 +426,12 @@ export default {
   },
   created: function() {
     console.log(this.appName + " Created");
+    console.log(this.$route.query.base);
+    console.log(this.$route.query.rel);
+    this.wallets.base.ticker = this.$route.query.base;
+    this.wallets.rel.ticker = this.$route.query.rel;
+    this.myBalance(this.wallets.base.ticker, this.wallets.rel.ticker);
+    this.getDEXMarket(this.wallets.base.ticker, this.wallets.rel.ticker);
     // this.getMyOrders();
     // axios
     //   .get("http://" + process.env.VUE_APP_WEBHOST + ":7780/coinsenabled")
@@ -335,6 +450,11 @@ export default {
     // this.showMarket("RICK", "MORTY");
     console.log(this.appName + " Finished Created");
   },
+  beforeRouteUpdate (to, from, next) {
+  // just use `this`
+  console.log("before route update " + this.wallets.base);
+  // this.base = to.params.base
+},
   computed: {
     coinCount: function(row) {
       return this.activeCoins.length;
@@ -342,3 +462,8 @@ export default {
   }
 };
 </script>
+<style scoped>
+.top-spaced {
+  margin-top: 50px;
+}
+</style>

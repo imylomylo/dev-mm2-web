@@ -2,7 +2,7 @@
   <v-card max-width="auto" class="mx-auto">
     <v-toolbar flat dense color="blue-grey lighten-5">
       <v-toolbar-title>
-        <span class="subheading">Wallets</span>
+        <span class="subheading">Wallets {{base.ticker}} / {{rel.ticker}}</span>
       </v-toolbar-title>
     </v-toolbar>
     <v-divider class="mx-4"></v-divider>
@@ -17,9 +17,9 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="row in activeCoins" v-bind:key="row.id">
+        <tr v-for="row in [base,rel]" v-bind:key="row.id">
           <td>{{ row.ticker }}</td>
-          <td>{{ row.balance }}</td>
+          <td>{{ row.balance }} {{ basebalance }}</td>
           <td>{{ row.address }}</td>
           <td>
             <div class="text-left">
@@ -37,14 +37,16 @@
   </v-card>
 </template>
 <script>
-import WalletActions from './lib/wallet.js'
+import WalletActions from "./lib/wallet.js";
 export default {
+  props: ["base", "rel"],
   data: function() {
     return {
-      base: { ticker: "KMD", balance: "105.2429", delta24h: "+9.59%" },
-      rel: { ticker: "BTC", balance: "0.0891", delta24h: "+12.59%" },
+      // base: { ticker: "KMD", balance: "105.2429", delta24h: "+9.59%" },
+      // rel: { ticker: "BTC", balance: "0.0891", delta24h: "+12.59%" },
       activeCoins: [],
-
+      basebalance: '',
+      relbalance: '',
       extra: "Some extra description"
     };
   },
@@ -60,6 +62,40 @@ export default {
     },
     withdraw: function(rel) {
       console.log("Withdraw: " + rel);
+    },
+    myBalance: function(base, rel) {
+      console.log("My balance");
+      axios
+        .get(
+          "http://" +
+            process.env.VUE_APP_WEBHOST +
+            ":7780/getBalance?coin=" +
+            base
+        )
+        .then(response => {
+          console.log(response.data);
+          this.basebalance = response.data.balance;
+        })
+        .catch(e => {
+          this.customerrors.push(e);
+        });
+
+      axios
+        .get(
+          "http://" +
+            process.env.VUE_APP_WEBHOST +
+            ":7780/getBalance?coin=" +
+            rel
+        )
+        .then(response => {
+          console.log(response.data);
+          this.relbalance = response.data.balance;
+        })
+        .catch(e => {
+          this.customerrors.push(e);
+        });
+      console.log(this.wallets.base.balance);
+      console.log(this.wallets.rel.balance);
     },
     enableCoin: function(coin) {
       console.log("Enable " + JSON.stringify(this.supportedCoins[coin].ticker));
