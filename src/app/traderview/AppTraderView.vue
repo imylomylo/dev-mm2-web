@@ -29,9 +29,9 @@
               <v-toolbar-items class="hidden-sm-and-down">
                 <v-divider vertical></v-divider>
                 <template v-if="!ammdisabled">
-                <v-btn rounded depressed dark large color="red" @click="mmenable">
-                  <h3>Disable Automation</h3>
-                </v-btn>
+                  <v-btn rounded depressed dark large color="red" @click="mmenable">
+                    <h3>Disable Automation</h3>
+                  </v-btn>
                 </template>
                 <template v-else>
                   <v-btn rounded depressed dark large color="green" @click="mmenable">
@@ -85,45 +85,36 @@
           </v-row>
         </v-flex>
 
-
-
-        <v-flex md6 lg6>
+        <!-- <v-flex md6 lg6>
           <v-row class="px-4">
             <v-col>
+              <h2>My Market Maker Orders</h2>
 
-
-
-    <h2>My Market Maker Orders</h2>
-
-    <div v-if="myOrders.maker">
-      <div>
-        <v-layout>
-          <v-flex md6 lg6>
-            <v-data-table
-              :headers="orderHeaders"
-              :items="myOrders.maker"
-              :items-per-page="5"
-              class="elevation-1"
-            >
-              <template v-slot:item.taker="{ item }">
-                <v-chip color="green" dark @click.stop.prevent="soon()">
-                  Cancel
-                  <v-icon left>swap_horiz</v-icon>Cancel
-                </v-chip>
-              </template>
-            </v-data-table>
-          </v-flex>
-        </v-layout>
-      </div>
-    </div>
-    <div v-else>No current maker orders to display.</div>
-
-
+              <div v-if="myOrders.maker">
+                <div>
+                  <v-layout>
+                    <v-flex md6 lg6>
+                      <v-data-table
+                        :headers="orderHeaders"
+                        :items="myOrders.maker"
+                        :items-per-page="5"
+                        class="elevation-1"
+                      >
+                        <template v-slot:item.taker="{ item }">
+                          <v-chip color="green" dark @click.stop.prevent="soon()">
+                            Cancel
+                            <v-icon left>swap_horiz</v-icon>Cancel
+                          </v-chip>
+                        </template>
+                      </v-data-table>
+                    </v-flex>
+                  </v-layout>
+                </div>
+              </div>
+              <div v-else>No current maker orders to display.</div>
             </v-col>
           </v-row>
-        </v-flex>
-
-
+        </v-flex> -->
       </v-layout>
     </div>
   </div>
@@ -238,8 +229,8 @@ export default {
     //   console.log("rel -" + rel);
     //   return "KMD";
     // },
-    sendorder: function(something1, something2){
-      console.log("traderview sendorder: " + something1 + ", " + something2 )
+    sendorder: function(something1, something2) {
+      console.log("traderview sendorder: " + something1 + ", " + something2);
     },
     invertbase: function(base, rel) {
       console.log("Invert base " + base);
@@ -247,9 +238,12 @@ export default {
       this.$router.go(this.$router.currentRoute);
     },
     mmenable: function() {
-      console.log("mmenable received: toggle from current state this.ammdisabled = " + this.ammdisabled);
+      console.log(
+        "mmenable received: toggle from current state this.ammdisabled = " +
+          this.ammdisabled
+      );
       this.$refs.amm.enable(!this.ammdisabled);
-      this.ammdisabled = !this.ammdisabled
+      this.ammdisabled = !this.ammdisabled;
     },
     myBalance: function(base, rel) {
       console.log(
@@ -381,79 +375,9 @@ export default {
         return obj.ticker !== ticker;
       });
     },
-    getDEXMarket: function(base, rel) {
-      console.log("Getting dex market");
-
-      axios
-        .post(
-          "http://" +
-            process.env.VUE_APP_WEBHOST +
-            ":7780/getMarket?base=" +
-            base +
-            "&rel=" +
-            rel
-        )
-        .then(response => {
-          this.marketData = response.data;
-
-          // console.log(
-          //   "Asks: " +
-          //     this.marketData.numasks +
-          //     " | Bids: " +
-          //     this.marketData.numbids
-          // );
-
-          // ** TO DO **
-          // to even out the columns nicely, pad
-          // while( this.marketData.numasks % 5 !== 0){
-          //   this.marketData.asks.push({})
-          // }
-          // while( this.marketData.numbids % 5 !== 0){
-          //   this.marketData.bids.push({})
-          // }
-        })
-        .catch(e => {
-          this.customerrors.push(e);
-        });
-    },
-    showDEXMarket: function(base, rel) {
-      console.log("Show market:" + base + "/" + rel);
-      axios
-        .post(
-          "http://" +
-            process.env.VUE_APP_WEBHOST +
-            ":7780/getMarket?base=" +
-            base +
-            "&rel=" +
-            rel
-        )
-        .then(response => {
-          this.marketData = response.data;
-
-          // console.log(
-          //   "Asks: " +
-          //     this.marketData.numasks +
-          //     " | Bids: " +
-          //     this.marketData.numbids
-          // );
-
-          // ** TO DO **
-          // to even out the columns nicely, pad
-          // while( this.marketData.numasks % 5 !== 0){
-          //   this.marketData.asks.push({})
-          // }
-          // while( this.marketData.numbids % 5 !== 0){
-          //   this.marketData.bids.push({})
-          // }
-        })
-        .catch(e => {
-          this.customerrors.push(e);
-        });
-      this.myBalance(base, rel);
-    },
     getMyOrders: function() {
       console.log("Getting orders");
-      
+
       axios
         .get("http://" + process.env.VUE_APP_WEBHOST + ":7780/getOrders")
         .then(response => {
@@ -466,7 +390,10 @@ export default {
             response.data.result.taker_orders
           );
           console.log(
-            "MY TAKER ORDERS: " + JSON.stringify(this.myOrders.taker,null,2) + "\nMY MAKER ORDERS: " + JSON.stringify(this.myOrders.maker,null,2)
+            "MY TAKER ORDERS: " +
+              JSON.stringify(this.myOrders.taker, null, 2) +
+              "\nMY MAKER ORDERS: " +
+              JSON.stringify(this.myOrders.maker, null, 2)
           );
         })
         .catch(e => {
@@ -481,7 +408,11 @@ export default {
       return toArray;
     },
     setAllWallets: function() {
-      this.allwallets = [{ticker: 'BTC', balance: 5 }, {ticker: 'KMD', balance: 11}, {ticker: 'DOGE', balance: 123 }]
+      this.allwallets = [
+        { ticker: "BTC", balance: 5 },
+        { ticker: "KMD", balance: 11 },
+        { ticker: "DOGE", balance: 123 }
+      ];
     }
   },
   created: function() {
@@ -490,10 +421,10 @@ export default {
     console.log(this.$route.query.rel);
     this.wallets.base.ticker = this.$route.query.base;
     this.wallets.rel.ticker = this.$route.query.rel;
-    this.myBalance(this.wallets.base.ticker, this.wallets.rel.ticker);
-    this.getDEXMarket(this.wallets.base.ticker, this.wallets.rel.ticker);
-    this.getMyOrders();
-    this.setAllWallets();
+    // this.myBalance(this.wallets.base.ticker, this.wallets.rel.ticker);
+    // this.getDEXMarket(this.wallets.base.ticker, this.wallets.rel.ticker);
+    // this.getMyOrders();
+    // this.setAllWallets();
     // axios
     //   .get("http://" + process.env.VUE_APP_WEBHOST + ":7780/coinsenabled")
     //   .then(response => {

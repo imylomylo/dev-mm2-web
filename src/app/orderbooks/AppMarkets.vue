@@ -1,7 +1,6 @@
 <template>
   <div>
     <v-row>
-      {{ newmarket.base }} / {{ newmarket.rel }}
       <v-btn
         v-if="newmarket.rel != 0"
         width="256"
@@ -9,20 +8,22 @@
         color="primary"
         outlined
         @click="gotoMarketView(newmarket.base.ticker, newmarket.rel.ticker)"
-      >Go to market</v-btn>
+      >Go to market {{ newmarket.base.ticker }} / {{ newmarket.rel.ticker }}</v-btn>
     </v-row>
     <v-row align="center">
       <v-col class="text-center" cols="12" sm="4">
-        <div v-for="coin in mmccoins" v-bind:key="coin.id">
+        <!-- <div v-for="coin in mmccoins" v-bind:key="coin.id"> -->
+        <div v-for="coin in activeCoins" v-bind:key="coin.id">
+
           <div class="my-2">
-            <v-btn width="128" depressed color="primary" outlined @click="base(coin)">{{coin}}</v-btn>
+            <v-btn width="128" depressed color="primary" outlined @click="base(coin)">{{coin.ticker}}</v-btn>
           </div>
         </div>
       </v-col>
       <v-col v-if="newmarket.base != 0" class="text-center" cols="12" sm="4">
-        <div v-for="coin in mmccoins" v-bind:key="coin.id">
+        <div v-for="coin in activeCoins" v-bind:key="coin.id">
           <div class="my-2">
-            <v-btn width="128" depressed color="primary" outlined @click="rel(coin)">{{coin}}</v-btn>
+            <v-btn width="128" depressed color="primary" outlined @click="rel(coin)">{{coin.ticker}}</v-btn>
           </div>
         </div>
       </v-col>
@@ -56,13 +57,6 @@
                   <v-btn depressed color="primary" outlined>{{ row.ticker }}</v-btn>
                 </td>
                 <td>
-                  <!-- {{getMarkets(row)}} -->
-                  <v-chip
-                    class="ma-2"
-                    v-for="market in getAvailableMarkets(row.ticker)"
-                    v-bind:key="row.id"
-                    @click="gotoMarketView(row.ticker, market.ticker)"
-                  >{{ market.ticker }}</v-chip>
                   <v-btn
                     depressed
                     color="primary"
@@ -79,57 +73,6 @@
       </div>
       <div v-else>Enable two coins to view the market data for that pair.</div>
     </div>
-
-<!-- 
-    <div v-if="activeCoins !== undefined && activeCoins.length > 0 && newmarket.base !== undefined">
-      <div>
-        <h2>
-          Enabled Coin Markets
-          <v-chip
-            v-if="marketData"
-            class="ma-2"
-            color="blue"
-            outlined
-            @click="showDEXMarket(marketData.rel, marketData.base)"
-          >
-            <v-icon left>shuffle</v-icon>Inverse
-          </v-chip>
-        </h2>
-        <v-simple-table>
-          <thead>
-            <tr>
-              <th class="text-left">Base</th>
-              <th class="text-left">Rel</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="row in activeCoins" v-bind:key="row.id">
-              <td>
-                <v-btn depressed color="primary" outlined>{{ row.ticker }}</v-btn>
-              </td>
-              <td>
-                <v-chip
-                  class="ma-2"
-                  v-for="market in getAvailableMarkets(row.ticker)"
-                  v-bind:key="row.id"
-                  @click="gotoMarketView(row.ticker, market.ticker)"
-                >{{ market.ticker }}</v-chip>
-                <v-btn
-                  depressed
-                  color="primary"
-                  outlined
-                  v-for="market in getAvailableMarkets(row.ticker)"
-                  v-bind:key="row.id"
-                  @click="gotoMarketView(row.ticker, market.ticker)"
-                >{{ market.ticker }}</v-btn>
-              </td>
-            </tr>
-          </tbody>
-        </v-simple-table>
-      </div>
-    </div>
-    <div v-else>Enable two coins to view the market data for that pair.</div>
-   -->
   </div>
 </template>
 <script>
@@ -223,11 +166,11 @@ export default {
   },
   methods: {
     base: function(base) {
-      this.newmarket.base.ticker = base;
+      this.newmarket.base.ticker = base.ticker;
       console.log("base: " + this.newmarket.base);
     },
     rel: function(rel) {
-      this.newmarket.rel.ticker = rel;
+      this.newmarket.rel.ticker = rel.ticker;
       console.log("rel -" + rel);
     },
     myBalance: function(base, rel) {
@@ -431,16 +374,16 @@ export default {
   },
   created: function() {
     console.log(this.appName + " Created");
-    this.getMyOrders();
+    // this.getMyOrders();
     axios
-      .get("http://" + process.env.VUE_APP_WEBHOST + ":7780/coinsenabled")
+      .get("http://" + process.env.VUE_APP_WEBHOST + ":" + process.env.VUE_APP_WEBPORT + "/" + process.env.VUE_APP_MMBOTHOST + ":" + process.env.VUE_APP_MMBOTPORT + "/api/v1/legacy/mm2/get_enabled_coins")
       .then(response => {
-        // console.log(response.data);
+        console.log("MYLO" + JSON.stringify(response.data.result));
         // JSON responses are automatically parsed.
-        if (response.data !== undefined) {
-          // console.log(response.data.result)
+        if (response !== undefined) {
+          console.log(response)
           this.activeCoins = response.data.result;
-          console.log("ACTIVE COINS: " + JSON.stringify(this.activeCoins));
+          console.log("this.activeCoins: " + this.activeCoins)
         }
       })
       .catch(e => {

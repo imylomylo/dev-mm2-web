@@ -31,7 +31,7 @@
       </div>
     </div>
     <div v-else>No current maker orders to display.</div>
-    <h2 class="pl-3">0.00255211 Last Traded Price</h2>
+    <h2 class="pl-3">0.XXXXXXX Last Traded Price</h2>
 
     <div v-if="marketdata.bids">
       <div>
@@ -143,25 +143,29 @@ export default {
     showDEXMarket: function(base, rel) {
       console.log("Show market:" + base + "/" + rel);
       axios
-        .post(
+        .get(
           "http://" +
             process.env.VUE_APP_WEBHOST +
-            ":7780/getMarket?base=" +
+            ":" +
+            process.env.VUE_APP_WEBPORT +
+            "/" +
+            process.env.VUE_APP_MMBOTHOST +
+            ":" +
+            process.env.VUE_APP_MMBOTPORT +
+            "/api/v1/legacy/mm2/getorderbook?base_currency=" +
             base +
-            "&rel=" +
+            "&quote_currency=" +
             rel
         )
         .then(response => {
           this.marketdata = response.data;
-
-          console.log(
-            "Asks: " +
-              this.marketdata.numasks +
-              " | Bids: " +
-              this.marketdata.numbids +
-              JSON.stringify(this.marketdata.asks, null, 2) +
-              JSON.stringify(this.marketdata.bids, null, 2)
-          );
+          console.log(JSON.stringify(this.marketdata))
+          // console.log(
+          //   "Asks: " +
+          //     this.marketData.numasks +
+          //     " | Bids: " +
+          //     this.marketData.numbids
+          // );
 
           // ** TO DO **
           // to even out the columns nicely, pad

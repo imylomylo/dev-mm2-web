@@ -80,8 +80,8 @@
           <v-subheader>Go to markets</v-subheader>
           <v-list-item>
             <v-list-item-content>
-              <v-list-item-title>Content filtering</v-list-item-title>
-              <v-list-item-subtitle>Set the content filtering level to restrict apps that can be downloaded</v-list-item-subtitle>
+              <v-list-item-title>Informational Section</v-list-item-title>
+              <v-list-item-subtitle>Please wait for the available market links to load</v-list-item-subtitle>
 
 
               <AppMarkets v-on:closeDialog="gotoMarket" :key="componentKey" />
