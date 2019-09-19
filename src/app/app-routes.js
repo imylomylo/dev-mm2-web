@@ -3,7 +3,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 // modules
 import AppHome from '@/app/home/AppHome.vue'
-import AppConsole from '@/app/console/AppConsole.vue'
+import AppDashboard from '@/app/dashboard/AppDashboard.vue'
 import AppCoins from '@/app/coins/AppCoins.vue'
 import AppWithdraw from '@/app/withdraw/AppWithdraw.vue'
 import AppOrderbooks from '@/app/orderbooks/AppOrderbooks.vue'
@@ -24,9 +24,9 @@ export default new Router({
       component: AppHome
     },
     {
-      path: '/console',
-      name: 'Console',
-      component: AppConsole
+      path: '/dashboard',
+      name: 'Dashboard',
+      component: AppDashboard
     },
     {
       path: '/coins',

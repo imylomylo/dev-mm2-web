@@ -6,44 +6,46 @@
       </v-toolbar-title>
       <div class="flex-grow-1"></div>
     </v-toolbar>
-    <div v-if="myOrders.maker">
+    <div v-if="marketdata.asks">
       <div>
         <v-layout>
           <v-flex md lg>
+            <v-card-title>Asks</v-card-title>
             <v-data-table
-            disable-pagination
-                hide-default-footer
+              disable-pagination
+              hide-default-footer
               :headers="orderHeaders"
-              :items="myOrders.maker"
+              :items="marketdata.asks"
               :items-per-page="5"
-              class="elevation-1"
             >
+              <template
+                v-slot:header.price="{ header }"
+              >{{ header.text.toUpperCase() }} Price ({{wallets.rel.ticker }})</template>
+
+              <template
+                v-slot:header.maxvolume="{ header }"
+              >{{ header.text.toUpperCase() }} Amount ({{wallets.base.ticker }})</template>
             </v-data-table>
           </v-flex>
         </v-layout>
       </div>
     </div>
     <div v-else>No current maker orders to display.</div>
-    <div v-if="myOrders.taker">
+    <h2 class="pl-3">0.00255211 Last Traded Price</h2>
+
+    <div v-if="marketdata.bids">
       <div>
         <v-layout>
           <v-flex md lg>
-            <h2>LAST TRADED PRICE: 000255211</h2>
+            <v-card-title>Bids</v-card-title>
             <v-data-table
-                            hide-default-header
-disable-pagination
+              disable-pagination
+              hide-default-header
+              hide-default-footer
               :headers="takerOrderHeaders"
-              :items="myOrders.taker"
-              :items-per-page="5"
-              class="elevation-1"
-            >
-              <template v-slot:item.taker="{ item }">
-                <v-chip color="green" dark @click.stop.prevent="soon()">
-                  Cancel
-                  <v-icon left>swap_horiz</v-icon>Cancel
-                </v-chip>
-              </template>
-            </v-data-table>
+              :items="marketdata.bids"
+              :items-per-page="15"
+            ></v-data-table>
           </v-flex>
         </v-layout>
       </div>
@@ -56,14 +58,15 @@ import axios from "axios";
 
 export default {
   // name: "MarketData",
-  props: ["myOrders"],
+  props: ["base", "rel", "wallets"],
   data: function() {
     return {
+      myOrders: "",
       takerDialog: false,
       makerDialog: false,
       activeCoins: [],
       walletBalance: { base: 0, rel: 0 },
-      marketData: "",
+      marketdata: "",
       trade: { base: "", rel: "", price: "", amount: "0" },
       appName: "MarketData",
       customerrors: [],
@@ -86,8 +89,8 @@ export default {
           sortable: true,
           value: "price"
         },
-        { text: "Amount (base)", value: "available_amount" },
-        { text: "Total (rel))", value: "cancellable" }
+        { text: "Amount (base)", align: "left", value: "maxvolume" },
+        { text: "Total (rel))", align: "right", value: "relamount" }
       ],
       takerOrderHeaders: [
         {
@@ -96,8 +99,8 @@ export default {
           sortable: true,
           value: "price"
         },
-        { text: "Base Amount", value: "request.base_amount" },
-        { text: "Can Cancel", value: "cancellable" }
+        { text: "Base Amount", align: "left", value: "relamount" },
+        { text: "Can Cancel", align: "right", value: "maxvolume" }
       ]
     };
   },
@@ -134,96 +137,8 @@ export default {
           this.customerrors.push(e);
         });
     },
-    doMarketTaker: function(base, rel, price, volume) {
-      console.log("base/rel: " + base + "/" + rel + " " + volume + "@" + price);
-      axios
-        .post(
-          "http://" +
-            process.env.VUE_APP_WEBHOST +
-            ":7780/doTaker?base=" +
-            base +
-            "&rel=" +
-            rel +
-            "&price=" +
-            price +
-            "&volume=" +
-            volume
-        )
-        .then(response => {
-          this.makerDialog = false;
-          // if response.data.result == "success"
-          // console.log(response.data);
-          buyResponse = response.data;
-          console.log("Buy Response: " + buyResponse);
-        })
-        .catch(e => {
-          this.takerDialog = false;
-
-          this.customerrors.push(e);
-        });
-    },
-    doMarketMaker: function(base, rel, price, volume) {
-      console.log("base/rel: " + base + "/" + rel + " " + volume + "@" + price);
-      axios
-        .post(
-          "http://" +
-            process.env.VUE_APP_WEBHOST +
-            ":7780/doMaker?base=" +
-            base +
-            "&rel=" +
-            rel +
-            "&price=" +
-            price +
-            "&volume=" +
-            volume
-        )
-        .then(response => {
-          this.makerDialog = false;
-          // if response.data.result == "success"
-          // console.log(response.data);
-          makerResponse = response.data;
-          console.log("Maker Response: " + makerResponse);
-        })
-        .catch(e => {
-          this.makerDialog = false;
-
-          this.customerrors.push(e);
-        });
-    },
-    takerBid: function(base, rel, price) {
-      console.log("Taker Bid" + base + "/" + rel + " price: " + price);
-      this.trade.base = base;
-      this.trade.rel = rel;
-      this.trade.price = price;
-      this.takerDialog = true;
-    },
-    takerAsk: function(base, rel, price) {
-      console.log("Taker Ask" + base + "/" + rel + " price: " + price);
-      this.trade.base = base;
-      this.trade.rel = rel;
-      this.trade.price = price;
-      this.takerDialog = true;
-    },
     soon: function() {
       console.log("Placeholder");
-    },
-    newAsk: function(base, rel) {
-      console.log("new ask " + base + "/" + rel);
-      this.trade.base = base;
-      this.trade.rel = rel;
-      this.makerDialog = true;
-    },
-    newBid: function(base, rel) {
-      console.log("new bid " + base + "/" + rel);
-      this.trade.base = base;
-      this.trade.rel = rel;
-      this.makerDialog = true;
-    },
-    getAvailableMarkets: function(ticker) {
-      console.log("Making links for orderbooks of coin: " + ticker);
-      return this.activeCoins.filter(function(obj) {
-        return obj.ticker !== ticker;
-      });
     },
     showDEXMarket: function(base, rel) {
       console.log("Show market:" + base + "/" + rel);
@@ -237,14 +152,16 @@ export default {
             rel
         )
         .then(response => {
-          this.marketData = response.data;
+          this.marketdata = response.data;
 
-          // console.log(
-          //   "Asks: " +
-          //     this.marketData.numasks +
-          //     " | Bids: " +
-          //     this.marketData.numbids
-          // );
+          console.log(
+            "Asks: " +
+              this.marketdata.numasks +
+              " | Bids: " +
+              this.marketdata.numbids +
+              JSON.stringify(this.marketdata.asks, null, 2) +
+              JSON.stringify(this.marketdata.bids, null, 2)
+          );
 
           // ** TO DO **
           // to even out the columns nicely, pad
@@ -258,7 +175,6 @@ export default {
         .catch(e => {
           this.customerrors.push(e);
         });
-      this.myBalance(base, rel);
     },
     getMyOrders: function() {
       axios
@@ -291,21 +207,7 @@ export default {
   created: function() {
     console.log(this.appName + " Created");
     this.getMyOrders();
-    // axios
-    //   .get("http://" + process.env.VUE_APP_WEBHOST + ":7780/coinsenabled")
-    //   .then(response => {
-    //     // console.log(response.data);
-    //     // JSON responses are automatically parsed.
-    //     if (response.data !== undefined) {
-    //       // console.log(response.data.result)
-    //       this.activeCoins = response.data.result;
-    //       console.log("ACTIVE COINS: " + JSON.stringify(this.activeCoins));
-    //     }
-    //   })
-    //   .catch(e => {
-    //     this.customerrors.push(e);
-    //   });
-    // this.showMarket("RICK", "MORTY");
+    this.showDEXMarket(this.wallets.base.ticker, this.wallets.rel.ticker);
     console.log(this.appName + " Finished Created");
   },
   computed: {

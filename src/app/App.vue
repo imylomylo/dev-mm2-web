@@ -54,7 +54,7 @@
       </v-toolbar-title>
 
       <v-spacer></v-spacer>
-      <v-btn rounded depressed dark large color="indigo">
+      <v-btn rounded depressed dark large color="indigo" href="/#/dashboard">
         <h3>Dashboard</h3>
         <v-icon class="px-2">ballot</v-icon>
       </v-btn>

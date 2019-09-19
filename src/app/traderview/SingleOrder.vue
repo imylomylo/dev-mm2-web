@@ -44,7 +44,7 @@ export default {
       currentStrategyInfo: "na...",
       price: 1.224,
       amount: 777,
-      total: 1234,
+      itotal: 1234,
       trade: { base: "", rel: "", price: "", amount: "0" },
       labels: ["SU", "MO", "TU", "WED", "TH", "FR", "SA"],
       time: 0,
@@ -69,6 +69,12 @@ export default {
     },
     onlybuyrel: function(rel) {
       console.log("Only buy rel: " + rel);
+      this.$emit('sendorder',"somethinghere", "somethingthere")
+    }
+  },
+  computed: {
+    total: function(){
+      return ( this.price * this.amount )
     }
   }
 };

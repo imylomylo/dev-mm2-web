@@ -19,8 +19,8 @@
               >
                 <v-icon left>mdi-server-plus</v-icon>BASE PAIR
               </v-chip>
-              <v-btn depressed small color="success">Enabled</v-btn>
-
+              <v-btn v-if="!ammdisabled" depressed small color="success">Enabled</v-btn>
+              <v-btn v-else depressed small color="error">Disabled</v-btn>
               <div class="flex-grow-1">
                 <v-divider class="mx-4" vertical></v-divider>
                 <v-btn depressed small>Global Average Price: 777</v-btn>
@@ -28,9 +28,16 @@
 
               <v-toolbar-items class="hidden-sm-and-down">
                 <v-divider vertical></v-divider>
+                <template v-if="!ammdisabled">
                 <v-btn rounded depressed dark large color="red" @click="mmenable">
                   <h3>Disable Automation</h3>
                 </v-btn>
+                </template>
+                <template v-else>
+                  <v-btn rounded depressed dark large color="green" @click="mmenable">
+                    <h3>Enable Automation</h3>
+                  </v-btn>
+                </template>
                 <v-divider vertical></v-divider>
               </v-toolbar-items>
 
@@ -54,29 +61,69 @@
         <v-flex md6 lg6>
           <v-row class="px-4">
             <v-col>
-              <WalletInfo v-bind="wallets" />
+              <WalletInfo v-bind:wallets="wallets" />
             </v-col>
           </v-row>
 
           <v-row class="px-4">
             <v-col>
-              <AutomatedMarketMaking :overlay="true" ref="amm" />
+              <AutomatedMarketMaking v-bind:overlay="ammdisabled" ref="amm" />
             </v-col>
           </v-row>
 
           <v-row class="px-4 mb-6">
             <v-col>
-              <SingleOrder />
+              <SingleOrder v-on:sendorder="sendorder" />
             </v-col>
           </v-row>
         </v-flex>
         <v-flex md6 lg6>
           <v-row class="px-4">
             <v-col>
-              <MarketData v-bind:myOrders="myOrders" />
+              <MarketData v-bind:wallets="wallets" />
             </v-col>
           </v-row>
         </v-flex>
+
+
+
+        <v-flex md6 lg6>
+          <v-row class="px-4">
+            <v-col>
+
+
+
+    <h2>My Market Maker Orders</h2>
+
+    <div v-if="myOrders.maker">
+      <div>
+        <v-layout>
+          <v-flex md6 lg6>
+            <v-data-table
+              :headers="orderHeaders"
+              :items="myOrders.maker"
+              :items-per-page="5"
+              class="elevation-1"
+            >
+              <template v-slot:item.taker="{ item }">
+                <v-chip color="green" dark @click.stop.prevent="soon()">
+                  Cancel
+                  <v-icon left>swap_horiz</v-icon>Cancel
+                </v-chip>
+              </template>
+            </v-data-table>
+          </v-flex>
+        </v-layout>
+      </div>
+    </div>
+    <div v-else>No current maker orders to display.</div>
+
+
+            </v-col>
+          </v-row>
+        </v-flex>
+
+
       </v-layout>
     </div>
   </div>
@@ -102,21 +149,23 @@ export default {
   // props: ['rows'],
   data: function() {
     return {
-      wallets: { 
-        base: { 
-          ticker: '',
+      myOrders: "",
+      wallets: {
+        base: {
+          ticker: "base1",
           balance: 0
         },
         rel: {
-          ticker: '',
+          ticker: "rel1",
           balance: 0
         }
       },
+      allwallets: [],
+      ammdisabled: true,
       currentStrategyInfo: "ONLY BUY KMD, 1.8% SPREAD WITH 10% ORDER SIZE",
       activeCoins: [],
       walletBalance: { base: 0, rel: 0 },
       marketData: "",
-      myOrders: {},
       trade: { base: "", rel: "", price: "", amount: "0" },
       appName: "VueCryptoTrader",
       customerrors: [],
@@ -189,14 +238,18 @@ export default {
     //   console.log("rel -" + rel);
     //   return "KMD";
     // },
+    sendorder: function(something1, something2){
+      console.log("traderview sendorder: " + something1 + ", " + something2 )
+    },
     invertbase: function(base, rel) {
       console.log("Invert base " + base);
-      window.location.href='#/traderview?base='+rel+'&rel='+base
-      this.$router.go(this.$router.currentRoute)
+      window.location.href = "#/traderview?base=" + rel + "&rel=" + base;
+      this.$router.go(this.$router.currentRoute);
     },
     mmenable: function() {
-      console.log("mmenable received");
-      this.$refs.amm.enable(true);
+      console.log("mmenable received: toggle from current state this.ammdisabled = " + this.ammdisabled);
+      this.$refs.amm.enable(!this.ammdisabled);
+      this.ammdisabled = !this.ammdisabled
     },
     myBalance: function(base, rel) {
       console.log(
@@ -329,6 +382,8 @@ export default {
       });
     },
     getDEXMarket: function(base, rel) {
+      console.log("Getting dex market");
+
       axios
         .post(
           "http://" +
@@ -397,6 +452,8 @@ export default {
       this.myBalance(base, rel);
     },
     getMyOrders: function() {
+      console.log("Getting orders");
+      
       axios
         .get("http://" + process.env.VUE_APP_WEBHOST + ":7780/getOrders")
         .then(response => {
@@ -409,7 +466,7 @@ export default {
             response.data.result.taker_orders
           );
           console.log(
-            "MY TAKER ORDERS: " + JSON.stringify(this.myOrders.taker)
+            "MY TAKER ORDERS: " + JSON.stringify(this.myOrders.taker,null,2) + "\nMY MAKER ORDERS: " + JSON.stringify(this.myOrders.maker,null,2)
           );
         })
         .catch(e => {
@@ -422,6 +479,9 @@ export default {
         toArray.push(obj[key]);
       });
       return toArray;
+    },
+    setAllWallets: function() {
+      this.allwallets = [{ticker: 'BTC', balance: 5 }, {ticker: 'KMD', balance: 11}, {ticker: 'DOGE', balance: 123 }]
     }
   },
   created: function() {
@@ -432,7 +492,8 @@ export default {
     this.wallets.rel.ticker = this.$route.query.rel;
     this.myBalance(this.wallets.base.ticker, this.wallets.rel.ticker);
     this.getDEXMarket(this.wallets.base.ticker, this.wallets.rel.ticker);
-    // this.getMyOrders();
+    this.getMyOrders();
+    this.setAllWallets();
     // axios
     //   .get("http://" + process.env.VUE_APP_WEBHOST + ":7780/coinsenabled")
     //   .then(response => {
@@ -450,11 +511,11 @@ export default {
     // this.showMarket("RICK", "MORTY");
     console.log(this.appName + " Finished Created");
   },
-  beforeRouteUpdate (to, from, next) {
-  // just use `this`
-  console.log("before route update " + this.wallets.base);
-  // this.base = to.params.base
-},
+  beforeRouteUpdate(to, from, next) {
+    // just use `this`
+    console.log("before route update " + this.wallets.base);
+    // this.base = to.params.base
+  },
   computed: {
     coinCount: function(row) {
       return this.activeCoins.length;

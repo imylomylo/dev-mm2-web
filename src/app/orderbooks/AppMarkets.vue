@@ -80,6 +80,7 @@
       <div v-else>Enable two coins to view the market data for that pair.</div>
     </div>
 
+<!-- 
     <div v-if="activeCoins !== undefined && activeCoins.length > 0 && newmarket.base !== undefined">
       <div>
         <h2>
@@ -107,7 +108,6 @@
                 <v-btn depressed color="primary" outlined>{{ row.ticker }}</v-btn>
               </td>
               <td>
-                <!-- {{getMarkets(row)}} -->
                 <v-chip
                   class="ma-2"
                   v-for="market in getAvailableMarkets(row.ticker)"
@@ -129,6 +129,7 @@
       </div>
     </div>
     <div v-else>Enable two coins to view the market data for that pair.</div>
+   -->
   </div>
 </template>
 <script>

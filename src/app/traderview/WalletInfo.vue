@@ -2,7 +2,7 @@
   <v-card max-width="auto" class="mx-auto">
     <v-toolbar flat dense color="blue-grey lighten-5">
       <v-toolbar-title>
-        <span class="subheading">Wallets {{base.ticker}} / {{rel.ticker}}</span>
+        <span class="subheading">Wallets</span>
       </v-toolbar-title>
     </v-toolbar>
     <v-divider class="mx-4"></v-divider>
@@ -17,9 +17,9 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="row in [base,rel]" v-bind:key="row.id">
+        <tr v-for="row in wallets" v-bind:key="row.ticker">
           <td>{{ row.ticker }}</td>
-          <td>{{ row.balance }} {{ basebalance }}</td>
+          <td>{{ row.balance }}</td>
           <td>{{ row.address }}</td>
           <td>
             <div class="text-left">
@@ -37,17 +37,12 @@
   </v-card>
 </template>
 <script>
+import axios from 'axios'
 import WalletActions from "./lib/wallet.js";
 export default {
-  props: ["base", "rel"],
+  props: ["base", "rel", "wallets"],
   data: function() {
     return {
-      // base: { ticker: "KMD", balance: "105.2429", delta24h: "+9.59%" },
-      // rel: { ticker: "BTC", balance: "0.0891", delta24h: "+12.59%" },
-      activeCoins: [],
-      basebalance: '',
-      relbalance: '',
-      extra: "Some extra description"
     };
   },
   methods: {
@@ -74,7 +69,7 @@ export default {
         )
         .then(response => {
           console.log(response.data);
-          this.basebalance = response.data.balance;
+          this.wallets.base.balance = response.data.balance;
         })
         .catch(e => {
           this.customerrors.push(e);
@@ -89,7 +84,7 @@ export default {
         )
         .then(response => {
           console.log(response.data);
-          this.relbalance = response.data.balance;
+          this.wallets.rel.balance = response.data.balance;
         })
         .catch(e => {
           this.customerrors.push(e);
@@ -144,28 +139,10 @@ export default {
         .catch(e => {
           this.customerrors.push(e);
         });
-    },
-    created: function() {
-      console.log("WalletInfo Created");
-      axios
-        .get("http://" + process.env.VUE_APP_WEBHOST + ":7780/coinsenabled")
-        .then(response => {
-          // console.log(response.data);
-          // JSON responses are automatically parsed.
-          if (response.data !== undefined) {
-            console.log(response.data.result);
-            this.activeCoins = response.data.result;
-            console.log("this.activeCoins: " + this.activeCoins);
-          }
-        })
-        .catch(e => {
-          this.customerrors.push(e);
-        });
-      console.log(
-        "WalletInfo Finished Created " + JSON.stringify(this.activeCoins)
-      );
-      this.getServiceConfig();
     }
+  },
+  created: function() {
+    console.log("WalletInfo Created");
   }
 };
 </script>
