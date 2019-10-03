@@ -73,7 +73,7 @@
 
           <v-row class="px-4 mb-6">
             <v-col>
-              <SingleOrder v-on:sendorder="sendorder" />
+              <SingleOrder v-on:sendsellorder="sendsellorder" v-on:sendbuyorder="sendbuyorder" v-bind:wallets="wallets"/>
             </v-col>
           </v-row>
         </v-flex>
@@ -221,16 +221,11 @@ export default {
     };
   },
   methods: {
-    // base: function() {
-    //   console.log("base");
-    //   return "BTC";
-    // },
-    // rel: function(rel) {
-    //   console.log("rel -" + rel);
-    //   return "KMD";
-    // },
-    sendorder: function(something1, something2) {
-      console.log("traderview sendorder: " + something1 + ", " + something2);
+    sendbuyorder: function(orderrel, orderamount, orderprice, ordertotal) {
+      console.log("traderview sendbuyorder: " + orderrel + ", " + orderamount + " @ " + orderprice + " = " + ordertotal );
+    },
+    sendsellorder: function(orderrel, orderamount, orderprice, ordertotal) {
+      console.log("traderview sendsellorder: " + orderrel + ", " + orderamount + " @ " + orderprice + " = " + ordertotal );
     },
     invertbase: function(base, rel) {
       console.log("Invert base " + base);
@@ -245,160 +240,8 @@ export default {
       this.$refs.amm.enable(!this.ammdisabled);
       this.ammdisabled = !this.ammdisabled;
     },
-    myBalance: function(base, rel) {
-      console.log(
-        "My balance: " +
-          this.wallets.base.ticker +
-          " & " +
-          this.wallets.rel.ticker
-      );
-      axios
-        .get(
-          "http://" +
-            process.env.VUE_APP_WEBHOST +
-            ":7780/getBalance?coin=" +
-            base
-        )
-        .then(response => {
-          console.log(response.data);
-          this.wallets.base.balance = response.data.balance;
-        })
-        .catch(e => {
-          this.customerrors.push(e);
-        });
-
-      axios
-        .get(
-          "http://" +
-            process.env.VUE_APP_WEBHOST +
-            ":7780/getBalance?coin=" +
-            rel
-        )
-        .then(response => {
-          console.log(response.data);
-          this.wallets.rel.balance = response.data.balance;
-        })
-        .catch(e => {
-          this.customerrors.push(e);
-        });
-      console.log(this.wallets.base.balance);
-      console.log(this.wallets.rel.balance);
-    },
-    doMarketTaker: function(base, rel, price, volume) {
-      console.log("base/rel: " + base + "/" + rel + " " + volume + "@" + price);
-      axios
-        .post(
-          "http://" +
-            process.env.VUE_APP_WEBHOST +
-            ":7780/doTaker?base=" +
-            base +
-            "&rel=" +
-            rel +
-            "&price=" +
-            price +
-            "&volume=" +
-            volume
-        )
-        .then(response => {
-          this.makerDialog = false;
-          // if response.data.result == "success"
-          // console.log(response.data);
-          buyResponse = response.data;
-          console.log("Buy Response: " + buyResponse);
-        })
-        .catch(e => {
-          this.takerDialog = false;
-
-          this.customerrors.push(e);
-        });
-    },
-    doMarketMaker: function(base, rel, price, volume) {
-      console.log("base/rel: " + base + "/" + rel + " " + volume + "@" + price);
-      axios
-        .post(
-          "http://" +
-            process.env.VUE_APP_WEBHOST +
-            ":7780/doMaker?base=" +
-            base +
-            "&rel=" +
-            rel +
-            "&price=" +
-            price +
-            "&volume=" +
-            volume
-        )
-        .then(response => {
-          this.makerDialog = false;
-          // if response.data.result == "success"
-          // console.log(response.data);
-          makerResponse = response.data;
-          console.log("Maker Response: " + makerResponse);
-        })
-        .catch(e => {
-          this.makerDialog = false;
-
-          this.customerrors.push(e);
-        });
-    },
-    takerBid: function(base, rel, price) {
-      console.log("Taker Bid" + base + "/" + rel + " price: " + price);
-      this.trade.base = base;
-      this.trade.rel = rel;
-      this.trade.price = price;
-      this.takerDialog = true;
-    },
-    takerAsk: function(base, rel, price) {
-      console.log("Taker Ask" + base + "/" + rel + " price: " + price);
-      this.trade.base = base;
-      this.trade.rel = rel;
-      this.trade.price = price;
-      this.takerDialog = true;
-    },
     soon: function() {
       console.log("Placeholder");
-    },
-    newAsk: function(base, rel) {
-      console.log("new ask " + base + "/" + rel);
-      this.trade.base = base;
-      this.trade.rel = rel;
-      this.makerDialog = true;
-    },
-    newBid: function(base, rel) {
-      console.log("new bid " + base + "/" + rel);
-      this.trade.base = base;
-      this.trade.rel = rel;
-      this.makerDialog = true;
-    },
-    getAvailableMarkets: function(ticker) {
-      console.log("Making links for orderbooks of coin: " + ticker);
-      return this.activeCoins.filter(function(obj) {
-        return obj.ticker !== ticker;
-      });
-    },
-    getMyOrders: function() {
-      console.log("Getting orders");
-
-      axios
-        .get("http://" + process.env.VUE_APP_WEBHOST + ":7780/getOrders")
-        .then(response => {
-          // if response.data.result == "success"
-          // console.log(response.data);
-          this.myOrders.maker = this.objectArrayByKeys(
-            response.data.result.maker_orders
-          );
-          this.myOrders.taker = this.objectArrayByKeys(
-            response.data.result.taker_orders
-          );
-          console.log(
-            "MY TAKER ORDERS: " +
-              JSON.stringify(this.myOrders.taker, null, 2) +
-              "\nMY MAKER ORDERS: " +
-              JSON.stringify(this.myOrders.maker, null, 2)
-          );
-        })
-        .catch(e => {
-          this.customerrors.push(e);
-        });
     },
     objectArrayByKeys: function(obj) {
       let toArray = [];
@@ -421,25 +264,6 @@ export default {
     console.log(this.$route.query.rel);
     this.wallets.base.ticker = this.$route.query.base;
     this.wallets.rel.ticker = this.$route.query.rel;
-    // this.myBalance(this.wallets.base.ticker, this.wallets.rel.ticker);
-    // this.getDEXMarket(this.wallets.base.ticker, this.wallets.rel.ticker);
-    // this.getMyOrders();
-    // this.setAllWallets();
-    // axios
-    //   .get("http://" + process.env.VUE_APP_WEBHOST + ":7780/coinsenabled")
-    //   .then(response => {
-    //     // console.log(response.data);
-    //     // JSON responses are automatically parsed.
-    //     if (response.data !== undefined) {
-    //       // console.log(response.data.result)
-    //       this.activeCoins = response.data.result;
-    //       console.log("ACTIVE COINS: " + JSON.stringify(this.activeCoins));
-    //     }
-    //   })
-    //   .catch(e => {
-    //     this.customerrors.push(e);
-    //   });
-    // this.showMarket("RICK", "MORTY");
     console.log(this.appName + " Finished Created");
   },
   beforeRouteUpdate(to, from, next) {

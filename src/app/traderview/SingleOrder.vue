@@ -14,7 +14,11 @@
         <v-text-field v-model="price" label="Price" required></v-text-field>
         <v-text-field v-model="amount" label="Amount" required></v-text-field>
         <v-card-text>
-          <v-chip-group class="justify-space-around" active-class="deep-purple accent-4 white--text" column>
+          <v-chip-group
+            class="justify-space-around"
+            active-class="deep-purple accent-4 white--text"
+            column
+          >
             <v-chip @click="ordersize_pc(5)">5%</v-chip>
             <v-chip @click="ordersize_pc(10)">10%</v-chip>
             <v-chip @click="ordersize_pc(125)">25%</v-chip>
@@ -24,11 +28,11 @@
         </v-card-text>
         <v-text-field v-model="total" label="Total" required></v-text-field>
         <div class="text-center">
-          <v-chip class="ma-2" color="success" @click="onlybuyrel(114)">
-            <v-icon left>mdi-server-plus</v-icon>Only buy rel
+          <v-chip class="ma-2" color="success" @click="onlybuyrel(wallets.rel.ticker)">
+            <v-icon left>mdi-server-plus</v-icon> Only buy {{ wallets.rel.ticker }}
           </v-chip>
-          <v-chip class="ma-2" color="red" dark @click="onlybuyrel(115)">
-            <v-icon left>mdi-server-plus</v-icon>Only sell rel
+          <v-chip class="ma-2" color="red" dark @click="onlysellrel(wallets.rel.ticker)">
+            <v-icon left>mdi-server-plus</v-icon>Only sell {{ wallets.rel.ticker }}
           </v-chip>
         </div>
       </v-form>
@@ -39,28 +43,13 @@
 export default {
   name: "SingleOrder",
   components: {},
+  props: { wallets: { type: Object } },
   data: function() {
     return {
       currentStrategyInfo: "na...",
       price: 1.224,
       amount: 777,
-      itotal: 1234,
-      trade: { base: "", rel: "", price: "", amount: "0" },
-      labels: ["SU", "MO", "TU", "WED", "TH", "FR", "SA"],
-      time: 0,
-      forecast: [
-        {
-          day: "Tuesday",
-          icon: "mdi-white-balance-sunny",
-          temp: "24\xB0/12\xB0"
-        },
-        {
-          day: "Wednesday",
-          icon: "mdi-white-balance-sunny",
-          temp: "22\xB0/14\xB0"
-        },
-        { day: "Thursday", icon: "mdi-cloud", temp: "25\xB0/15\xB0" }
-      ]
+      trade: { base: "", rel: "", price: "", amount: "0" }
     };
   },
   methods: {
@@ -68,13 +57,21 @@ export default {
       console.log(pc);
     },
     onlybuyrel: function(rel) {
-      console.log("Only buy rel: " + rel);
-      this.$emit('sendorder',"somethinghere", "somethingthere")
+      console.log("SingleOrder buy rel: " + rel + ", amount: " + this.amount + " @ " + this.price + " = " + this.total);
+      this.$emit("sendbuyorder", rel, this.amount, this.price, this.total);
+    },
+    onlysellrel: function(rel) {
+      console.log("SingleOrder sell rel: " + rel + ", amount: " + this.amount + " @ " + this.price + " = " + this.total );
+      this.$emit("sendsellorder", rel, this.amount, this.price, this.total)
     }
   },
+  created: function() {
+    console.log("SingleOrder Created")
+    console.log("wallets: " + JSON.stringify(this.wallets))
+  },
   computed: {
-    total: function(){
-      return ( this.price * this.amount )
+    total: function() {
+      return this.price * this.amount;
     }
   }
 };

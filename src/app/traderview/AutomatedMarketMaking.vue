@@ -110,6 +110,7 @@ export default {
   methods: {
     enable: function(change) {
       this.overlay = change;
+      this.$emit("toggleAMM", change)
     },
     toggle() {
       this.isPlaying = !this.isPlaying;

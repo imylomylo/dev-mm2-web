@@ -20,7 +20,7 @@
         <tr v-for="row in wallets" v-bind:key="row.ticker">
           <td>{{ row.ticker }}</td>
           <td>{{ row.balance }}</td>
-          <td>{{ row.address }}</td>
+          <td>n/a</td>
           <td>
             <div class="text-left">
               <v-chip class="ma-2" color="success" @click="deposit(121)">
@@ -40,23 +40,24 @@
 import axios from 'axios'
 import WalletActions from "./lib/wallet.js";
 export default {
-  props: ["base", "rel", "wallets"],
+  props: ["wallets"],
   data: function() {
     return {
+      customerrors: []
     };
   },
   methods: {
-    isEnabled: function(coin) {
-      console.log("isEnabled(): Checking " + coin);
-      if (this.activeCoins.some(e => e.ticker === coin)) {
+    isEnabled: function(ticker) {
+      console.log("isEnabled(): Checking " + ticker);
+      if (this.activeCoins.some(e => e.ticker === ticker)) {
         return true;
       }
     },
-    deposit: function(rel) {
-      console.log("Deposit: " + rel);
+    deposit: function(ticker) {
+      console.log("Deposit: " + ticker);
     },
-    withdraw: function(rel) {
-      console.log("Withdraw: " + rel);
+    withdraw: function(ticker) {
+      console.log("Withdraw: " + ticker);
     },
     myBalance: function(base, rel) {
       console.log("My balance");
@@ -64,12 +65,19 @@ export default {
         .get(
           "http://" +
             process.env.VUE_APP_WEBHOST +
-            ":7780/getBalance?coin=" +
+            ":" +
+            process.env.VUE_APP_WEBPORT +
+            "/" +
+            process.env.VUE_APP_MMBOTHOST +
+            ":" +
+            process.env.VUE_APP_MMBOTPORT +
+            "/api/v1/legacy/mm2/my_balance?currency=" +
             base
         )
         .then(response => {
           console.log(response.data);
-          this.wallets.base.balance = response.data.balance;
+          this.wallets.base.balance = response.data.balance
+          this.wallets.base.address = response.data.address
         })
         .catch(e => {
           this.customerrors.push(e);
@@ -79,12 +87,19 @@ export default {
         .get(
           "http://" +
             process.env.VUE_APP_WEBHOST +
-            ":7780/getBalance?coin=" +
+            ":" +
+            process.env.VUE_APP_WEBPORT +
+            "/" +
+            process.env.VUE_APP_MMBOTHOST +
+            ":" +
+            process.env.VUE_APP_MMBOTPORT +
+            "/api/v1/legacy/mm2/my_balance?currency=" +
             rel
         )
         .then(response => {
           console.log(response.data);
-          this.wallets.rel.balance = response.data.balance;
+          this.wallets.rel.balance = response.data.balance
+          this.wallets.rel.address = response.data.address
         })
         .catch(e => {
           this.customerrors.push(e);
@@ -142,7 +157,9 @@ export default {
     }
   },
   created: function() {
-    console.log("WalletInfo Created");
+    console.log("WalletInfo Created")
+    this.myBalance(this.wallets.base.ticker, this.wallets.rel.ticker)
+    console.log("WalletInfo Finished")
   }
 };
 </script>
