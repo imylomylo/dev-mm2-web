@@ -9,7 +9,7 @@
             <th class="text-center" span="2">{{ Object.keys(coin)[0] }}</th>
           </tr>
           <tr>
-            <th class="text-left">Pair</th>
+            <th class="text-left">Pair (base/rel)</th>
             <th class="text-left">Price</th>
           </tr>
         </thead>
