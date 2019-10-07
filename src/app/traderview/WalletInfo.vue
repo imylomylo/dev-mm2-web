@@ -132,28 +132,6 @@ export default {
         .catch(e => {
           this.customerrors.push(e);
         });
-    },
-    getServiceConfig: function() {
-      axios
-        .get("http://" + process.env.VUE_APP_WEBHOST + ":7780/config2")
-        .then(response => {
-          // console.log(response.data);
-          // JSON responses are automatically parsed.
-          if (response.data !== undefined) {
-            // console.log(response.data.result)
-            this.configService = response.data;
-            console.log(
-              "getServiceConfig(): configService: " +
-                JSON.stringify(this.configService)
-            );
-            this.supportedCoins = this.configService;
-            // this.supportedCoins = Object.keys(this.configService)
-            console.log(this.supportedCoins);
-          }
-        })
-        .catch(e => {
-          this.customerrors.push(e);
-        });
     }
   },
   created: function() {

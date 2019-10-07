@@ -40,6 +40,8 @@
   </div>
 </template>
 <script>
+import axios from 'axios'
+
 export default {
   name: "SingleOrder",
   components: {},
@@ -58,11 +60,77 @@ export default {
     },
     onlybuyrel: function(rel) {
       console.log("SingleOrder buy rel: " + rel + ", amount: " + this.amount + " @ " + this.price + " = " + this.total);
-      this.$emit("sendbuyorder", rel, this.amount, this.price, this.total);
+
+      let requestData = {}
+      requestData['base'] = this.wallets.base.ticker
+      requestData['rel'] = this.wallets.rel.ticker
+      requestData['method'] = 'setprice'
+      requestData['volume'] = this.amount
+      requestData['price'] = this.price
+      requestData['userpass'] = 'YOUR_PASSWORD_HERE'
+
+      axios
+        .post(
+          "http://" +
+            process.env.VUE_APP_WEBHOST +
+            ":" +
+            process.env.VUE_APP_WEBPORT +
+            "/" +
+            process.env.VUE_APP_MMBOTHOST +
+            ":" +
+            process.env.VUE_APP_MMBOTPORT +
+            "/api/v1/legacy/mm2/setprice",
+            requestData
+        )
+        .then(response => {
+          console.log(JSON.stringify(response.data))
+        })
+        .catch(e => {
+          this.customerrors.push(e);
+        });
+
+
+/*
+buy rel: RICK, amount: 0.5552 @ 0.5551 = 0.30819152000000005
+{"result":{"base":"MORTY","created_at":1570125971927,"matches":{},"max_base_vol":"0.5552","min_base_vol":"0","price":"0.5551","rel":"RICK","started_swaps":[],"uuid":"6a999307-8b63-4117-97c5-2464af18c368"}}
+*/
+
+      // this is wrong.   send the order from this component then send result to other components that need the swap-id/op-id etc.
+      // this.$emit("sendbuyorder", rel, this.amount, this.price, this.total);
     },
     onlysellrel: function(rel) {
       console.log("SingleOrder sell rel: " + rel + ", amount: " + this.amount + " @ " + this.price + " = " + this.total );
-      this.$emit("sendsellorder", rel, this.amount, this.price, this.total)
+
+      let requestData = {}
+      requestData['rel'] = this.wallets.base.ticker
+      requestData['base'] = this.wallets.rel.ticker
+      requestData['method'] = 'setprice'
+      requestData['volume'] = this.amount
+      requestData['price'] = this.price
+      requestData['userpass'] = 'YOUR_PASSWORD_HERE'
+
+      axios
+        .post(
+          "http://" +
+            process.env.VUE_APP_WEBHOST +
+            ":" +
+            process.env.VUE_APP_WEBPORT +
+            "/" +
+            process.env.VUE_APP_MMBOTHOST +
+            ":" +
+            process.env.VUE_APP_MMBOTPORT +
+            "/api/v1/legacy/mm2/setprice",
+            requestData
+        )
+        .then(response => {
+          console.log(JSON.stringify(response.data))
+        })
+        .catch(e => {
+          this.customerrors.push(e);
+        });
+
+      // this is wrong.   send the order from this component then send result to other components that need the swap-id/op-id etc.
+      // this.$emit("sendsellorder", rel, this.amount, this.price, this.total)
     }
   },
   created: function() {

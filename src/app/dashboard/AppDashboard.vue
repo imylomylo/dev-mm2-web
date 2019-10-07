@@ -5,9 +5,11 @@
       <v-flex md6 lg6>
         <v-row class="px-4">
           <v-col>
-            <WalletInfo v-bind:wallets="allwallets" />
+            <DashboardWalletInfo v-bind:wallets="allwallets" ref="dashboardWallets" />
           </v-col>
         </v-row>
+      </v-flex>
+      <v-flex md6 lg6>
         <v-row class="px-4">
           <v-col>
             <AppStrategy />
@@ -23,12 +25,13 @@
   </div>
 </template>
 <script>
-import WalletInfo from "../traderview/WalletInfo";
-import AppStrategy from "../strategy/AppStrategy";
-import AppExport from "../export/AppExport";
+import axios from 'axios'
+import DashboardWalletInfo from "./DashboardWalletInfo"
+import AppStrategy from "../strategy/AppStrategy"
+import AppExport from "../export/AppExport"
 
 export default {
-  components: { WalletInfo, AppStrategy, AppExport },
+  components: { DashboardWalletInfo, AppStrategy, AppExport },
   data: function() {
     return {
       appName: "Dashboard",
@@ -38,11 +41,27 @@ export default {
   },
   methods: {
     setAllWallets: function() {
-      this.allwallets = [
-        { ticker: "BTC", balance: 5 },
-        { ticker: "KMD", balance: 11 },
-        { ticker: "DOGE", balance: 123 }
-      ];
+      console.log("Getting enabled coins")
+      axios
+        .get(
+          "http://" +
+            process.env.VUE_APP_WEBHOST +
+            ":" +
+            process.env.VUE_APP_WEBPORT +
+            "/" +
+            process.env.VUE_APP_MMBOTHOST +
+            ":" +
+            process.env.VUE_APP_MMBOTPORT +
+            "/api/v1/legacy/mm2/get_enabled_coins"
+        )
+        .then(response => {
+          console.log(JSON.stringify(response.data.result))
+          this.allwallets = response.data.result;
+          this.$refs.dashboardWallets.allwallets = this.allwallets
+        })
+        .catch(e => {
+          this.customerrors.push(e);
+        });
     }
   },
   created: function() {

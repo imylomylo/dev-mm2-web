@@ -1,0 +1,110 @@
+<template>
+  <v-card max-width="auto" class="mx-auto">
+    <v-toolbar flat dense color="blue-grey lighten-5">
+      <v-toolbar-title>
+        <span class="subheading">Wallets</span>
+      </v-toolbar-title>
+    </v-toolbar>
+    <v-divider class="mx-4"></v-divider>
+
+    <v-simple-table fixed-header height="auto">
+      <thead>
+        <tr>
+          <th class="text-left">TICKER</th>
+          <th class="text-left">Balance</th>
+          <th class="text-left">24h Delta</th>
+          <th class="text-left">Actions</th>
+        </tr>
+      </thead>
+      <tbody v-if="allwallets">
+        <tr v-for="row in allwallets" v-bind:key="row.ticker">
+          <td>{{ row.ticker }}</td>
+          <td>{{ row.balance }}</td>
+          <td>n/a</td>
+          <td>
+            <div class="text-left">
+              <v-chip class="ma-2" color="success" @click="deposit(121)">
+                <v-icon left>mdi-server-plus</v-icon>Deposit
+              </v-chip>
+              <v-chip class="ma-2" color="red" dark @click="withdraw(122)">
+                <v-icon left>mdi-server-plus</v-icon>Withdraw
+              </v-chip>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+      <tbody v-else>
+        <tr>
+          <td>Waiting for wallet info</td>
+        </tr>
+      </tbody>
+    </v-simple-table>
+  </v-card>
+</template>
+<script>
+import axios from "axios";
+export default {
+  data: function() {
+    return {
+      customerrors: [],
+      allwallets: []
+    };
+  },
+  methods: {
+    isEnabled: function(ticker) {
+      console.log("isEnabled(): Checking " + ticker);
+      if (this.activeCoins.some(e => e.ticker === ticker)) {
+        return true;
+      }
+    },
+    updateBalances: function(){
+      console.log("Update balances")
+      this.allwallets.forEach(function(item,index){
+        this.myBalance(item,index)
+      })
+    },
+    deposit: function(ticker) {
+      console.log("Deposit: " + ticker);
+    },
+    withdraw: function(ticker) {
+      console.log("Withdraw: " + ticker);
+    },
+    myBalance: function(wallet, index) {
+      console.log("Fetch myBalance: " + JSON.stringify(wallet));
+      axios
+        .get(
+          "http://" +
+            process.env.VUE_APP_WEBHOST +
+            ":" +
+            process.env.VUE_APP_WEBPORT +
+            "/" +
+            process.env.VUE_APP_MMBOTHOST +
+            ":" +
+            process.env.VUE_APP_MMBOTPORT +
+            "/api/v1/legacy/mm2/my_balance?currency=" +
+            wallet.ticker
+        )
+        .then(response => {
+          console.log(response.data);
+          this.wallets[index].balance = response.data.balance;
+          this.wallets[index].address = response.data.address;
+        })
+        .catch(e => {
+          this.customerrors.push(e);
+        });
+    }
+  },
+  created: function() {
+    console.log("DashboardWalletInfo Created")
+    console.log("DashboardWalletInfo Finished");
+  },
+  watch: {
+    allwallets: function(newval, oldval){
+      console.log("Old val & new val: " + JSON.stringify(oldval + " *** " + JSON.stringify(newval)))
+      this.updateBalances()
+    }
+  }
+};
+</script>
+<style scoped>
+</style>

@@ -151,7 +151,6 @@ export default {
           balance: 0
         }
       },
-      allwallets: [],
       ammdisabled: true,
       currentStrategyInfo: "ONLY BUY KMD, 1.8% SPREAD WITH 10% ORDER SIZE",
       activeCoins: [],
