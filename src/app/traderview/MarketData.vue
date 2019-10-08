@@ -62,6 +62,8 @@
               :items="marketdata.bids"
               :items-per-page="15"
             >
+              <!-- Rounding from https://www.jacklmoore.com/notes/rounding-in-javascript/ -->
+              <!-- Better to move to computed function for maintainability/non-repetitive -->
               <template v-slot:item.price="{ item }">{{ Number(Math.round(item.price+'e8')+'e-8') }}</template>
               <template v-slot:item.baseamount="{ item }">{{ Number(Math.round(item.maxvolume/item.price+'e8')+'e-8') }}</template>
               <template v-slot:item.maxvolume="{ item }">{{ Number(Math.round(item.maxvolume+'e8')+'e-8') }}</template>
@@ -91,18 +93,6 @@ export default {
       trade: { base: "", rel: "", price: "", amount: "0" },
       appName: "MarketData",
       customerrors: [],
-      // headers: [
-      //   {
-      //     text: "Price (rel)",
-      //     align: "left",
-      //     sortable: true,
-      //     value: "price"
-      //   },
-      //   { text: "Max Volume (base)", value: "maxvolume" },
-      //   { text: "Age", value: "age" },
-      //   { text: "Coin", value: "coin" },
-      //   { text: "Trade As", value: "taker" }
-      // ],
       asksHeaders: [
         {
           text: "Price (rel)",
@@ -174,28 +164,13 @@ export default {
           ":" +
           process.env.VUE_APP_MMBOTPORT +
           "/api/v1/legacy/mm2/getorderbook?base_currency=" +
-          rel + // base +
+          base +
             "&quote_currency=" +
-            base // rel
+          rel
         )
         .then(response => {
           this.marketdata = response.data;
           console.log(JSON.stringify(this.marketdata));
-          // console.log(
-          //   "Asks: " +
-          //     this.marketData.numasks +
-          //     " | Bids: " +
-          //     this.marketData.numbids
-          // );
-
-          // ** TO DO **
-          // to even out the columns nicely, pad
-          // while( this.marketData.numasks % 5 !== 0){
-          //   this.marketData.asks.push({})
-          // }
-          // while( this.marketData.numbids % 5 !== 0){
-          //   this.marketData.bids.push({})
-          // }
         })
         .catch(e => {
           this.customerrors.push(e);
