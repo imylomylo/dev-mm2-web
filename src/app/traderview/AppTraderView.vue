@@ -17,7 +17,7 @@
                 outlined
                 @click="invertbase(wallets.base.ticker, wallets.rel.ticker)"
               >
-                <v-icon left>mdi-server-plus</v-icon>INVERT PAIR
+                <v-icon left>mdi-server-plus</v-icon>INVERT
               </v-chip>
               <v-btn v-if="!ammdisabled" depressed small color="success">Enabled</v-btn>
               <v-btn v-else depressed small color="error">Disabled</v-btn>
