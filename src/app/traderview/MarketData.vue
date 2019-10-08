@@ -12,6 +12,7 @@
           <v-flex md lg>
             <v-card-title>Asks</v-card-title>
             <v-data-table
+              dense
               disable-pagination
               hide-default-footer
               :headers="orderHeaders"
@@ -39,6 +40,7 @@
           <v-flex md lg>
             <v-card-title>Bids</v-card-title>
             <v-data-table
+              dense
               disable-pagination
               hide-default-header
               hide-default-footer

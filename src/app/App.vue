@@ -129,7 +129,7 @@ export default {
     base: '',
     componentKey: 0,
     dialog: false,
-    drawer: null,
+    drawer: false,
     items: [
       { icon: "play_circle_outline", text: "Coins" },
       { icon: "blur_linear", text: "Orderbooks" },

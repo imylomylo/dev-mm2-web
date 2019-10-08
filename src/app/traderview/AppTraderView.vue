@@ -17,7 +17,7 @@
                 outlined
                 @click="invertbase(wallets.base.ticker, wallets.rel.ticker)"
               >
-                <v-icon left>mdi-server-plus</v-icon>BASE PAIR
+                <v-icon left>mdi-server-plus</v-icon>INVERT PAIR
               </v-chip>
               <v-btn v-if="!ammdisabled" depressed small color="success">Enabled</v-btn>
               <v-btn v-else depressed small color="error">Disabled</v-btn>
@@ -65,15 +65,13 @@
             </v-col>
           </v-row>
 
-          <v-row class="px-4">
-            <v-col>
-              <AutomatedMarketMaking v-bind:overlay="ammdisabled" ref="amm" />
-            </v-col>
-          </v-row>
-
           <v-row class="px-4 mb-6">
             <v-col>
-              <SingleOrder v-on:sendsellorder="sendsellorder" v-on:sendbuyorder="sendbuyorder" v-bind:wallets="wallets"/>
+              <SingleOrder
+                v-on:sendsellorder="sendsellorder"
+                v-on:sendbuyorder="sendbuyorder"
+                v-bind:wallets="wallets"
+              />
             </v-col>
           </v-row>
         </v-flex>
@@ -81,6 +79,12 @@
           <v-row class="px-4">
             <v-col>
               <MarketData v-bind:wallets="wallets" />
+            </v-col>
+          </v-row>
+
+          <v-row class="px-4">
+            <v-col>
+              <AutomatedMarketMaking v-bind:overlay="ammdisabled" ref="amm" />
             </v-col>
           </v-row>
         </v-flex>
@@ -114,7 +118,7 @@
               <div v-else>No current maker orders to display.</div>
             </v-col>
           </v-row>
-        </v-flex> -->
+        </v-flex>-->
       </v-layout>
     </div>
   </div>
@@ -221,10 +225,28 @@ export default {
   },
   methods: {
     sendbuyorder: function(orderrel, orderamount, orderprice, ordertotal) {
-      console.log("traderview sendbuyorder: " + orderrel + ", " + orderamount + " @ " + orderprice + " = " + ordertotal );
+      console.log(
+        "traderview sendbuyorder: " +
+          orderrel +
+          ", " +
+          orderamount +
+          " @ " +
+          orderprice +
+          " = " +
+          ordertotal
+      );
     },
     sendsellorder: function(orderrel, orderamount, orderprice, ordertotal) {
-      console.log("traderview sendsellorder: " + orderrel + ", " + orderamount + " @ " + orderprice + " = " + ordertotal );
+      console.log(
+        "traderview sendsellorder: " +
+          orderrel +
+          ", " +
+          orderamount +
+          " @ " +
+          orderprice +
+          " = " +
+          ordertotal
+      );
     },
     invertbase: function(base, rel) {
       console.log("Invert base " + base);
