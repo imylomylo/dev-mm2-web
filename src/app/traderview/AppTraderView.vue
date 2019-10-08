@@ -64,8 +64,12 @@
               <WalletInfo v-bind:wallets="wallets" />
             </v-col>
           </v-row>
-
-          <v-row class="px-4 mb-6">
+          <v-row class="px-4 pb-6">
+            <v-col>
+              <MyOrders />
+            </v-col>
+          </v-row>
+          <v-row class="px-4 pb-6">
             <v-col>
               <SingleOrder
                 v-on:sendsellorder="sendsellorder"
@@ -126,6 +130,7 @@
 <script>
 import axios from "axios";
 import Description from "./Description";
+import MyOrders from "./MyOrders"
 import WalletInfo from "./WalletInfo";
 import AutomatedMarketMaking from "./AutomatedMarketMaking";
 import SingleOrder from "./SingleOrder";
@@ -136,6 +141,7 @@ export default {
   name: "TraderView",
   components: {
     Description,
+    MyOrders,
     WalletInfo,
     AutomatedMarketMaking,
     SingleOrder,

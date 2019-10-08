@@ -26,7 +26,7 @@
               <v-chip class="ma-2" color="success" @click="deposit(row.ticker, row.address)">
                 <v-icon left>mdi-server-plus</v-icon>Deposit
               </v-chip>
-              <v-chip class="ma-2" color="red" dark @click="withdraw(122)">
+              <v-chip class="ma-2" color="red" dark @click="withdraw(row.ticker)">
                 <v-icon left>mdi-server-plus</v-icon>Withdraw
               </v-chip>
             </div>
@@ -38,6 +38,16 @@
       {{ depositTicker }}: {{ depositAddress }}
       <qrcode-vue :value="depositAddress" :size="depositOverlaySize" level="L"></qrcode-vue>
       <v-btn color="success" @click="hideDepositOverlay">Dismiss</v-btn>
+    </v-overlay>
+    <v-overlay opacity="0.88" :absolute="absoluteOverlay" :value="withdrawOverlay">
+      <v-card class="mx-auto" min-width="400">
+        <v-form ref="form">
+          <v-text-field v-model="withdrawAddress" label="Address" required></v-text-field>
+          <v-text-field v-model="withdrawAmount" label="Amount" required></v-text-field>
+        </v-form>
+        <v-btn color="success" @click="hideWithdrawOverlay">Send</v-btn>
+        <v-btn color="error" @click="hideWithdrawOverlay">Cancel</v-btn>
+      </v-card>
     </v-overlay>
   </v-card>
 </template>
@@ -56,6 +66,10 @@ export default {
       depositOverlaySize: 100,
       depositTicker: "",
       depositAddress: "",
+      withdrawOverlay: false,
+      withdrawTicker: "",
+      withdrawAddress: "",
+      withdrawAmount: 0,
       customerrors: []
     };
   },
@@ -71,6 +85,11 @@ export default {
         (this.depositTicker = ""),
         (this.depositAddress = "");
     },
+    hideWithdrawOverlay: function() {
+      (this.withdrawOverlay = false),
+        (this.withdrawAddress = ""),
+        (this.withdrawAmount = 0);
+    },
     deposit: function(ticker, address) {
       console.log("Deposit: " + ticker + " @ " + address);
       this.depositTicker = ticker;
@@ -79,6 +98,9 @@ export default {
     },
     withdraw: function(ticker) {
       console.log("Withdraw: " + ticker);
+      this.withdrawTicker = ticker;
+      this.withdrawAddress = "";
+      this.withdrawOverlay = true;
     },
     myBalance: function(base, rel) {
       console.log("My balance");

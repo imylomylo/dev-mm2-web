@@ -29,6 +29,10 @@
                 v-slot:header.maxvolume="{ header }"
               ><!-- {{ header.text.toUpperCase() }} --> Amount ({{wallets.base.ticker }})</template>
 
+              <template
+                v-slot:header.relamount="{ header }"
+              ><!-- {{ header.text.toUpperCase() }} --> Total ({{wallets.rel.ticker }})</template>
+
               <!-- Rounding from https://www.jacklmoore.com/notes/rounding-in-javascript/ -->
               <!-- Better to move to computed function for maintainability/non-repetitive -->
               <template v-slot:item.price="{ item }">{{ Number(Math.round(item.price+'e8')+'e-8') }}</template>
@@ -40,7 +44,7 @@
       </div>
     </div>
     <div v-else>No current asks to display.</div>
-    <h2 class="pl-3">0.XXXXXXX Last Traded Price</h2>
+    <h2 class="pl-3">CEX Price: {{ cexprice }}</h2>
 
     <div v-if="marketdata.bids">
       <div>
@@ -77,6 +81,7 @@ export default {
   props: ["base", "rel", "wallets"],
   data: function() {
     return {
+      cexprice: "",
       myOrders: "",
       takerDialog: false,
       makerDialog: false,
@@ -216,6 +221,30 @@ export default {
           this.customerrors.push(e);
         });
     },
+    getCEXprice: function(base, rel) {
+      console.log("Getting CEX Price:" + base + "/" + rel);
+      axios
+        .get(
+          "http://" +
+          process.env.VUE_APP_WEBHOST +
+          ":" +
+          process.env.VUE_APP_WEBPORT +
+          "/" +
+          process.env.VUE_APP_MMBOTHOST +
+          ":" +
+          process.env.VUE_APP_MMBOTPORT +
+          "/api/v1/getprice?base_currency=" +
+          base + 
+          "&quote_currency=" +
+          rel
+        )
+        .then(response => {
+          this.cexprice = response.data.price;
+        })
+        .catch(e => {
+          this.customerrors.push(e);
+        });
+    },
     objectArrayByKeys: function(obj) {
       let toArray = [];
       Object.keys(obj).forEach(function(key) {
@@ -226,8 +255,9 @@ export default {
   },
   created: function() {
     console.log(this.appName + " Created");
-    this.getMyOrders();
-    this.showDEXMarket(this.wallets.base.ticker, this.wallets.rel.ticker);
+    this.getMyOrders()
+    this.showDEXMarket(this.wallets.base.ticker, this.wallets.rel.ticker)
+    this.getCEXprice(this.wallets.base.ticker, this.wallets.rel.ticker)
     console.log(this.appName + " Finished Created");
   },
   computed: {

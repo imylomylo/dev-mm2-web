@@ -29,10 +29,10 @@
         <v-text-field v-model="total" label="Total" required></v-text-field>
         <div class="text-center">
           <v-chip class="ma-2" color="success" @click="onlybuyrel(wallets.rel.ticker)">
-            <v-icon left>mdi-server-plus</v-icon> Only buy {{ wallets.rel.ticker }}
+            <v-icon left>mdi-server-plus</v-icon> Buy {{ wallets.rel.ticker }}
           </v-chip>
           <v-chip class="ma-2" color="red" dark @click="onlysellrel(wallets.rel.ticker)">
-            <v-icon left>mdi-server-plus</v-icon>Only sell {{ wallets.rel.ticker }}
+            <v-icon left>mdi-server-plus</v-icon>Sell {{ wallets.rel.ticker }}
           </v-chip>
         </div>
       </v-form>
@@ -49,8 +49,8 @@ export default {
   data: function() {
     return {
       currentStrategyInfo: "na...",
-      price: 1.224,
-      amount: 777,
+      price: "",
+      amount: "",
       trade: { base: "", rel: "", price: "", amount: "0" }
     };
   },
@@ -124,6 +124,8 @@ buy rel: RICK, amount: 0.5552 @ 0.5551 = 0.30819152000000005
         )
         .then(response => {
           console.log(JSON.stringify(response.data))
+          this.price = ""
+          this.amount = ""
         })
         .catch(e => {
           this.customerrors.push(e);
