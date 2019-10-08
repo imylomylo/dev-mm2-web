@@ -153,9 +153,9 @@ export default {
             ":" +
             process.env.VUE_APP_MMBOTPORT +
             "/api/v1/legacy/mm2/getorderbook?base_currency=" +
-            base +
+            rel + // base +
             "&quote_currency=" +
-            rel
+            base // rel
         )
         .then(response => {
           this.marketdata = response.data;

@@ -23,7 +23,7 @@
           <td>n/a</td>
           <td>
             <div class="text-left">
-              <v-chip class="ma-2" color="success" @click="deposit(121)">
+              <v-chip class="ma-2" color="success" @click="deposit(row.ticker, row.address)">
                 <v-icon left>mdi-server-plus</v-icon>Deposit
               </v-chip>
               <v-chip class="ma-2" color="red" dark @click="withdraw(122)">
@@ -39,13 +39,26 @@
         </tr>
       </tbody>
     </v-simple-table>
+    <v-overlay opacity="0.88" :absolute="absoluteOverlay" :value="depositOverlay">
+      {{ depositTicker }}: {{ depositAddress }}
+      <qrcode-vue :value="depositAddress" :size="depositOverlaySize" level="L"></qrcode-vue>
+      <v-btn color="success" @click="hideDepositOverlay">Dismiss</v-btn>
+    </v-overlay>
   </v-card>
 </template>
 <script>
 import axios from "axios";
+import QrcodeVue from "qrcode.vue";
+
 export default {
+  components: { QrcodeVue },
   data: function() {
     return {
+      absoluteOverlay: true,
+      depositOverlay: false,
+      depositOverlaySize: 200,
+      depositTicker: "",
+      depositAddress: "",
       customerrors: [],
       allwallets: []
     };
@@ -57,14 +70,22 @@ export default {
         return true;
       }
     },
-    updateBalances: function(){
-      console.log("Update balances")
-      this.allwallets.forEach(function(item,index){
-        this.myBalance(item,index)
-      })
+    updateBalances: function() {
+      console.log("Update balances");
+      this.allwallets.forEach(function(item, index) {
+        this.myBalance(item, index);
+      });
     },
-    deposit: function(ticker) {
-      console.log("Deposit: " + ticker);
+    hideDepositOverlay: function() {
+      (this.depositOverlay = false),
+        (this.depositTicker = ""),
+        (this.depositAddress = "");
+    },
+    deposit: function(ticker, address) {
+      console.log("Deposit: " + ticker + " @ " + address);
+      this.depositTicker = ticker;
+      this.depositAddress = address;
+      this.depositOverlay = true;
     },
     withdraw: function(ticker) {
       console.log("Withdraw: " + ticker);
@@ -95,13 +116,16 @@ export default {
     }
   },
   created: function() {
-    console.log("DashboardWalletInfo Created")
+    console.log("DashboardWalletInfo Created");
     console.log("DashboardWalletInfo Finished");
   },
   watch: {
-    allwallets: function(newval, oldval){
-      console.log("Old val & new val: " + JSON.stringify(oldval + " *** " + JSON.stringify(newval)))
-      this.updateBalances()
+    allwallets: function(newval, oldval) {
+      console.log(
+        "Old val & new val: " +
+          JSON.stringify(oldval + " *** " + JSON.stringify(newval))
+      );
+      this.updateBalances();
     }
   }
 };
