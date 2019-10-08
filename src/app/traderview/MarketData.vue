@@ -13,25 +13,33 @@
             <v-card-title>Asks</v-card-title>
             <v-data-table
               dense
+              :sort-by="['price']"
+              :sort-desc="[true]"
               disable-pagination
               hide-default-footer
-              :headers="orderHeaders"
+              :headers="asksHeaders"
               :items="marketdata.asks"
               :items-per-page="5"
             >
               <template
                 v-slot:header.price="{ header }"
-              >{{ header.text.toUpperCase() }} Price ({{wallets.rel.ticker }})</template>
+              ><!-- {{ header.text.toUpperCase() }} --> Price ({{wallets.rel.ticker }})</template>
 
               <template
                 v-slot:header.maxvolume="{ header }"
-              >{{ header.text.toUpperCase() }} Amount ({{wallets.base.ticker }})</template>
+              ><!-- {{ header.text.toUpperCase() }} --> Amount ({{wallets.base.ticker }})</template>
+
+              <!-- Rounding from https://www.jacklmoore.com/notes/rounding-in-javascript/ -->
+              <!-- Better to move to computed function for maintainability/non-repetitive -->
+              <template v-slot:item.price="{ item }">{{ Number(Math.round(item.price+'e8')+'e-8') }}</template>
+              <template v-slot:item.maxvolume="{ item }">{{ Number(Math.round(item.maxvolume+'e8')+'e-8') }}</template>
+              <template v-slot:item.relamount="{ item }">{{ Number(Math.round(item.price*item.maxvolume+'e8')+'e-8') }}</template>
             </v-data-table>
           </v-flex>
         </v-layout>
       </div>
     </div>
-    <div v-else>No current maker orders to display.</div>
+    <div v-else>No current asks to display.</div>
     <h2 class="pl-3">0.XXXXXXX Last Traded Price</h2>
 
     <div v-if="marketdata.bids">
@@ -41,18 +49,24 @@
             <v-card-title>Bids</v-card-title>
             <v-data-table
               dense
+              :sort-by="['price']"
+              :sort-desc="[true]"
               disable-pagination
               hide-default-header
               hide-default-footer
-              :headers="takerOrderHeaders"
+              :headers="bidsHeaders"
               :items="marketdata.bids"
               :items-per-page="15"
-            ></v-data-table>
+            >
+              <template v-slot:item.price="{ item }">{{ Number(Math.round(item.price+'e8')+'e-8') }}</template>
+              <template v-slot:item.baseamount="{ item }">{{ Number(Math.round(item.maxvolume/item.price+'e8')+'e-8') }}</template>
+              <template v-slot:item.maxvolume="{ item }">{{ Number(Math.round(item.maxvolume+'e8')+'e-8') }}</template>
+            </v-data-table>
           </v-flex>
         </v-layout>
       </div>
     </div>
-    <div v-else>No current taker orders to display.</div>
+    <div v-else>No current bids to display.</div>
   </v-card>
 </template>
 <script>
@@ -72,19 +86,19 @@ export default {
       trade: { base: "", rel: "", price: "", amount: "0" },
       appName: "MarketData",
       customerrors: [],
-      headers: [
-        {
-          text: "Price (rel)",
-          align: "left",
-          sortable: true,
-          value: "price"
-        },
-        { text: "Max Volume (base)", value: "maxvolume" },
-        { text: "Age", value: "age" },
-        { text: "Coin", value: "coin" },
-        { text: "Trade As", value: "taker" }
-      ],
-      orderHeaders: [
+      // headers: [
+      //   {
+      //     text: "Price (rel)",
+      //     align: "left",
+      //     sortable: true,
+      //     value: "price"
+      //   },
+      //   { text: "Max Volume (base)", value: "maxvolume" },
+      //   { text: "Age", value: "age" },
+      //   { text: "Coin", value: "coin" },
+      //   { text: "Trade As", value: "taker" }
+      // ],
+      asksHeaders: [
         {
           text: "Price (rel)",
           align: "left",
@@ -94,14 +108,14 @@ export default {
         { text: "Amount (base)", align: "left", value: "maxvolume" },
         { text: "Total (rel))", align: "right", value: "relamount" }
       ],
-      takerOrderHeaders: [
+      bidsHeaders: [
         {
           text: "Price (rel)",
           align: "left",
           sortable: true,
           value: "price"
         },
-        { text: "Base Amount", align: "left", value: "relamount" },
+        { text: "Base Amount", align: "left", value: "baseamount" },
         { text: "Can Cancel", align: "right", value: "maxvolume" }
       ]
     };
@@ -147,21 +161,21 @@ export default {
       axios
         .get(
           "http://" +
-            process.env.VUE_APP_WEBHOST +
-            ":" +
-            process.env.VUE_APP_WEBPORT +
-            "/" +
-            process.env.VUE_APP_MMBOTHOST +
-            ":" +
-            process.env.VUE_APP_MMBOTPORT +
-            "/api/v1/legacy/mm2/getorderbook?base_currency=" +
-            rel + // base +
+          process.env.VUE_APP_WEBHOST +
+          ":" +
+          process.env.VUE_APP_WEBPORT +
+          "/" +
+          process.env.VUE_APP_MMBOTHOST +
+          ":" +
+          process.env.VUE_APP_MMBOTPORT +
+          "/api/v1/legacy/mm2/getorderbook?base_currency=" +
+          rel + // base +
             "&quote_currency=" +
             base // rel
         )
         .then(response => {
           this.marketdata = response.data;
-          console.log(JSON.stringify(this.marketdata))
+          console.log(JSON.stringify(this.marketdata));
           // console.log(
           //   "Asks: " +
           //     this.marketData.numasks +
