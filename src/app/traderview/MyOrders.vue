@@ -12,22 +12,20 @@
           <thead>
             <tr>
               <th class="text-left">Pair</th>
-              <th class="text-left">Type</th>
               <th class="text-left">Status</th>
               <th class="text-left">Order Price</th>
-              <th class="text-left">Market Price</th>
+              <th class="text-left">Amount</th>
               <th class="text-left">Shortcut</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="row in myOrders" v-bind:key="row.ticker">
               <td>
-                <a href="#">KMD {{ row.base }} / {{ row.rel }} BTC</a>
+                <a href="#">{{ row.base }} / {{ row.rel }}</a>
               </td>
-              <td>Ask</td>
-              <td>{{ row.status }} Unmatched</td>
-              <td>0.00005555</td>
-              <td>0.00004567</td>
+              <td>No data yet</td>
+              <td>{{ row.price }}</td>
+              <td>{{row.max_base_vol }}</td>
               <td>
                 <div class="text-right">
                   <!-- <v-chip class="ma-2" color="success" @click="gotoMarket(row.base, row.rel)">
@@ -42,7 +40,7 @@
           </tbody>
         </v-simple-table>
       </div>
-      <div v-else>Nothing to show</div>
+      <div v-else>Not implemented fully yet.  Place a single order.</div>
     </v-card>
   </div>
 </template>
@@ -52,7 +50,7 @@ import axios from "axios";
 export default {
   data: function() {
     return {
-      myOrders: [{ example: "1" }],
+      myOrders: [],
       customerrors: []
     };
   },
@@ -62,6 +60,10 @@ export default {
     },
     cancelOrder: function(uuid) {
       console.log("Cancel order: " + uuid);
+    },
+    newOrder: function(orderDetails){
+      console.log(JSON.stringify(orderDetails, null, 4))
+      this.myOrders.push(orderDetails)
     },
     getMyOrders: function() {
       console.log("My Orders");

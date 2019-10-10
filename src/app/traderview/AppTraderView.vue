@@ -66,14 +66,13 @@
           </v-row>
           <v-row class="px-4 pb-6">
             <v-col>
-              <MyOrders />
+              <MyOrders ref="myordersref" />
             </v-col>
           </v-row>
           <v-row class="px-4 pb-6">
             <v-col>
               <SingleOrder
-                v-on:sendsellorder="sendsellorder"
-                v-on:sendbuyorder="sendbuyorder"
+                v-on:orderResponse="orderResponse"
                 v-bind:wallets="wallets"
               />
             </v-col>
@@ -230,29 +229,9 @@ export default {
     };
   },
   methods: {
-    sendbuyorder: function(orderrel, orderamount, orderprice, ordertotal) {
-      console.log(
-        "traderview sendbuyorder: " +
-          orderrel +
-          ", " +
-          orderamount +
-          " @ " +
-          orderprice +
-          " = " +
-          ordertotal
-      );
-    },
-    sendsellorder: function(orderrel, orderamount, orderprice, ordertotal) {
-      console.log(
-        "traderview sendsellorder: " +
-          orderrel +
-          ", " +
-          orderamount +
-          " @ " +
-          orderprice +
-          " = " +
-          ordertotal
-      );
+    orderResponse: function(result) {
+      console.log(JSON.stringify(result, null, 4));
+      this.$refs.myordersref.newOrder(result)
     },
     invertbase: function(base, rel) {
       console.log("Invert base " + base);
