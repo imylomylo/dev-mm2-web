@@ -35,17 +35,17 @@
         </v-card-text>
         <v-text-field v-model="total" label="Total" required></v-text-field>
         <div class="text-center">
-          <v-chip class="ma-2" color="success" @click="onlybuyrel(wallets.rel.ticker)">
+          <v-chip class="ma-2" color="success" @click="buyBase(wallets.base.ticker)">
             <v-icon left>mdi-server-plus</v-icon>
-            Buy {{ wallets.rel.ticker }}
+            Buy {{ wallets.base.ticker }}
           </v-chip>
-          <v-chip class="ma-2" color="red" dark @click="onlysellrel(wallets.rel.ticker)">
+          <v-chip class="ma-2" color="red" dark @click="sellBase(wallets.base.ticker)">
             <v-icon left>mdi-server-plus</v-icon>
-            Sell {{ wallets.rel.ticker }}
+            Sell {{ wallets.base.ticker }}
           </v-chip>
         </div>
       </v-form>
-      <v-overlay :absolute="absoluteOverlay" :value="orderSentOverlay">
+      <v-overlay :opacity="0.88" :absolute="absoluteOverlay" :value="orderSentOverlay">
           <v-progress-circular :size="70" :width="7" color="purple" indeterminate></v-progress-circular>
       </v-overlay>
     </v-card>
@@ -72,10 +72,10 @@ export default {
     ordersize_pc: function(pc) {
       console.log(pc);
     },
-    onlybuyrel: function(rel) {
+    sellBase: function(base) {
       console.log(
-        "SingleOrder buy rel: " +
-          rel +
+        "SingleOrder buy base: " +
+          base +
           ", amount: " +
           this.amount +
           " @ " +
@@ -84,13 +84,13 @@ export default {
           this.total
       );
       this.orderSentOverlay = true 
-      let requestData = {};
-      requestData["base"] = this.wallets.base.ticker;
-      requestData["rel"] = this.wallets.rel.ticker;
-      requestData["method"] = "setprice";
-      requestData["volume"] = this.amount;
-      requestData["price"] = this.price;
-      requestData["userpass"] = "YOUR_PASSWORD_HERE";
+      let requestData = {}
+      requestData["base"] = this.wallets.base.ticker
+      requestData["rel"] = this.wallets.rel.ticker
+      requestData["method"] = "setprice"
+      requestData["volume"] = this.amount
+      requestData["price"] = this.price
+      requestData["userpass"] = "YOUR_PASSWORD_HERE"
 
       axios
         .post(
@@ -106,10 +106,10 @@ export default {
           requestData
         )
         .then(response => {
-          console.log(JSON.stringify(response.data));
+          console.log(JSON.stringify(response.data))
           this.$emit("orderResponse", response.data.result)
-          this.price = "";
-          this.amount = "";
+          this.price = ""
+          this.amount = ""
           this.orderSentOverlay = false
         })
         .catch(e => {
@@ -124,10 +124,10 @@ buy rel: RICK, amount: 0.5552 @ 0.5551 = 0.30819152000000005
       // this is wrong.   send the order from this component then send result to other components that need the swap-id/op-id etc.
       // this.$emit("sendbuyorder", rel, this.amount, this.price, this.total);
     },
-    onlysellrel: function(rel) {
+    buyBase: function(base) {
       console.log(
-        "SingleOrder sell rel: " +
-          rel +
+        "SingleOrder sell base: " +
+          base +
           ", amount: " +
           this.amount +
           " @ " +
@@ -135,14 +135,14 @@ buy rel: RICK, amount: 0.5552 @ 0.5551 = 0.30819152000000005
           " = " +
           this.total
       );
-      this.toggleOrderSentOverlay = true 
+      this.orderSentOverlay = true 
       let requestData = {};
-      requestData["rel"] = this.wallets.base.ticker;
-      requestData["base"] = this.wallets.rel.ticker;
-      requestData["method"] = "setprice";
-      requestData["volume"] = this.amount;
-      requestData["price"] = this.price;
-      requestData["userpass"] = "YOUR_PASSWORD_HERE";
+      requestData["rel"] = this.wallets.base.ticker //flipped for a buy because of underlying mm2 mechanism
+      requestData["base"] = this.wallets.rel.ticker //flipped for a buy because of underlying mm2 mechanism
+      requestData["method"] = "setprice"
+      requestData["volume"] = this.amount
+      requestData["price"] = (1/this.price).toString()  // 1/price for a buy & needs to be a string for the makerbot api
+      requestData["userpass"] = "YOUR_PASSWORD_HERE"
 
       axios
         .post(
@@ -158,11 +158,11 @@ buy rel: RICK, amount: 0.5552 @ 0.5551 = 0.30819152000000005
           requestData
         )
         .then(response => {
-          console.log(JSON.stringify(response.data));
+          console.log(JSON.stringify(response.data))
           this.$emit("orderResponse", response.data.result)
-          this.price = "";
-          this.amount = "";
-          this.toggleOrderSentOverlay = false
+          this.price = ""
+          this.amount = ""
+          this.orderSentOverlay = false
         })
         .catch(e => {
           this.customerrors.push(e);
@@ -174,7 +174,7 @@ buy rel: RICK, amount: 0.5552 @ 0.5551 = 0.30819152000000005
   },
   created: function() {
     console.log("SingleOrder Created");
-    console.log("wallets: " + JSON.stringify(this.wallets));
+    console.log("wallets: " + JSON.stringify(this.wallets))
   },
   computed: {
     total: function() {

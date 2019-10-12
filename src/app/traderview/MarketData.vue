@@ -4,7 +4,18 @@
       <v-toolbar-title>
         <span class="subheading">AtomicDEX order book</span>
       </v-toolbar-title>
-      <div class="flex-grow-1"></div>
+      <div class="flex-grow-1">
+
+
+      </div>
+                    <v-chip
+                class="ma-2"
+                color="purple"
+                outlined
+                @click="showDEXMarket(wallets.base.ticker, wallets.rel.ticker)"
+              >
+                <v-icon left>mdi-server-plus</v-icon>Refresh
+              </v-chip>
     </v-toolbar>
     <div v-if="marketdata.asks">
       <div>
@@ -147,9 +158,6 @@ export default {
         .catch(e => {
           this.customerrors.push(e);
         });
-    },
-    soon: function() {
-      console.log("Placeholder");
     },
     showDEXMarket: function(base, rel) {
       console.log("Show market:" + base + "/" + rel);

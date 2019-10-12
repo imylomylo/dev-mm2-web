@@ -4,6 +4,15 @@
       <v-toolbar-title>
         <span class="subheading">Wallets</span>
       </v-toolbar-title>
+      <div class="flex-grow-1"></div>
+      <v-chip
+        class="ma-2"
+        color="purple"
+        outlined
+        @click="myBalance(wallets.base.ticker, wallets.rel.ticker)"
+      >
+        <v-icon left>mdi-server-plus</v-icon>Refresh
+      </v-chip>
     </v-toolbar>
     <v-divider class="mx-4"></v-divider>
 

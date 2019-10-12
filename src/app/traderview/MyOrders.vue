@@ -5,6 +5,10 @@
         <v-toolbar-title>
           <span class="subheading">My Orders</span>
         </v-toolbar-title>
+        <div class="flex-grow-1"></div>
+        <v-chip class="ma-2" color="error" outlined @click="cancelAllOrders()">
+          <v-icon left>mdi-server-plus</v-icon>Cancel All
+        </v-chip>
       </v-toolbar>
       <v-divider class="mx-4"></v-divider>
       <div v-if="myOrders !== undefined && myOrders.length > 0">
@@ -40,7 +44,7 @@
           </tbody>
         </v-simple-table>
       </div>
-      <div v-else>Not implemented fully yet.  Place a single order.</div>
+      <div v-else>Not implemented fully yet. Place a single order.</div>
     </v-card>
   </div>
 </template>
@@ -58,12 +62,64 @@ export default {
     gotoMarket: function(base, rel) {
       console.log("Go to market");
     },
+    cancelAllOrders: function() {
+      console.log("Cancel All Orders");
+      let requestData = {};
+      requestData["method"] = "cancel_all_orders";
+      requestData["cancel_by"] = { type: "All" };
+      requestData["userpass"] = "YOUR_PASSWORD_HERE";
+
+      axios
+        .post(
+          "http://" +
+            process.env.VUE_APP_WEBHOST +
+            ":" +
+            process.env.VUE_APP_WEBPORT +
+            "/" +
+            process.env.VUE_APP_MMBOTHOST +
+            ":" +
+            process.env.VUE_APP_MMBOTPORT +
+            "/api/v1/legacy/mm2/cancel_all_orders",
+          requestData
+        )
+        .then(response => {
+          console.log(JSON.stringify(response.data, null, 4));
+          this.myOrders = [];
+        })
+        .catch(e => {
+          this.customerrors.push(e);
+        });
+    },
     cancelOrder: function(uuid) {
       console.log("Cancel order: " + uuid);
+      let requestData = {};
+      requestData["method"] = "cancel_order";
+      requestData["uuid"] = uuid;
+      requestData["userpass"] = "YOUR_PASSWORD_HERE";
+
+      axios
+        .post(
+          "http://" +
+            process.env.VUE_APP_WEBHOST +
+            ":" +
+            process.env.VUE_APP_WEBPORT +
+            "/" +
+            process.env.VUE_APP_MMBOTHOST +
+            ":" +
+            process.env.VUE_APP_MMBOTPORT +
+            "/api/v1/legacy/mm2/cancel_order",
+          requestData
+        )
+        .then(response => {
+          console.log("Orders: " + JSON.stringify(response.data, null, 4));
+        })
+        .catch(e => {
+          this.customerrors.push(e);
+        });
     },
-    newOrder: function(orderDetails){
-      console.log(JSON.stringify(orderDetails, null, 4))
-      this.myOrders.push(orderDetails)
+    newOrder: function(orderDetails) {
+      console.log(JSON.stringify(orderDetails, null, 4));
+      this.myOrders.push(orderDetails);
     },
     getMyOrders: function() {
       console.log("My Orders");
@@ -81,7 +137,7 @@ export default {
         )
         .then(response => {
           console.log(response.data);
-          this.myOrders = response.data;
+          this.myOrders = response.data.result.maker_orders;
         })
         .catch(e => {
           this.customerrors.push(e);
