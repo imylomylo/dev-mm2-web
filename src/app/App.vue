@@ -54,7 +54,7 @@
       </v-toolbar-title>
 
       <v-spacer></v-spacer>
-      <v-btn rounded depressed dark large color="indigo" href="/#/dashboard">
+      <v-btn rounded depressed dark large color="indigo" href="/dashboard">
         <h3>Dashboard</h3>
         <v-icon class="px-2">ballot</v-icon>
       </v-btn>
@@ -121,7 +121,7 @@ export default {
 // window.location.href = "#/" + command.toLowerCase().replace(/ /g, "");
     },
     doAction: function(command) {
-      window.location.href = "#/" + command.toLowerCase().replace(/ /g, "");
+      window.location.href = "/" + command.toLowerCase().replace(/ /g, "");
     }
   },
   data: () => ({

@@ -11,7 +11,7 @@
         </v-chip>
       </v-toolbar>
       <v-divider class="mx-4"></v-divider>
-      <div v-if="myOrders !== undefined && myOrders.length > 0">
+      <div v-if="myOrders !== undefined && Object.keys(myOrders).length > 0">
         <v-simple-table fixed-header height="auto">
           <thead>
             <tr>
@@ -23,19 +23,19 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="row in myOrders" v-bind:key="row.ticker">
+            <tr v-for="row in Object.keys(myOrders)" v-bind:key="row.ticker">
               <td>
-                <a href="#">{{ row.base }} / {{ row.rel }}</a>
+                <router-link :to="`/traderview/${myOrders[row].base}/${myOrders[row].rel}`">{{ myOrders[row].base }} / {{ myOrders[row].rel }}</router-link>              
               </td>
-              <td>No data yet</td>
-              <td>{{ row.price }}</td>
-              <td>{{row.max_base_vol }}</td>
+              <td>Not implemented yet</td>
+              <td>{{ myOrders[row].price }}</td>
+              <td>{{myOrders[row].max_base_vol }}</td>
               <td>
                 <div class="text-right">
                   <!-- <v-chip class="ma-2" color="success" @click="gotoMarket(row.base, row.rel)">
                 <v-icon left>mdi-server-plus</v-icon>Go to market
                   </v-chip>-->
-                  <v-chip class="ma-2" color="red" dark @click="cancelOrder(row.uuid)">
+                  <v-chip class="ma-2" color="red" dark @click="cancelOrder(myOrders[row].uuid)">
                     <v-icon left>mdi-server-plus</v-icon>Cancel
                   </v-chip>
                 </div>
@@ -54,7 +54,7 @@ import axios from "axios";
 export default {
   data: function() {
     return {
-      myOrders: [],
+      myOrders: {},
       customerrors: []
     };
   },
@@ -111,18 +111,23 @@ export default {
           requestData
         )
         .then(response => {
-          console.log("Orders: " + JSON.stringify(response.data, null, 4));
+          console.log("Order result: " + JSON.stringify(response.data, null, 4));
+          if( response.data.result === "success" ){
+            console.log("success cancel, remove from myOrders array")
+            this.getMyOrders()
+          }
         })
         .catch(e => {
           this.customerrors.push(e);
         });
     },
     newOrder: function(orderDetails) {
-      console.log(JSON.stringify(orderDetails, null, 4));
-      this.myOrders.push(orderDetails);
+      // console.log(JSON.stringify(orderDetails, null, 4));
+      // let newUUID = orderDetails.uuid 
+      // this.myOrders.newUUID = orderDetails
+      this.getMyOrders()
     },
     getMyOrders: function() {
-      console.log("My Orders");
       axios
         .get(
           "http://" +
@@ -136,8 +141,15 @@ export default {
             "/api/v1/legacy/mm2/my_orders"
         )
         .then(response => {
-          console.log(response.data);
-          this.myOrders = response.data.result.maker_orders;
+          console.log(
+            "My Orders: " +
+              JSON.stringify(response.data.result.maker_orders, null, 4)
+          );
+          this.myOrders = response.data.result.maker_orders
+          // this.myOrders = Object.keys(response.data.result.maker_orders).map(function(key) {
+          //   return response.data.result.maker_orders[key]
+          // });
+          // console.log(JSON.stringify(this.myOrders))
         })
         .catch(e => {
           this.customerrors.push(e);

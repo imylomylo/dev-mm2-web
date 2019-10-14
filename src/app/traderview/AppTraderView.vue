@@ -235,8 +235,9 @@ export default {
     },
     invertbase: function(base, rel) {
       console.log("Invert base " + base);
-      window.location.href = "#/traderview?base=" + rel + "&rel=" + base;
-      this.$router.go(this.$router.currentRoute);
+      // window.location.href = "#/traderview?base=" + rel + "&rel=" + base;
+      window.location.href = "/traderview/" + rel + "/" + base
+      // this.$router.go(this.$router.currentRoute);
     },
     mmenable: function() {
       console.log(
@@ -266,16 +267,20 @@ export default {
   },
   created: function() {
     console.log(this.appName + " Created");
-    console.log(this.$route.query.base);
-    console.log(this.$route.query.rel);
-    this.wallets.base.ticker = this.$route.query.base;
-    this.wallets.rel.ticker = this.$route.query.rel;
+    // console.log(this.$route.query.base);
+    // console.log(this.$route.query.rel);
+    // this.wallets.base.ticker = this.$route.query.base;
+    // this.wallets.rel.ticker = this.$route.query.rel;
+    this.wallets.base.ticker = this.$route.params.base.toUpperCase()
+    this.wallets.rel.ticker = this.$route.params.rel.toUpperCase()
     console.log(this.appName + " Finished Created");
   },
   beforeRouteUpdate(to, from, next) {
     // just use `this`
-    console.log("before route update " + this.wallets.base);
-    // this.base = to.params.base
+    // console.log("before route update going to " + this.wallets.base.ticker + "/" + this.wallets.rel.ticker + JSON.stringify(from) + JSON.stringify(to))
+    // console.log("before route update going to " + JSON.stringify(from))
+    window.location.href='/traderview/'+this.wallets.base.ticker +'/'+ this.wallets.rel.ticker
+    // next()
   },
   computed: {
     coinCount: function(row) {

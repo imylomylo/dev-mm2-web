@@ -127,38 +127,6 @@ export default {
     };
   },
   methods: {
-    myBalance: function(base, rel) {
-      console.log("My balance");
-      axios
-        .get(
-          "http://" +
-            process.env.VUE_APP_WEBHOST +
-            ":7780/getBalance?coin=" +
-            base
-        )
-        .then(response => {
-          console.log(response.data);
-          this.walletBalance.base = response.data.balance;
-        })
-        .catch(e => {
-          this.customerrors.push(e);
-        });
-
-      axios
-        .get(
-          "http://" +
-            process.env.VUE_APP_WEBHOST +
-            ":7780/getBalance?coin=" +
-            rel
-        )
-        .then(response => {
-          console.log(response.data);
-          this.walletBalance.rel = response.data.balance;
-        })
-        .catch(e => {
-          this.customerrors.push(e);
-        });
-    },
     showDEXMarket: function(base, rel) {
       console.log("Show market:" + base + "/" + rel);
       axios
@@ -178,27 +146,7 @@ export default {
         )
         .then(response => {
           this.marketdata = response.data;
-          console.log(JSON.stringify(this.marketdata));
-        })
-        .catch(e => {
-          this.customerrors.push(e);
-        });
-    },
-    getMyOrders: function() {
-      axios
-        .get("http://" + process.env.VUE_APP_WEBHOST + ":7780/getOrders")
-        .then(response => {
-          // if response.data.result == "success"
-          // console.log(response.data);
-          this.myOrders.maker = this.objectArrayByKeys(
-            response.data.result.maker_orders
-          );
-          this.myOrders.taker = this.objectArrayByKeys(
-            response.data.result.taker_orders
-          );
-          console.log(
-            "MY TAKER ORDERS: " + JSON.stringify(this.myOrders.taker)
-          );
+          // console.log(JSON.stringify(this.marketdata, null, 4));
         })
         .catch(e => {
           this.customerrors.push(e);
@@ -238,7 +186,6 @@ export default {
   },
   created: function() {
     console.log(this.appName + " Created");
-    this.getMyOrders()
     this.showDEXMarket(this.wallets.base.ticker, this.wallets.rel.ticker)
     this.getCEXprice(this.wallets.base.ticker, this.wallets.rel.ticker)
     console.log(this.appName + " Finished Created");

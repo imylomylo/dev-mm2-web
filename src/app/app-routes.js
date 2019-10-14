@@ -18,6 +18,7 @@ import AppTraderView from '@/app/traderview/AppTraderView.vue'
 Vue.use(Router)
 
 export default new Router({
+  mode: 'history',
   routes: [{
       path: '/',
       name: 'AppHome',
@@ -75,6 +76,12 @@ export default new Router({
     },
     {
       path: '/traderview',
+      name: 'TraderView',
+      component: AppTraderView,
+      props: true
+    },
+    {
+      path: '/traderview/:base/:rel',
       name: 'TraderView',
       component: AppTraderView,
       props: true
