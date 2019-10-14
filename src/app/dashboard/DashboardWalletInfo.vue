@@ -54,9 +54,9 @@ export default {
   components: { QrcodeVue },
   data: function() {
     return {
-      absoluteOverlay: true,
+      absoluteOverlay: false,
       depositOverlay: false,
-      depositOverlaySize: 200,
+      depositOverlaySize: 400,
       depositTicker: "",
       depositAddress: "",
       customerrors: [],

@@ -5,13 +5,6 @@
         <v-toolbar-title>
           <span class="subheading">Single Order</span>
         </v-toolbar-title>
-        <!-- <v-progress-linear
-        :active="loading"
-        :indeterminate="orderSentOverlay"
-        absolute
-        bottom
-        color="deep-purple accent-4"
-      ></v-progress-linear> -->
         <div class="flex-grow-1"></div>
       </v-toolbar>
 
@@ -115,14 +108,6 @@ export default {
         .catch(e => {
           this.customerrors.push(e);
         });
-
-      /*
-buy rel: RICK, amount: 0.5552 @ 0.5551 = 0.30819152000000005
-{"result":{"base":"MORTY","created_at":1570125971927,"matches":{},"max_base_vol":"0.5552","min_base_vol":"0","price":"0.5551","rel":"RICK","started_swaps":[],"uuid":"6a999307-8b63-4117-97c5-2464af18c368"}}
-*/
-
-      // this is wrong.   send the order from this component then send result to other components that need the swap-id/op-id etc.
-      // this.$emit("sendbuyorder", rel, this.amount, this.price, this.total);
     },
     buyBase: function(base) {
       console.log(
@@ -134,9 +119,9 @@ buy rel: RICK, amount: 0.5552 @ 0.5551 = 0.30819152000000005
           this.price +
           " = " +
           this.total
-      );
+      )
       this.orderSentOverlay = true 
-      let requestData = {};
+      let requestData = {}
       requestData["rel"] = this.wallets.base.ticker //flipped for a buy because of underlying mm2 mechanism
       requestData["base"] = this.wallets.rel.ticker //flipped for a buy because of underlying mm2 mechanism
       requestData["method"] = "setprice"
@@ -166,10 +151,7 @@ buy rel: RICK, amount: 0.5552 @ 0.5551 = 0.30819152000000005
         })
         .catch(e => {
           this.customerrors.push(e);
-        });
-
-      // this is wrong.   send the order from this component then send result to other components that need the swap-id/op-id etc.
-      // this.$emit("sendsellorder", rel, this.amount, this.price, this.total)
+        })
     }
   },
   created: function() {

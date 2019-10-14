@@ -35,7 +35,7 @@
               <v-chip class="ma-2" color="success" @click="deposit(row.ticker, row.address)">
                 <v-icon left>mdi-server-plus</v-icon>Deposit
               </v-chip>
-              <v-chip class="ma-2" color="red" dark @click="withdraw(row.ticker)">
+              <v-chip class="ma-2" color="red" dark @click="showWithdrawOverlay(row.ticker)">
                 <v-icon left>mdi-server-plus</v-icon>Withdraw
               </v-chip>
             </div>
@@ -54,7 +54,7 @@
           <v-text-field v-model="withdrawAddress" label="Address" required></v-text-field>
           <v-text-field v-model="withdrawAmount" label="Amount" required></v-text-field>
         </v-form>
-        <v-btn color="success" @click="hideWithdrawOverlay">Send</v-btn>
+        <v-btn color="success" @click="withdraw()">Send</v-btn>
         <v-btn color="error" @click="hideWithdrawOverlay">Cancel</v-btn>
       </v-card>
     </v-overlay>
@@ -70,9 +70,9 @@ export default {
   components: { QrcodeVue },
   data: function() {
     return {
-      absoluteOverlay: true,
+      absoluteOverlay: false,
       depositOverlay: false,
-      depositOverlaySize: 100,
+      depositOverlaySize: 400,
       depositTicker: "",
       depositAddress: "",
       withdrawOverlay: false,
@@ -98,6 +98,14 @@ export default {
       (this.withdrawOverlay = false),
         (this.withdrawAddress = ""),
         (this.withdrawAmount = 0);
+        //add 1 or 2 seconds of delay
+      this.myBalance(this.wallets.base.ticker, this.wallets.rel.ticker);
+    },
+    showWithdrawOverlay: function(ticker) {
+      console.log("Withdraw Overlay: " + ticker);
+      this.withdrawTicker = ticker;
+      this.withdrawAddress = "";
+      this.withdrawOverlay = true;
     },
     deposit: function(ticker, address) {
       console.log("Deposit: " + ticker + " @ " + address);
@@ -105,11 +113,60 @@ export default {
       this.depositAddress = address;
       this.depositOverlay = true;
     },
-    withdraw: function(ticker) {
+    withdraw: function(ticker, amount) {
       console.log("Withdraw: " + ticker);
-      this.withdrawTicker = ticker;
-      this.withdrawAddress = "";
-      this.withdrawOverlay = true;
+      let requestData = {};
+      requestData["coin"] = this.withdrawTicker;
+      requestData["to"] = this.withdrawAddress;
+      requestData["amount"] = this.withdrawAmount;
+      requestData["method"] = "withdraw";
+      requestData["userpass"] = process.env.VUE_APP_USERPASS;
+
+      axios
+        .post(
+          "http://" +
+            process.env.VUE_APP_WEBHOST +
+            ":" +
+            process.env.VUE_APP_WEBPORT +
+            "/" +
+            process.env.VUE_APP_MMBOTHOST +
+            ":" +
+            process.env.VUE_APP_MMBOTPORT +
+            "/api/v1/legacy/mm2/withdraw",
+          requestData
+        )
+        .then(response => {
+          console.log(JSON.stringify(response.data, null, 4));
+          let requestData = {};
+          requestData["coin"] = this.withdrawTicker;
+          requestData["tx_hex"] = response.data.tx_hex;
+          requestData["method"] = "send_raw_transaction";
+          requestData["userpass"] = process.env.VUE_APP_USERPASS;
+
+          axios
+            .post(
+              "http://" +
+                process.env.VUE_APP_WEBHOST +
+                ":" +
+                process.env.VUE_APP_WEBPORT +
+                "/" +
+                process.env.VUE_APP_MMBOTHOST +
+                ":" +
+                process.env.VUE_APP_MMBOTPORT +
+                "/api/v1/legacy/mm2/send_raw_transaction",
+              requestData
+            )
+            .then(response => {
+              console.log(JSON.stringify(response, null, 4));
+              this.hideWithdrawOverlay();
+            })
+            .catch(e => {
+              this.customerrors.push(e);
+            });
+        })
+        .catch(e => {
+          this.customerrors.push(e);
+        });
     },
     myBalance: function(base, rel) {
       console.log("My balance");
