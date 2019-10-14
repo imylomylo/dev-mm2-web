@@ -25,7 +25,7 @@
           <tbody>
             <tr v-for="row in Object.keys(myOrders)" v-bind:key="row.ticker">
               <td>
-                <router-link :to="`/traderview/${myOrders[row].base}/${myOrders[row].rel}`">{{ myOrders[row].base }} / {{ myOrders[row].rel }}</router-link>              
+                <a @click="gotoMarket(myOrders[row].base,myOrders[row].rel)">{{ myOrders[row].base }} / {{ myOrders[row].rel }}</a>              
               </td>
               <td>Not implemented yet</td>
               <td>{{ myOrders[row].price }}</td>
@@ -61,6 +61,8 @@ export default {
   methods: {
     gotoMarket: function(base, rel) {
       console.log("Go to market");
+      window.location.href = "/#/traderview/" + base + "/" + rel
+      this.$router.go(this.$router.currentRoute);
     },
     cancelAllOrders: function() {
       console.log("Cancel All Orders");

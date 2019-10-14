@@ -236,8 +236,8 @@ export default {
     invertbase: function(base, rel) {
       console.log("Invert base " + base);
       // window.location.href = "#/traderview?base=" + rel + "&rel=" + base;
-      window.location.href = "/traderview/" + rel + "/" + base
-      // this.$router.go(this.$router.currentRoute);
+      window.location.href = "/#/traderview/" + rel + "/" + base
+      this.$router.go(this.$router.currentRoute);
     },
     mmenable: function() {
       console.log(
@@ -279,8 +279,8 @@ export default {
     // just use `this`
     // console.log("before route update going to " + this.wallets.base.ticker + "/" + this.wallets.rel.ticker + JSON.stringify(from) + JSON.stringify(to))
     // console.log("before route update going to " + JSON.stringify(from))
-    window.location.href='/traderview/'+this.wallets.base.ticker +'/'+ this.wallets.rel.ticker
-    // next()
+    // window.location.href='/#/traderview/'+this.wallets.base.ticker +'/'+ this.wallets.rel.ticker
+    next()
   },
   computed: {
     coinCount: function(row) {

@@ -311,7 +311,7 @@ export default {
       //   }
       // });
       // window.location.href='#/traderview?base='+base+'&rel='+rel
-      window.location.href='/traderview/'+base+'/'+rel
+      window.location.href='/#/traderview/'+base+'/'+rel
       // this.$router.go(this.$router.currentRoute)
 
       // this.forceRerender();
