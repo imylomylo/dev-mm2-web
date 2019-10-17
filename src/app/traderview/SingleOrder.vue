@@ -67,7 +67,7 @@ export default {
     },
     sellBase: function(base) {
       console.log(
-        "SingleOrder buy base: " +
+        "SingleOrder sell base: " +
           base +
           ", amount: " +
           this.amount +
@@ -84,6 +84,7 @@ export default {
       requestData["volume"] = this.amount
       requestData["price"] = this.price
       requestData["userpass"] = "YOUR_PASSWORD_HERE"
+      console.log("Sell BASE: " + JSON.stringify(requestData, null, 4))
 
       axios
         .post(
@@ -111,7 +112,7 @@ export default {
     },
     buyBase: function(base) {
       console.log(
-        "SingleOrder sell base: " +
+        "SingleOrder buy base: " +
           base +
           ", amount: " +
           this.amount +
@@ -125,10 +126,11 @@ export default {
       requestData["rel"] = this.wallets.base.ticker //flipped for a buy because of underlying mm2 mechanism
       requestData["base"] = this.wallets.rel.ticker //flipped for a buy because of underlying mm2 mechanism
       requestData["method"] = "setprice"
-      requestData["volume"] = this.amount
+      requestData["volume"] = this.total.toString()
       requestData["price"] = (1/this.price).toString()  // 1/price for a buy & needs to be a string for the makerbot api
       requestData["userpass"] = "YOUR_PASSWORD_HERE"
 
+      console.log("Buy BASE: " + JSON.stringify(requestData, null, 4))
       axios
         .post(
           "http://" +
