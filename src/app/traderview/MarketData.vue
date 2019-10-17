@@ -47,6 +47,15 @@
               <!-- Rounding from https://www.jacklmoore.com/notes/rounding-in-javascript/ -->
               <!-- Better to move to computed function for maintainability/non-repetitive -->
               <template v-slot:item.price="{ item }">{{ Number(Math.round(item.price+'e8')+'e-8') }}</template>
+
+              <!-- For highlighting my orders               -->
+<!--               
+              <template v-slot:item.price="{ item }">
+                {{ Number(Math.round(item.price+'e8')+'e-8') }}
+                <v-chip v-if="item.myOrder" color="purple" dark>*</v-chip>
+              </template> 
+ -->
+
               <template
                 v-slot:item.maxvolume="{ item }"
               >{{ Number(Math.round(item.maxvolume+'e8')+'e-8') }}</template>
@@ -95,6 +104,14 @@
               <!-- Rounding from https://www.jacklmoore.com/notes/rounding-in-javascript/ -->
               <!-- Better to move to computed function for maintainability/non-repetitive -->
               <template v-slot:item.price="{ item }">{{ Number(Math.round(item.price+'e8')+'e-8') }}</template>
+              
+              <!-- for highlighting my order -->
+<!--               
+              <template v-slot:item.price="{ item }">
+                {{ Number(Math.round(item.price+'e8')+'e-8') }}
+                <v-chip v-if="item.myOrder" color="purple" dark>*</v-chip>
+              </template> 
+-->
               <template
                 v-slot:item.baseamount="{ item }"
               >{{ Number(Math.round(item.maxvolume/item.price+'e8')+'e-8') }}</template>
@@ -386,6 +403,10 @@ export default {
             orderTemplate = interim[i][j]
             orderTemplate.address = ''
             orderTemplate.pubkey = ''
+            // for highlighting my orders in the OB, set prices within these ranges to activate
+            // if( orderTemplate.price < 100 && orderTemplate.price > 15 || orderTemplate.price < 0.05 ){
+            //   orderTemplate.myOrder = true
+            // }
           }
           else {
             orderTemplate.maxvolume += interim[i][j].maxvolume
