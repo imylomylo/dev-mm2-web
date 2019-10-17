@@ -71,12 +71,27 @@
               :sort-by="['price']"
               :sort-desc="[true]"
               disable-pagination
-              hide-default-header
               hide-default-footer
               :headers="bidsHeaders"
               :items="marketdata.bids"
               :items-per-page="15"
             >
+
+              <template v-slot:header.price="{ header }">
+                <!-- {{ header.text.toUpperCase() }} -->
+                Price ({{wallets.rel.ticker }})
+              </template>
+
+              <template v-slot:header.baseamount="{ header }">
+                <!-- {{ header.text.toUpperCase() }} -->
+                Amount ({{wallets.base.ticker }})
+              </template>
+
+              <template v-slot:header.maxvolume="{ header }">
+                <!-- {{ header.text.toUpperCase() }} -->
+                Total ({{wallets.rel.ticker }})
+              </template>
+
               <!-- Rounding from https://www.jacklmoore.com/notes/rounding-in-javascript/ -->
               <!-- Better to move to computed function for maintainability/non-repetitive -->
               <template v-slot:item.price="{ item }">{{ Number(Math.round(item.price+'e8')+'e-8') }}</template>
@@ -132,120 +147,120 @@ export default {
         },
         { text: "Base Amount", align: "left", value: "baseamount" },
         { text: "Can Cancel", align: "right", value: "maxvolume" }
-      ],
-      fakeData: {
-        askdepth: 0,
-        asks: [
-          {
-            address: "R9ViegsR8qrthx81NJdANfnkLoQxomzHAM",
-            age: 21,
-            coin: "RICK",
-            max_volume_rat: [[1, [3751360449, 17509]], [1, [78125000]]],
-            maxvolume: 962615.4719502465,
-            price: "3.6",
-            price_rat: [[1, [1]], [1, [1]]],
-            pubkey:
-              "b86508ab996ca87d863c907e44fe495d96adf7e95ad0823bac16c3e55758f902",
-            zcredits: 0
-          },
-          {
-            address: "RT9MpMyucqXiX8bZLimXBnrrn2ofmdGNKd",
-            age: 3,
-            coin: "RICK",
-            max_volume_rat: [[1, [1000]], [1, [1]]],
-            maxvolume: 1000,
-            price: "3.6",
-            price_rat: [[1, [2]], [1, [1]]],
-            pubkey:
-              "1bb83b58ec130e28e0a6d5d2acf2eb01b0d3f1670e021d47d31db8a858219da8",
-            zcredits: 0
-          },
-          {
-            address: "R9ViegsR8qrthx81NJdANfnkLoQxomzHAM",
-            age: 25,
-            coin: "RICK",
-            max_volume_rat: [[1, [4241140441, 140078]], [1, [625000000]]],
-            maxvolume: 962615.4720472464,
-            price: "3.6",
-            price_rat: [[1, [1]], [1, [1]]],
-            pubkey:
-              "b86508ab996ca87d863c907e44fe495d96adf7e95ad0823bac16c3e55758f902",
-            zcredits: 0
-          },
-          {
-            address: "RTpwruinq4GLbkGZg8NrJw5YPWUvMWnHYR",
-            age: 2,
-            coin: "RICK",
-            max_volume_rat: [[1, [7987]], [1, [8]]],
-            maxvolume: 998.375,
-            price: "2",
-            price_rat: [[1, [2]], [1, [1]]],
-            pubkey:
-              "9727ffa665389a4fed0a2b75687d1a7ad23a430f0aa06dfbf9edb9b972da7808",
-            zcredits: 0
-          }
-        ],
-        base: "RICK",
-        biddepth: 0,
-        bids: [
-          {
-            address: "RT9MpMyucqXiX8bZLimXBnrrn2ofmdGNKd",
-            age: 3,
-            coin: "MORTY",
-            max_volume_rat: [[1, [1000]], [1, [1]]],
-            maxvolume: 1000,
-            price: "0.5",
-            price_rat: [[1, [1]], [1, [2]]],
-            pubkey:
-              "1bb83b58ec130e28e0a6d5d2acf2eb01b0d3f1670e021d47d31db8a858219da8",
-            zcredits: 0
-          },
-          {
-            address: "RTpwruinq4GLbkGZg8NrJw5YPWUvMWnHYR",
-            age: 2,
-            coin: "MORTY",
-            max_volume_rat: [[1, [2394874817, 11]], [1, [50000000]]],
-            maxvolume: 992.79030146,
-            price: "0.5",
-            price_rat: [[1, [1]], [1, [2]]],
-            pubkey:
-              "9727ffa665389a4fed0a2b75687d1a7ad23a430f0aa06dfbf9edb9b972da7808",
-            zcredits: 0
-          },
-          {
-            address: "RFaYHBEZrFVfVxcg9TCzxupmKBwd8Rv5Y4",
-            age: 6,
-            coin: "MORTY",
-            max_volume_rat: [
-              [1, [3553673217, 1746229]],
-              [1, [392331264, 5820766]]
-            ],
-            maxvolume: 0.30000000000000004,
-            price: "0.1",
-            price_rat: [[1, [1]], [1, [10]]],
-            pubkey:
-              "c00fb5010c5319035a43ed2ea1a7bf40f36b761d7e7e912173b094e0ecebcd39",
-            zcredits: 0
-          },
-          {
-            address: "RRGKTckWwrZWq73vNekoLxqCJLHS4UKTyk",
-            age: 10,
-            coin: "MORTY",
-            max_volume_rat: [[1, [5]], [1, [2]]],
-            maxvolume: 2.5,
-            price: "0.25",
-            price_rat: [[1, [1]], [1, [4]]],
-            pubkey:
-              "e52560d1ce0ccf12a4d38aa0f141ae269697c45830b1337995917fdf00bdb58c",
-            zcredits: 0
-          }
-        ],
-        netid: 9999,
-        numasks: 4,
-        numbids: 4,
-        rel: "MORTY",
-        timestamp: 1571303370
-      }
+      ]//,
+      // fakeData: {
+      //   askdepth: 0,
+      //   asks: [
+      //     {
+      //       address: "R9ViegsR8qrthx81NJdANfnkLoQxomzHAM",
+      //       age: 21,
+      //       coin: "RICK",
+      //       max_volume_rat: [[1, [3751360449, 17509]], [1, [78125000]]],
+      //       maxvolume: 962615.4719502465,
+      //       price: "3.6",
+      //       price_rat: [[1, [1]], [1, [1]]],
+      //       pubkey:
+      //         "b86508ab996ca87d863c907e44fe495d96adf7e95ad0823bac16c3e55758f902",
+      //       zcredits: 0
+      //     },
+      //     {
+      //       address: "RT9MpMyucqXiX8bZLimXBnrrn2ofmdGNKd",
+      //       age: 3,
+      //       coin: "RICK",
+      //       max_volume_rat: [[1, [1000]], [1, [1]]],
+      //       maxvolume: 1000,
+      //       price: "3.6",
+      //       price_rat: [[1, [2]], [1, [1]]],
+      //       pubkey:
+      //         "1bb83b58ec130e28e0a6d5d2acf2eb01b0d3f1670e021d47d31db8a858219da8",
+      //       zcredits: 0
+      //     },
+      //     {
+      //       address: "R9ViegsR8qrthx81NJdANfnkLoQxomzHAM",
+      //       age: 25,
+      //       coin: "RICK",
+      //       max_volume_rat: [[1, [4241140441, 140078]], [1, [625000000]]],
+      //       maxvolume: 962615.4720472464,
+      //       price: "3.6",
+      //       price_rat: [[1, [1]], [1, [1]]],
+      //       pubkey:
+      //         "b86508ab996ca87d863c907e44fe495d96adf7e95ad0823bac16c3e55758f902",
+      //       zcredits: 0
+      //     },
+      //     {
+      //       address: "RTpwruinq4GLbkGZg8NrJw5YPWUvMWnHYR",
+      //       age: 2,
+      //       coin: "RICK",
+      //       max_volume_rat: [[1, [7987]], [1, [8]]],
+      //       maxvolume: 998.375,
+      //       price: "2",
+      //       price_rat: [[1, [2]], [1, [1]]],
+      //       pubkey:
+      //         "9727ffa665389a4fed0a2b75687d1a7ad23a430f0aa06dfbf9edb9b972da7808",
+      //       zcredits: 0
+      //     }
+      //   ],
+      //   base: "RICK",
+      //   biddepth: 0,
+      //   bids: [
+      //     {
+      //       address: "RT9MpMyucqXiX8bZLimXBnrrn2ofmdGNKd",
+      //       age: 3,
+      //       coin: "MORTY",
+      //       max_volume_rat: [[1, [1000]], [1, [1]]],
+      //       maxvolume: 1000,
+      //       price: "0.5",
+      //       price_rat: [[1, [1]], [1, [2]]],
+      //       pubkey:
+      //         "1bb83b58ec130e28e0a6d5d2acf2eb01b0d3f1670e021d47d31db8a858219da8",
+      //       zcredits: 0
+      //     },
+      //     {
+      //       address: "RTpwruinq4GLbkGZg8NrJw5YPWUvMWnHYR",
+      //       age: 2,
+      //       coin: "MORTY",
+      //       max_volume_rat: [[1, [2394874817, 11]], [1, [50000000]]],
+      //       maxvolume: 992.79030146,
+      //       price: "0.5",
+      //       price_rat: [[1, [1]], [1, [2]]],
+      //       pubkey:
+      //         "9727ffa665389a4fed0a2b75687d1a7ad23a430f0aa06dfbf9edb9b972da7808",
+      //       zcredits: 0
+      //     },
+      //     {
+      //       address: "RFaYHBEZrFVfVxcg9TCzxupmKBwd8Rv5Y4",
+      //       age: 6,
+      //       coin: "MORTY",
+      //       max_volume_rat: [
+      //         [1, [3553673217, 1746229]],
+      //         [1, [392331264, 5820766]]
+      //       ],
+      //       maxvolume: 0.30000000000000004,
+      //       price: "0.1",
+      //       price_rat: [[1, [1]], [1, [10]]],
+      //       pubkey:
+      //         "c00fb5010c5319035a43ed2ea1a7bf40f36b761d7e7e912173b094e0ecebcd39",
+      //       zcredits: 0
+      //     },
+      //     {
+      //       address: "RRGKTckWwrZWq73vNekoLxqCJLHS4UKTyk",
+      //       age: 10,
+      //       coin: "MORTY",
+      //       max_volume_rat: [[1, [5]], [1, [2]]],
+      //       maxvolume: 2.5,
+      //       price: "0.25",
+      //       price_rat: [[1, [1]], [1, [4]]],
+      //       pubkey:
+      //         "e52560d1ce0ccf12a4d38aa0f141ae269697c45830b1337995917fdf00bdb58c",
+      //       zcredits: 0
+      //     }
+      //   ],
+      //   netid: 9999,
+      //   numasks: 4,
+      //   numbids: 4,
+      //   rel: "MORTY",
+      //   timestamp: 1571303370
+      // }
     };
   },
   methods: {
@@ -369,6 +384,8 @@ export default {
           if( j == 0 ){
             console.log("First grouped price to add maxvolume: " + interim[i][j].price)
             orderTemplate = interim[i][j]
+            orderTemplate.address = ''
+            orderTemplate.pubkey = ''
           }
           else {
             orderTemplate.maxvolume += interim[i][j].maxvolume
