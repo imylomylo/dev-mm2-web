@@ -83,7 +83,11 @@ export default {
     getBalance: function(coin) {
       console.log("getBalance " + coin);
       return axios
-        .get("http://" + process.env.VUE_APP_WEBHOST + ":7780/getBalance?coin=" + coin)
+        .get("http://" + 
+  	   process.env.VUE_APP_MMBOTHOST + 
+	   ":" +
+	   process.env.VUE_APP_MMBOTPORT + 
+   	   "/getBalance?coin=" + coin)
         .then(response => {
           // if response.data.result == "success"
           console.log("getBalance() response: " + response.data);
