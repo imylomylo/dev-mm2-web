@@ -95,14 +95,10 @@ export default {
       axios
         .get(
           "http://" +
-            process.env.VUE_APP_WEBHOST +
-            ":" +
-            process.env.VUE_APP_WEBPORT +
-            "/" +
             process.env.VUE_APP_MMBOTHOST +
             ":" +
             process.env.VUE_APP_MMBOTPORT +
-            "/api/v1/legacy/mm2/my_balance?currency=" +
+            "/getBalance?coin=" +
             wallet.ticker
         )
         .then(response => {

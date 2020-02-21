@@ -121,7 +121,8 @@ export default {
   created: function() {
     console.log("AppCoins Created");
     axios
-      .get("http://" + process.env.VUE_APP_WEBHOST + ":" + process.env.VUE_APP_WEBPORT + "/" + process.env.VUE_APP_MMBOTHOST + ":" + process.env.VUE_APP_MMBOTPORT + "/api/v1/legacy/mm2/get_enabled_coins")
+      //.get("http://" + process.env.VUE_APP_WEBHOST + ":" + process.env.VUE_APP_WEBPORT + "/" + process.env.VUE_APP_MMBOTHOST + ":" + process.env.VUE_APP_MMBOTPORT + "/api/v1/legacy/mm2/get_enabled_coins")
+      .get("http://" + process.env.VUE_APP_MMBOTHOST + ":" + process.env.VUE_APP_MMBOTPORT + "/coinsenabled")
       .then(response => {
         console.log("MYLO" + JSON.stringify(response.data.result));
         // JSON responses are automatically parsed.

@@ -125,7 +125,7 @@ export default {
     }
   },
   data: () => ({
-    appName: "Marketmaker Club",
+    appName: "atomicDEX OB (beta)",
     base: '',
     componentKey: 0,
     dialog: false,

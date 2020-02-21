@@ -284,18 +284,14 @@ export default {
     showDEXMarket: function(base, rel) {
       console.log("Show market:" + base + "/" + rel);
       axios
-        .get(
+        .post(
           "http://" +
-            process.env.VUE_APP_WEBHOST +
-            ":" +
-            process.env.VUE_APP_WEBPORT +
-            "/" +
             process.env.VUE_APP_MMBOTHOST +
             ":" +
             process.env.VUE_APP_MMBOTPORT +
-            "/api/v1/legacy/mm2/getorderbook?base_currency=" +
+            "/getMarket?base=" +
             base +
-            "&quote_currency=" +
+            "&rel=" +
             rel
         )
         .then(response => {
