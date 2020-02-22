@@ -125,7 +125,7 @@ export default {
     }
   },
   data: () => ({
-    appName: "atomicDEX OB (beta)",
+    appName: "OrderBook Live v0",
     base: '',
     componentKey: 0,
     dialog: false,

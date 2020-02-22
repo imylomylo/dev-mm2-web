@@ -19,8 +19,8 @@
               >
                 <v-icon left>mdi-server-plus</v-icon>INVERT
               </v-chip>
-              <v-btn v-if="!ammdisabled" depressed small color="success">Enabled</v-btn>
-              <v-btn v-else depressed small color="error">Disabled</v-btn>
+              <v-btn v-if="!ammdisabled" depressed small color="success">Automated</v-btn>
+              <v-btn v-else depressed small color="error">No Automation</v-btn>
               <div class="flex-grow-1">
                 <v-divider class="mx-4" vertical></v-divider>
                 <v-btn depressed small>Global Average Price: 777</v-btn>
@@ -29,12 +29,12 @@
               <v-toolbar-items class="hidden-sm-and-down">
                 <v-divider vertical></v-divider>
                 <template v-if="!ammdisabled">
-                  <v-btn rounded depressed dark large color="red" @click="mmenable">
+                  <v-btn rounded depressed dark large color="red" @click="dismmenable">
                     <h3>Disable Automation</h3>
                   </v-btn>
                 </template>
                 <template v-else>
-                  <v-btn rounded depressed dark large color="green" @click="mmenable">
+                  <v-btn rounded depressed dark large color="green" @click="dismmenable">
                     <h3>Enable Automation</h3>
                   </v-btn>
                 </template>
@@ -161,7 +161,8 @@ export default {
         }
       },
       ammdisabled: true,
-      currentStrategyInfo: "ONLY BUY KMD, 1.8% SPREAD WITH 10% ORDER SIZE",
+      //currentStrategyInfo: "ONLY BUY KMD, 1.8% SPREAD WITH 10% ORDER SIZE",
+      currentStrategyInfo: "NO AUTOMATION",
       activeCoins: [],
       walletBalance: { base: 0, rel: 0 },
       marketData: "",

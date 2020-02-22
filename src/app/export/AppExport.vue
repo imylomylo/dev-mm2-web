@@ -1,5 +1,13 @@
 <template>
   <v-card max-width="auto" class="mx-auto">
+    <v-row justify="center">
+      <!-- <v-btn color="success" class="mt-12" @click="overlay = !overlay">Show Overlay</v-btn> -->
+
+      <v-overlay opacity="0.88" :absolute="absolute" :value="overlay">
+        <v-btn color="warning" @click="disenable(false)">No Export</v-btn>
+      </v-overlay>
+    </v-row>
+
     <v-toolbar flat dense color="blue-grey lighten-5">
       <v-toolbar-title>
         <span class="subheading">Export</span>
@@ -35,6 +43,7 @@ export default {
   // props: ["strategies"],
   data: function() {
     return {
+      absolute: true,
       strategies: [{}]
     };
   },

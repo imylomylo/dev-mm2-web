@@ -69,19 +69,15 @@ export default {
       let requestData = {};
       requestData["method"] = "cancel_all_orders";
       requestData["cancel_by"] = { type: "All" };
-      requestData["userpass"] = "YOUR_PASSWORD_HERE";
+ //     requestData["userpass"] = "YOUR_PASSWORD_HERE";
 
       axios
-        .post(
+        .get(
           "http://" +
-            process.env.VUE_APP_WEBHOST +
-            ":" +
-            process.env.VUE_APP_WEBPORT +
-            "/" +
             process.env.VUE_APP_MMBOTHOST +
             ":" +
             process.env.VUE_APP_MMBOTPORT +
-            "/api/v1/legacy/mm2/cancel_all_orders",
+            "/cancelAllOrders",
           requestData
         )
         .then(response => {
@@ -97,20 +93,15 @@ export default {
       let requestData = {};
       requestData["method"] = "cancel_order";
       requestData["uuid"] = uuid;
-      requestData["userpass"] = "YOUR_PASSWORD_HERE";
+ //     requestData["userpass"] = "YOUR_PASSWORD_HERE";
 
       axios
         .post(
           "http://" +
-            process.env.VUE_APP_WEBHOST +
-            ":" +
-            process.env.VUE_APP_WEBPORT +
-            "/" +
             process.env.VUE_APP_MMBOTHOST +
             ":" +
             process.env.VUE_APP_MMBOTPORT +
-            "/api/v1/legacy/mm2/cancel_order",
-          requestData
+            "/cancelOrder?uuid="+requestData.uuid
         )
         .then(response => {
           console.log("Order result: " + JSON.stringify(response.data, null, 4));
@@ -133,14 +124,10 @@ export default {
       axios
         .get(
           "http://" +
-            process.env.VUE_APP_WEBHOST +
-            ":" +
-            process.env.VUE_APP_WEBPORT +
-            "/" +
             process.env.VUE_APP_MMBOTHOST +
             ":" +
             process.env.VUE_APP_MMBOTPORT +
-            "/api/v1/legacy/mm2/my_orders"
+            "/getOrders"
         )
         .then(response => {
           console.log(

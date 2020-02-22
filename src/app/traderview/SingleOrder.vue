@@ -3,7 +3,7 @@
     <v-card class="mx-auto" max-width="auto" outlined>
       <v-toolbar flat dense color="blue-grey lighten-5">
         <v-toolbar-title>
-          <span class="subheading">Single Order</span>
+          <span class="subheading">Single Order {{wallets.base.ticker}}</span>
         </v-toolbar-title>
         <div class="flex-grow-1"></div>
       </v-toolbar>
@@ -11,7 +11,7 @@
       <v-divider class="mx-4"></v-divider>
 
       <v-form ref="form">
-        <v-text-field v-model="price" label="Price" required></v-text-field>
+        <v-text-field v-model="price" label="Price in other coin" required></v-text-field>
         <v-text-field v-model="amount" label="Amount" required></v-text-field>
         <v-card-text>
           <v-chip-group
@@ -83,21 +83,16 @@ export default {
       requestData["method"] = "setprice"
       requestData["volume"] = this.amount
       requestData["price"] = this.price
-      requestData["userpass"] = "YOUR_PASSWORD_HERE"
+ //     requestData["userpass"] = "YOUR_PASSWORD_HERE"
       console.log("Sell BASE: " + JSON.stringify(requestData, null, 4))
 
       axios
         .post(
           "http://" +
-            process.env.VUE_APP_WEBHOST +
-            ":" +
-            process.env.VUE_APP_WEBPORT +
-            "/" +
             process.env.VUE_APP_MMBOTHOST +
             ":" +
             process.env.VUE_APP_MMBOTPORT +
-            "/api/v1/legacy/mm2/setprice",
-          requestData
+            "/doMaker?base="+requestData.base+"&rel="+requestData.rel+"&volume="+requestData.volume+"&price="+requestData.price
         )
         .then(response => {
           console.log(JSON.stringify(response.data))
@@ -128,21 +123,16 @@ export default {
       requestData["method"] = "setprice"
       requestData["volume"] = this.total.toString()
       requestData["price"] = (1/this.price).toString()  // 1/price for a buy & needs to be a string for the makerbot api
-      requestData["userpass"] = "YOUR_PASSWORD_HERE"
+//      requestData["userpass"] = "YOUR_PASSWORD_HERE"
 
       console.log("Buy BASE: " + JSON.stringify(requestData, null, 4))
       axios
         .post(
           "http://" +
-            process.env.VUE_APP_WEBHOST +
-            ":" +
-            process.env.VUE_APP_WEBPORT +
-            "/" +
             process.env.VUE_APP_MMBOTHOST +
             ":" +
             process.env.VUE_APP_MMBOTPORT +
-            "/api/v1/legacy/mm2/setprice",
-          requestData
+            "/doMaker?base="+requestData.base+"&rel="+requestData.rel+"&volume="+requestData.volume+"&price="+requestData.price
         )
         .then(response => {
           console.log(JSON.stringify(response.data))

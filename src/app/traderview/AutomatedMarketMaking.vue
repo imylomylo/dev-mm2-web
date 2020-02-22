@@ -4,7 +4,7 @@
       <!-- <v-btn color="success" class="mt-12" @click="overlay = !overlay">Show Overlay</v-btn> -->
 
       <v-overlay opacity="0.88" :absolute="absolute" :value="overlay">
-        <v-btn color="success" @click="enable(false)">Enable Automation</v-btn>
+        <v-btn color="success" @click="disenable(false)">Enable Automation</v-btn>
       </v-overlay>
     </v-row>
     <div>
