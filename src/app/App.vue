@@ -1,5 +1,6 @@
 <template>
   <v-app id="inspire">
+<!--
     <v-navigation-drawer v-model="drawer" :clipped="$vuetify.breakpoint.lgAndUp" app>
       <v-list dense>
         <template v-for="item in items">
@@ -46,6 +47,7 @@
         </template>
       </v-list>
     </v-navigation-drawer>
+-->
 
     <v-app-bar :clipped-left="$vuetify.breakpoint.lgAndUp" app color="indigo" dark>
       <v-toolbar-title style="width: 300px" class="ml-0 pl-4">

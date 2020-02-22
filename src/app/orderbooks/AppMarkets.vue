@@ -1,6 +1,7 @@
 <template>
   <div>
     <v-row>
+<!--
 <v-col class="text-center" cols="12" sm="4">
       <v-btn
         v-if="newmarket.rel != 0"
@@ -11,6 +12,7 @@
         @click="gotoMarketView(newmarket.base.ticker, newmarket.rel.ticker)"
       >Go to market {{ newmarket.base.ticker }} / {{ newmarket.rel.ticker }}</v-btn>
 </v-col>
+-->
     </v-row>
     <v-row align="center">
       <v-col class="text-center" cols="12" sm="4">
@@ -30,6 +32,19 @@ BASE COIN (e.g. BTC)
           </div>
         </div>
       </v-col>
+<v-col class="text-center" cols="12" sm="4">
+(e.g. KMD / BTC)
+<div>
+      <v-btn
+        v-if="newmarket.rel != 0"
+        width="256"
+        depressed
+        color="primary"
+        outlined
+        @click="gotoMarketView(newmarket.base.ticker, newmarket.rel.ticker)"
+      >Go to market {{ newmarket.base.ticker }} / {{ newmarket.rel.ticker }}</v-btn>
+</div>
+</v-col>
     </v-row>
 
 <!-- this is for a REL column with all the base in other column, one click solution.  e.g. KMD  then LTC,BTC,RVN,DGB, click on 1 of 4 base for KMD.
@@ -316,8 +331,10 @@ export default {
       //   }
       // });
       // window.location.href='#/traderview?base='+base+'&rel='+rel
-      window.location.href='/#/traderview/'+base+'/'+rel
-      // this.$router.go(this.$router.currentRoute)
+      // window.location.href='/#/traderview/'+base+'/'+rel
+      this.$router.push({name: "TraderView", params: {base: base, rel: rel}})
+      //this.$forceUpdate()
+      this.$router.go(this.$router.currentRoute)
 
       // this.forceRerender();
       // "http://" +

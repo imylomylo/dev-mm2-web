@@ -75,12 +75,6 @@ export default new Router({
       component: AppHome
     },
     {
-      path: '/traderview',
-      name: 'TraderView',
-      component: AppTraderView,
-      props: true
-    },
-    {
       path: '/traderview/:base/:rel',
       name: 'TraderView',
       component: AppTraderView,

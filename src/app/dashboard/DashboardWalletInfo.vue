@@ -12,7 +12,7 @@
         <tr>
           <th class="text-left">TICKER</th>
           <th class="text-left">Balance</th>
-          <th class="text-left">24h Delta</th>
+          <th class="text-left">Address</th>
           <th class="text-left">Actions</th>
         </tr>
       </thead>
@@ -20,7 +20,7 @@
         <tr v-for="row in allwallets" v-bind:key="row.ticker">
           <td>{{ row.ticker }}</td>
           <td>{{ row.balance }}</td>
-          <td>n/a</td>
+          <td>{{ row.address }}</td>
           <td>
             <div class="text-left">
               <v-chip class="ma-2" color="success" @click="deposit(row.ticker, row.address)">
@@ -39,7 +39,7 @@
         </tr>
       </tbody>
     </v-simple-table>
-    <v-overlay opacity="0.88" :absolute="absoluteOverlay" :value="depositOverlay">
+    <v-overlay opacity="0.88" :absolute="absoluteOverlay" :value="depositOverlay" z-index="6">
       {{ depositTicker }}: {{ depositAddress }}
       <qrcode-vue :value="depositAddress" :size="depositOverlaySize" level="L"></qrcode-vue>
       <v-btn color="success" @click="hideDepositOverlay">Dismiss</v-btn>
