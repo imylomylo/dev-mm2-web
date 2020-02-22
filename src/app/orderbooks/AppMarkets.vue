@@ -17,7 +17,7 @@
     <v-row align="center">
       <v-col class="text-center" cols="12" sm="4">
         <!-- <div v-for="coin in mmccoins" v-bind:key="coin.id"> -->
-REL COIN (e.g. KMD)
+BASE COIN (e.g. KMD)
         <div v-for="coin in activeCoins" v-bind:key="coin.id">
           <div class="my-2">
             <v-btn width="128" depressed color="primary" outlined @click="base(coin)">{{coin.ticker}}</v-btn>
@@ -25,7 +25,7 @@ REL COIN (e.g. KMD)
         </div>
       </v-col>
       <v-col v-if="newmarket.base != 0" class="text-center" cols="12" sm="4">
-BASE COIN (e.g. BTC)
+REL COIN (e.g. BTC)
         <div v-for="coin in activeCoins" v-bind:key="coin.id">
           <div class="my-2">
             <v-btn width="128" depressed color="primary" outlined @click="rel(coin)">{{coin.ticker}}</v-btn>
