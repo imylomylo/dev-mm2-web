@@ -183,7 +183,6 @@ export default {
 
       axios
         .get(
-          "http://" +
             process.env.VUE_APP_MMBOTURL +
             "/getBalance?coin=" +
             rel
