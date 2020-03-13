@@ -127,7 +127,7 @@ export default {
     }
   },
   data: () => ({
-    appName: "OrderBook Live v0",
+    appName: "OrderBook.Live",
     base: '',
     componentKey: 0,
     dialog: false,

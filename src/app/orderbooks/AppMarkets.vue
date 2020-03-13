@@ -413,6 +413,8 @@ export default {
         this.customerrors.push(e);
       });
     // this.showMarket("RICK", "MORTY");
+    this.newmarket.base.ticker = "KMD"
+    this.newmarket.rel.ticker = "BTC"
     console.log(this.appName + " Finished Created");
   },
   computed: {
