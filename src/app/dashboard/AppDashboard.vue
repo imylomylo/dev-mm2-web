@@ -41,13 +41,10 @@ export default {
   },
   methods: {
     setAllWallets: function() {
-      console.log("Getting enabled coins")
+      console.log("Getting enabled coins with MMBOTURL")
       axios
         .get(
-          "http://" +
-            process.env.VUE_APP_MMBOTHOST +
-            ":" +
-            process.env.VUE_APP_MMBOTPORT +
+            process.env.VUE_APP_MMBOTURL +
             "/coinsenabled"
         )
         .then(response => {

@@ -73,10 +73,7 @@ export default {
 
       axios
         .get(
-          "http://" +
-            process.env.VUE_APP_MMBOTHOST +
-            ":" +
-            process.env.VUE_APP_MMBOTPORT +
+            process.env.VUE_APP_MMBOTURL +
             "/cancelAllOrders",
           requestData
         )
@@ -97,10 +94,7 @@ export default {
 
       axios
         .post(
-          "http://" +
-            process.env.VUE_APP_MMBOTHOST +
-            ":" +
-            process.env.VUE_APP_MMBOTPORT +
+            process.env.VUE_APP_MMBOTURL +
             "/cancelOrder?uuid="+requestData.uuid
         )
         .then(response => {
@@ -123,10 +117,7 @@ export default {
     getMyOrders: function() {
       axios
         .get(
-          "http://" +
-            process.env.VUE_APP_MMBOTHOST +
-            ":" +
-            process.env.VUE_APP_MMBOTPORT +
+            process.env.VUE_APP_MMBOTURL +
             "/getOrders"
         )
         .then(response => {

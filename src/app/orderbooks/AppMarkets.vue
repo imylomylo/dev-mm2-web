@@ -399,7 +399,7 @@ export default {
     console.log(this.appName + " Created");
     // this.getMyOrders();
     axios
-      .get("http://" + process.env.VUE_APP_MMBOTHOST + ":" + process.env.VUE_APP_MMBOTPORT + "/coinsenabled")
+      .get(process.env.VUE_APP_MMBOTURL + "/coinsenabled")
       .then(response => {
         console.log("MYLO" + JSON.stringify(response.data.result));
         // JSON responses are automatically parsed.

@@ -285,10 +285,7 @@ export default {
       console.log("Show market:" + base + "/" + rel);
       axios
         .post(
-          "http://" +
-            process.env.VUE_APP_MMBOTHOST +
-            ":" +
-            process.env.VUE_APP_MMBOTPORT +
+            process.env.VUE_APP_MMBOTURL +
             "/getMarket?base=" +
             base +
             "&rel=" +
@@ -308,7 +305,7 @@ export default {
           this.customerrors.push(e);
         });
     },
-    getCEXprice: function(base, rel) {
+    NOTUSEDgetCEXprice: function(base, rel) {
       console.log("Getting CEX Price:" + base + "/" + rel);
       axios
         .get(

@@ -503,7 +503,7 @@ export default {
     showDEXMarket: function(base, rel) {
       console.log("Show market:" + base + "/" + rel);
       axios
-        .post('http://' + process.env.VUE_APP_MMBOTHOST + ':' + process.env.VUE_APP_MMBOTPORT + '/getMarket?base=' + base + '&rel=' + rel)
+        .post(process.env.VUE_APP_MMBOTURL + '/getMarket?base=' + base + '&rel=' + rel)
         .then(response => {
           this.marketData = response.data;
 
@@ -530,7 +530,7 @@ export default {
     },
     getMyOrders: function() {
       axios
-        .get('http://' + process.env.VUE_APP_MMBOTHOST + ':' + process.env.VUE_APP_MMBOTPORT + '/getOrders')
+        .get(process.env.VUE_APP_MMBOTURL + '/getOrders')
         .then(response => {
           // if response.data.result == "success"
           // console.log(response.data);
@@ -560,7 +560,7 @@ export default {
     console.log(this.appName + " Created");
     this.getMyOrders();
     axios
-      .get('http://' + process.env.VUE_APP_MMBOTHOST + ':'+ process.env.VUE_APP_MMBOTPORT + '/coinsenabled')
+      .get(process.env.VUE_APP_MMBOTURL + '/coinsenabled')
       .then(response => {
         // console.log(response.data);
         // JSON responses are automatically parsed.

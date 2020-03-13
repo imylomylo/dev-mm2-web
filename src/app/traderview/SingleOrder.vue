@@ -88,10 +88,7 @@ export default {
 
       axios
         .post(
-          "http://" +
-            process.env.VUE_APP_MMBOTHOST +
-            ":" +
-            process.env.VUE_APP_MMBOTPORT +
+            process.env.VUE_APP_MMBOTURL +
             "/doMaker?base="+requestData.base+"&rel="+requestData.rel+"&volume="+requestData.volume+"&price="+requestData.price
         )
         .then(response => {
@@ -128,10 +125,7 @@ export default {
       console.log("Buy BASE: " + JSON.stringify(requestData, null, 4))
       axios
         .post(
-          "http://" +
-            process.env.VUE_APP_MMBOTHOST +
-            ":" +
-            process.env.VUE_APP_MMBOTPORT +
+            process.env.VUE_APP_MMBOTURL +
             "/doMaker?base="+requestData.base+"&rel="+requestData.rel+"&volume="+requestData.volume+"&price="+requestData.price
         )
         .then(response => {

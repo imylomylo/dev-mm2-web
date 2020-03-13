@@ -168,10 +168,7 @@ export default {
       console.log("My balance");
       axios
         .get(
-          "http://" +
-            process.env.VUE_APP_MMBOTHOST +
-            ":" +
-            process.env.VUE_APP_MMBOTPORT +
+            process.env.VUE_APP_MMBOTURL +
             "/getBalance?coin=" +
             base
         )
@@ -187,9 +184,7 @@ export default {
       axios
         .get(
           "http://" +
-            process.env.VUE_APP_MMBOTHOST +
-            ":" +
-            process.env.VUE_APP_MMBOTPORT +
+            process.env.VUE_APP_MMBOTURL +
             "/getBalance?coin=" +
             rel
         )

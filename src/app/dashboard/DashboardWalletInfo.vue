@@ -94,10 +94,7 @@ export default {
       console.log("Fetch myBalance: " + JSON.stringify(wallet));
       axios
         .get(
-          "http://" +
-            process.env.VUE_APP_MMBOTHOST +
-            ":" +
-            process.env.VUE_APP_MMBOTPORT +
+            process.env.VUE_APP_MMBOTURL +
             "/getBalance?coin=" +
             wallet.ticker
         )
