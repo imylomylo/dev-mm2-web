@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2>{{ coinCount }} Active Coins</h2>
+    <h2>{{ activeCoins.length }} Active Coins</h2>
     <div v-if="activeCoins !== undefined && activeCoins.length > 0">
       <div>
         <v-simple-table>
@@ -34,38 +34,6 @@
       </div>
     </div>
     <div v-else>Nothing to show</div>
-    <div>
-      <h2>Supported Coins</h2>
-      <v-simple-table>
-        <thead>
-          <tr>
-            <th class="text-left">Coin</th>
-            <th class="text-left">Activate</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(item, index) in supportedCoins" :key="item.ticker">
-            <td>{{ item.ticker }}</td>
-            <td>
-              <v-btn
-                v-if="!isEnabled(item.ticker)"
-                small
-                class="mx-2"
-                fab
-                dark
-                color="indigo"
-                @click="enableCoin(index)"
-              >
-                <v-icon dark>add</v-icon>
-              </v-btn>
-              <v-btn v-else small class="mx-2" fab disabled>
-                <v-icon>check_circle_outline</v-icon>
-              </v-btn>
-            </td>
-          </tr>
-        </tbody>
-      </v-simple-table>
-    </div>
   </div>
 </template>
 
@@ -115,7 +83,11 @@ export default {
     getBalance: function(coin) {
       console.log("getBalance " + coin);
       return axios
-        .get("http://" + process.env.VUE_APP_WEBHOST + ":7780/getBalance?coin=" + coin)
+        .get("http://" + 
+  	   process.env.VUE_APP_MMBOTHOST + 
+	   ":" +
+	   process.env.VUE_APP_MMBOTPORT + 
+   	   "/getBalance?coin=" + coin)
         .then(response => {
           // if response.data.result == "success"
           console.log("getBalance() response: " + response.data);
@@ -153,12 +125,13 @@ export default {
   created: function() {
     console.log("AppCoins Created");
     axios
-      .get("http://" + process.env.VUE_APP_WEBHOST + ":7780/coinsenabled")
+      //.get("http://" + process.env.VUE_APP_WEBHOST + ":" + process.env.VUE_APP_WEBPORT + "/" + process.env.VUE_APP_MMBOTHOST + ":" + process.env.VUE_APP_MMBOTPORT + "/api/v1/legacy/mm2/get_enabled_coins")
+      .get("http://" + process.env.VUE_APP_MMBOTHOST + ":" + process.env.VUE_APP_MMBOTPORT + "/coinsenabled")
       .then(response => {
-        // console.log(response.data);
+        console.log("MYLO" + JSON.stringify(response.data.result));
         // JSON responses are automatically parsed.
-        if (response.data !== undefined) {
-          console.log(response.data.result)
+        if (response !== undefined) {
+          console.log(response)
           this.activeCoins = response.data.result;
           console.log("this.activeCoins: " + this.activeCoins)
         }
@@ -167,7 +140,7 @@ export default {
         this.customerrors.push(e);
       });
     console.log("AppCoins Finished Created " + JSON.stringify(this.activeCoins))
-    this.getServiceConfig();
+    // this.getServiceConfig();
   },
   // computed: {
   //   coinCount: function() {

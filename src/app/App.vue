@@ -1,5 +1,6 @@
 <template>
   <v-app id="inspire">
+<!--
     <v-navigation-drawer v-model="drawer" :clipped="$vuetify.breakpoint.lgAndUp" app>
       <v-list dense>
         <template v-for="item in items">
@@ -11,6 +12,7 @@
               <a href="#!" class="body-2 black--text">EDIT</a>
             </v-flex>
           </v-layout>
+
           <v-list-group
             v-else-if="item.children"
             :key="item.text"
@@ -45,138 +47,103 @@
         </template>
       </v-list>
     </v-navigation-drawer>
+-->
 
-    <v-app-bar :clipped-left="$vuetify.breakpoint.lgAndUp" app color="blue darken-3" dark>
+    <v-app-bar :clipped-left="$vuetify.breakpoint.lgAndUp" app color="indigo" dark>
       <v-toolbar-title style="width: 300px" class="ml-0 pl-4">
         <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
         <span class="hidden-sm-and-down">{{ appName }}</span>
       </v-toolbar-title>
-      <v-text-field
-        flat
-        solo-inverted
-        hide-details
-        prepend-inner-icon="search"
-        label="Search"
-        class="hidden-sm-and-down"
-      ></v-text-field>
+
       <v-spacer></v-spacer>
-      <v-btn icon>
-        <v-icon>apps</v-icon>
+      <v-btn rounded depressed dark large color="indigo" href="/#/dashboard">
+        <h3>Dashboard</h3>
+        <v-icon class="px-2">ballot</v-icon>
       </v-btn>
-      <v-btn icon>
-        <v-icon>notifications</v-icon>
+      <v-btn rounded depressed dark large color="indigo" @click="dialog = !dialog">
+        <h3>Markets</h3>
+        <v-icon class="px-2">apps</v-icon>
       </v-btn>
-      <!-- <v-btn icon large>
-        <v-avatar size="64px" item>
-          <v-img src="https://atomicdex.io/assets/images/logo_light.svg" alt="AtomicDEX"></v-img>
-        </v-avatar>
-      </v-btn> -->
     </v-app-bar>
+
+    <v-dialog v-model="dialog" fullscreen hide-overlay transition="dialog-bottom-transition">
+      <v-card>
+        <v-toolbar dark color="indigo">
+          <v-btn icon dark @click="dialog = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+          <v-toolbar-title>Markets</v-toolbar-title>
+          <div class="flex-grow-1"></div>
+          <v-toolbar-items>
+            <v-btn dark text @click="dialog = false">back</v-btn>
+          </v-toolbar-items>
+        </v-toolbar>
+        <v-list three-line subheader>
+          <v-subheader>Go to markets</v-subheader>
+          <v-list-item>
+            <v-list-item-content>
+              <v-list-item-title>Informational Section</v-list-item-title>
+              <v-list-item-subtitle>Please wait for the available market links to load</v-list-item-subtitle>
+
+
+              <AppMarkets v-on:closeDialog="gotoMarket" :key="componentKey" />
+
+
+            </v-list-item-content>
+          </v-list-item>
+          <v-divider></v-divider>
+        </v-list>
+      </v-card>
+    </v-dialog>
+
     <v-content>
       <router-view></router-view>
     </v-content>
-    <v-btn bottom color="pink" dark fab fixed right @click="dialog = !dialog">
-      <v-icon>add</v-icon>
-    </v-btn>
-    <!-- <div v-if="dialog = true">
-      <NewOrderDialog :dialog="dialog"/>
-    </div> -->
-
-    <!-- <v-dialog v-model="dialog" width="800px">
-      <v-card>
-        <v-card-title class="grey darken-2">Create contact</v-card-title>
-        <v-container grid-list-sm>
-          <v-layout wrap>
-            <v-flex xs12 align-center justify-space-between>
-              <v-layout align-center>
-                <v-avatar size="40px" class="mr-4">
-                  <img src="//ssl.gstatic.com/s2/oz/images/sge/grey_silhouette.png" alt />
-                </v-avatar>
-                <v-text-field placeholder="Name"></v-text-field>
-              </v-layout>
-            </v-flex>
-            <v-flex xs6>
-              <v-text-field prepend-icon="business" placeholder="Company"></v-text-field>
-            </v-flex>
-            <v-flex xs6>
-              <v-text-field placeholder="Job title"></v-text-field>
-            </v-flex>
-            <v-flex xs12>
-              <v-text-field prepend-icon="mail" placeholder="Email"></v-text-field>
-            </v-flex>
-            <v-flex xs12>
-              <v-text-field type="tel" prepend-icon="phone" placeholder="(000) 000 - 0000"></v-text-field>
-            </v-flex>
-            <v-flex xs12>
-              <v-text-field prepend-icon="notes" placeholder="Notes"></v-text-field>
-            </v-flex>
-          </v-layout>
-        </v-container>
-        <v-card-actions>
-          <v-btn text color="primary">More</v-btn>
-          <v-spacer></v-spacer>
-          <v-btn text color="primary" @click="dialog = false">Cancel</v-btn>
-          <v-btn text @click="dialog = false">Save</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog> -->
   </v-app>
 </template>
 
 <script>
-// import HelloWorld from "./helloworld/HelloWorld";
-// import NewOrderDialog from './shared/dialogNewOrder'
+import AppMarkets from "./orderbooks/AppMarkets";
 
 export default {
   name: "App",
-  // components: {
-  //   NewOrderDialog
-  // },
+  components: { AppMarkets },
   props: {
     source: String
   },
   methods: {
+    gotoMarket: function() {
+      // console.log("Going to new market..." + base + "/")// + rel)
+      console.log(this.componentKey)
+      this.componentKey += 1
+      this.dialog = !this.dialog
+      // this.$router.push("#")
+      // this.$router.push("/traderview?base=" + base + "&rel=KMD")// + rel);
+
+// window.location.href = "#/" + command.toLowerCase().replace(/ /g, "");
+    },
     doAction: function(command) {
-      // console.log("HEY " + command)
-      window.location.href='#/'+command.toLowerCase().replace(/ /g,'')
+      window.location.href = "/#/" + command.toLowerCase().replace(/ /g, "");
     }
   },
   data: () => ({
-    appName: "Marketmaker Club",
+    appName: "OrderBook.Live",
+    base: '',
+    componentKey: 0,
     dialog: false,
-    drawer: null,
+    drawer: false,
     items: [
       { icon: "play_circle_outline", text: "Coins" },
       { icon: "blur_linear", text: "Orderbooks" },
-      { icon: "swap_horiz", text: "Completed Swaps"},
-      { icon: "swap_horizontal_circle", text: "Current Swap Status"},
+      { icon: "swap_horiz", text: "Completed Swaps" },
+      { icon: "swap_horizontal_circle", text: "Current Swap Status" },
       { icon: "save_alt", text: "Refill" },
       { icon: "eject", text: "Withdraw" },
-      // {
-      //   icon: "keyboard_arrow_up",
-      //   "icon-alt": "keyboard_arrow_down",
-      //   text: "Labels",
-      //   model: true,
-      //   children: [{ icon: "add", text: "Create label" }]
-      // },
-      // {
-      //   icon: "keyboard_arrow_up",
-      //   "icon-alt": "keyboard_arrow_down",
-      //   text: "More",
-      //   model: false,
-      //   children: [
-      //     { text: "Import" },
-      //     { text: "Export" },
-      //     { text: "Print" },
-      //     { text: "Undo changes" },
-      //     { text: "Other contacts" }
-      //   ]
-      // },
       { icon: "control_camera", text: "Marketmaking" },
       { icon: "settings", text: "Settings" },
-      { icon: "account_balance", text: "Antara Market Cap"},
+      { icon: "account_balance", text: "Antara Market Cap" },
       { icon: "trending_up", text: "CEX Prices" },
-      { icon: "timeline", text: "Aggregator Prices"},
+      { icon: "timeline", text: "Aggregator Prices" },
       { icon: "chat_bubble", text: "Send feedback" },
       { icon: "help", text: "Help" },
       { icon: "phonelink", text: "App downloads" }

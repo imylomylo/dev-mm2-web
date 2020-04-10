@@ -65,22 +65,49 @@ export default {
   },
   methods: {},
   created: function() {
+
+      let requestData = {}
+      requestData['from_uuid'] = ""
+      requestData['limit'] = 10
+      // requestData['userpass'] = 'YOUR_PASSWORD_HERE'
+
+      axios
+        .post(
+          "http://" +
+            process.env.VUE_APP_WEBHOST +
+            ":" +
+            process.env.VUE_APP_WEBPORT +
+            "/" +
+            process.env.VUE_APP_MMBOTHOST +
+            ":" +
+            process.env.VUE_APP_MMBOTPORT +
+            "/api/v1/legacy/mm2/my_recent_swaps",
+            requestData
+        )
+        .then(response => {
+          console.log(JSON.stringify(response.data))
+        })
+        .catch(e => {
+          this.customerrors.push(e);
+        });
+
     console.log(this.appName + " Created");
-    axios
-      .get( "http://" + process.env.VUE_APP_WEBHOST + ":7780/recentswaps")
-      .then(response => {
-        // console.log(response.data);
-        // JSON responses are automatically parsed.
-        if (response.data !== undefined) {
-          // console.log(response.data.result)
-          this.history = response.data.result;
-          console.log("RECENT SWAPS: " + JSON.stringify(this.history));
-        }
-      })
-      .catch(e => {
-        this.customerrors.push(e);
-      });
-    // this.showMarket("RICK", "MORTY");
+
+    // axios
+    //   .get( "http://" + process.env.VUE_APP_WEBHOST + ":7780/recentswaps")
+    //   .then(response => {
+    //     // console.log(response.data);
+    //     // JSON responses are automatically parsed.
+    //     if (response.data !== undefined) {
+    //       // console.log(response.data.result)
+    //       this.history = response.data.result;
+    //       console.log("RECENT SWAPS: " + JSON.stringify(this.history));
+    //     }
+    //   })
+    //   .catch(e => {
+    //     this.customerrors.push(e);
+    //   });
+
     console.log(this.appName + " Finished Created");
   }
 };
