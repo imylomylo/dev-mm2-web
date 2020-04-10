@@ -14,6 +14,7 @@
           <th class="text-left">Balance</th>
           <th class="text-left">Address</th>
           <th class="text-left">Actions</th>
+          <th class="text-left">Market</th>
         </tr>
       </thead>
       <tbody v-if="allwallets">
@@ -30,6 +31,17 @@
                 <v-icon left>mdi-server-plus</v-icon>Withdraw
               </v-chip>
             </div>
+          </td>
+          <td>
+              <v-chip
+                class="ma-2"
+                color="purple"
+                outlined
+                @click="toTraderView(myCoin, row.ticker)"
+              >
+                <v-icon left>mdi-server-plus</v-icon>{{ myCoin }}/{{row.ticker}}
+              </v-chip>
+
           </td>
         </tr>
       </tbody>
@@ -52,6 +64,7 @@ import QrcodeVue from "qrcode.vue";
 
 export default {
   components: { QrcodeVue },
+  props: [ 'myCoin' ],
   data: function() {
     return {
       absoluteOverlay: false,
@@ -106,6 +119,11 @@ export default {
         .catch(e => {
           this.customerrors.push(e);
         });
+    },
+    toTraderView: function(base, rel){
+      console.log("Invert base " + base);
+      window.location.href = "/#/traderview/" + base + "/" + rel
+      this.$router.go(this.$router.currentRoute);
     }
   },
   created: function() {

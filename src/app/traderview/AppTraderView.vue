@@ -10,7 +10,13 @@
               <v-toolbar-title>Trading</v-toolbar-title>
 
               <v-divider class="mx-4" vertical></v-divider>
-              <h2>{{ wallets.base.ticker + " / " + wallets.rel.ticker}}</h2>
+<div class="d-flex">
+    <v-overflow-btn :items="items"
+      label="Select coin"
+      hide-details
+      class="pa-0 mg-0 tiny font-weight-bold"
+    ></v-overflow-btn>
+</div>
               <v-chip
                 class="ma-2"
                 color="success"
@@ -20,40 +26,24 @@
                 <v-icon left>mdi-server-plus</v-icon>INVERT
               </v-chip>
               <v-btn v-if="!ammdisabled" depressed small color="success">Automated</v-btn>
-              <v-btn v-else depressed small color="error">No Automation</v-btn>
+              <v-btn v-else depressed small color="error">{{ currentStrategyInfo }}</v-btn>
               <div class="flex-grow-1">
                 <v-divider class="mx-4" vertical></v-divider>
-                <v-btn depressed small>Global Average Price: 777</v-btn>
               </div>
+              <h2>{{ wallets.base.ticker + " / " + wallets.rel.ticker}}</h2>
+<!--
+<div class="flex-grow-1">
+    <v-overflow-btn :items="items"
+      label="Select coin"
+      hide-details
+      class="pa-0 mg-0 tiny font-weight-bold"
+    ></v-overflow-btn>
+</div>
+-->
 
-              <v-toolbar-items class="hidden-sm-and-down">
-                <v-divider vertical></v-divider>
-                <template v-if="!ammdisabled">
-                  <v-btn rounded depressed dark large color="red" @click="dismmenable">
-                    <h3>Disable Automation</h3>
-                  </v-btn>
-                </template>
-                <template v-else>
-                  <v-btn rounded depressed dark large color="green" @click="dismmenable">
-                    <h3>Enable Automation</h3>
-                  </v-btn>
-                </template>
-                <v-divider vertical></v-divider>
-              </v-toolbar-items>
-
-              <v-app-bar-nav-icon></v-app-bar-nav-icon>
             </v-toolbar>
           </v-row>
         </div>
-        <v-card-text color="blue">
-          <div>
-            CURRENT STRATEGY: {{ currentStrategyInfo}}
-            <!-- <v-btn text color="deep-purple accent-4">Learn More</v-btn> -->
-          </div>
-          <!-- <v-card-title> {{ currentStrategyInfo }} </v-card-title>
-          <p class="display-1 text--primary">{{currentStrategyInfo}}</p>-->
-        </v-card-text>
-        <!-- <CurrentStrategies /> -->
       </div>
 
       <v-divider class="mx-4 pb-5"></v-divider>
@@ -91,37 +81,6 @@
             </v-col>
           </v-row>
         </v-flex>
-
-        <!-- <v-flex md6 lg6>
-          <v-row class="px-4">
-            <v-col>
-              <h2>My Market Maker Orders</h2>
-
-              <div v-if="myOrders.maker">
-                <div>
-                  <v-layout>
-                    <v-flex md6 lg6>
-                      <v-data-table
-                        :headers="orderHeaders"
-                        :items="myOrders.maker"
-                        :items-per-page="5"
-                        class="elevation-1"
-                      >
-                        <template v-slot:item.taker="{ item }">
-                          <v-chip color="green" dark @click.stop.prevent="soon()">
-                            Cancel
-                            <v-icon left>swap_horiz</v-icon>Cancel
-                          </v-chip>
-                        </template>
-                      </v-data-table>
-                    </v-flex>
-                  </v-layout>
-                </div>
-              </div>
-              <div v-else>No current maker orders to display.</div>
-            </v-col>
-          </v-row>
-        </v-flex>-->
       </v-layout>
     </div>
   </div>
@@ -150,6 +109,7 @@ export default {
   data: function() {
     return {
       myOrders: "",
+      myCoin: process.env.VUE_APP_MYCOIN,
       wallets: {
         base: {
           ticker: "base1",
@@ -226,7 +186,8 @@ export default {
         { text: "Created At", value: "created_at" },
         { text: "Base Amount", value: "request.base_amount" },
         { text: "Can Cancel", value: "cancellable" }
-      ]
+      ],
+      items: ['KMD / FOO1', 'KMD / BAR1', 'KMD / FIZZ1', 'KMD / BUZZY1','KMD / FOO2', 'KMD / BAR2', 'KMD / FIZZ2', 'KMD / BUZZY2','KMD / FOO3', 'KMD / BAR3', 'KMD / FIZZ3', 'KMD / BUZZY3','KMD / FOO4', 'KMD / BAR4', 'KMD / FIZZ4', 'KMD / BUZZY4']
     };
   },
   methods: {
@@ -257,21 +218,13 @@ export default {
         toArray.push(obj[key]);
       });
       return toArray;
-    },
-    setAllWallets: function() {
-      this.allwallets = [
-        { ticker: "BTC", balance: 5 },
-        { ticker: "KMD", balance: 11 },
-        { ticker: "DOGE", balance: 123 }
-      ];
     }
   },
   created: function() {
     console.log(this.appName + " Created");
-    // console.log(this.$route.query.base);
-    // console.log(this.$route.query.rel);
     // this.wallets.base.ticker = this.$route.query.base;
     // this.wallets.rel.ticker = this.$route.query.rel;
+    console.log(this.myCoin)
     this.wallets.base.ticker = this.$route.params.base.toUpperCase()
     this.wallets.rel.ticker = this.$route.params.rel.toUpperCase()
     console.log(this.appName + " Finished Created");
@@ -291,6 +244,9 @@ export default {
 };
 </script>
 <style scoped>
+.tiny {
+  width: 185px;
+}
 .top-spaced {
   margin-top: 50px;
 }
