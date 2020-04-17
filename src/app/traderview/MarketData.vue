@@ -68,7 +68,7 @@
       </div>
     </div>
     <div v-else>No current asks to display.</div>
-    <h2 class="pl-3">CEX Price: {{ cexprice }}</h2>
+    <h2 class="pl-3">{{ middlePrice }} Middle Price</h2>
 
     <div v-if="marketdata.bids">
       <div>
@@ -299,6 +299,7 @@ export default {
           this.marketdata = tmpmarketdata
 
           console.log(JSON.stringify(this.marketdata, null, 4))
+          console.log("Lowest ask: " + this.marketdata.asks.sort((a,b) => a.price - b.price)[0].price + "\nHighest bid: " + this.marketdata.bids.sort((a,b) => b.price - a.price)[0].price)
 
         })
         .catch(e => {
@@ -420,12 +421,24 @@ export default {
     // test grouping
     // this.marketdata.asks = this.groupByPrice2(this.fakeData.asks, "price");
     // this.marketdata.bids = this.groupByPrice2(this.fakeData.bids, "price");
-    this.getCEXprice(this.wallets.base.ticker, this.wallets.rel.ticker);
+    //this.getCEXprice(this.wallets.base.ticker, this.wallets.rel.ticker);
     console.log(this.appName + " Finished Created");
   },
   computed: {
     coinCount: function() {
       return this.activeCoins.length;
+    },
+    middlePrice: function(lowAsk, highBid) {
+      let middle = "No"
+      if( this.marketdata.asks.length > 0 && this.marketdata.bids.length > 0) {
+        let lowestAsk = this.marketdata.asks.sort((a,b) => a.price - b.price)[0].price 
+        let highestBid = this.marketdata.bids.sort((a,b) => b.price - a.price)[0].price
+        middle = parseFloat(parseFloat(highestBid) + (parseFloat(lowestAsk) - parseFloat(highestBid))/2)
+        return middle.toFixed(8) + " Approx. "
+      }
+      else {
+        return middle
+      }
     }
   }
 };
