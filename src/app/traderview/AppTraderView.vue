@@ -11,10 +11,13 @@
 
               <v-divider class="mx-4" vertical></v-divider>
 <div class="d-flex">
-    <v-overflow-btn :items="items"
-      label="Select coin"
+    <v-overflow-btn :items="availableMarkets"
+      :label="(wallets.base.ticker +' / '+  wallets.rel.ticker)"
+      :disabled="loadingNextMarket"
       hide-details
       class="pa-0 mg-0 tiny font-weight-bold"
+      item-value="text"
+      @change="nextMarket($event)"
     ></v-overflow-btn>
 </div>
               <v-chip
@@ -59,6 +62,8 @@
               <MyOrders ref="myordersref" />
             </v-col>
           </v-row>
+<!-- mePrivate and mePublic are set in .env* files of the root of the webapp project and read in at runtime -->
+<div v-if="mePrivate == 'true' && mePublic == 'false'">
           <v-row class="px-4 pb-6">
             <v-col>
               <SingleOrder
@@ -67,6 +72,7 @@
               />
             </v-col>
           </v-row>
+</div>
         </v-flex>
         <v-flex md6 lg6>
           <v-row class="px-4">
@@ -110,6 +116,10 @@ export default {
     return {
       myOrders: "",
       myCoin: process.env.VUE_APP_MYCOIN,
+      isMyCoinBase: '',
+      mePrivate: process.env.VUE_APP_MEPRIVATE,
+      mePublic: process.env.VUE_APP_MEPUBLIC,
+      loadingNextMarket: false,
       wallets: {
         base: {
           ticker: "base1",
@@ -186,11 +196,20 @@ export default {
         { text: "Created At", value: "created_at" },
         { text: "Base Amount", value: "request.base_amount" },
         { text: "Can Cancel", value: "cancellable" }
-      ],
-      items: ['KMD / FOO1', 'KMD / BAR1', 'KMD / FIZZ1', 'KMD / BUZZY1','KMD / FOO2', 'KMD / BAR2', 'KMD / FIZZ2', 'KMD / BUZZY2','KMD / FOO3', 'KMD / BAR3', 'KMD / FIZZ3', 'KMD / BUZZY3','KMD / FOO4', 'KMD / BAR4', 'KMD / FIZZ4', 'KMD / BUZZY4']
+      ]
     };
   },
   methods: {
+    nextMarket: function(e){
+        console.log("NEXT MARKET + " + e)
+        this.loadingNextMarket = true
+        let nextMarket = e.split('/')
+        let nextBase = nextMarket[0].trim()
+        let nextRel = nextMarket[1].trim()
+        console.log("Next base & rel is: " + nextBase + " & " + nextRel)
+      window.location.href = "/#/traderview/" + nextBase + "/" + nextRel
+      this.$router.go(this.$router.currentRoute);
+    },
     orderResponse: function(result) {
       console.log(JSON.stringify(result, null, 4));
       this.$refs.myordersref.newOrder(result)
@@ -222,11 +241,34 @@ export default {
   },
   created: function() {
     console.log(this.appName + " Created");
+    // set the base & rel for this.wallets
+    // old work
     // this.wallets.base.ticker = this.$route.query.base;
     // this.wallets.rel.ticker = this.$route.query.rel;
-    console.log(this.myCoin)
+    // current work
     this.wallets.base.ticker = this.$route.params.base.toUpperCase()
+    if( this.myCoin === this.wallets.base.ticker ){
+        this.isMyCoinBase = true
+    } else {
+        this.isMyCoinBase = false
+    }
+    console.log("My coin is: " + this.myCoin + " and is my coin base: " + this.isMyCoinBase )
     this.wallets.rel.ticker = this.$route.params.rel.toUpperCase()
+
+    // get enabled coins, this has come from AppMarkets.vue
+    axios
+      .get(process.env.VUE_APP_MMBOTURL + "/coinsenabled")
+      .then(response => {
+        console.log("MYLO" + JSON.stringify(response.data.result));
+        if (response !== undefined) {
+          this.activeCoins = response.data.result;
+          console.log("this.activeCoins: " + this.activeCoins)
+        }
+      })
+      .catch(e => {
+        this.customerrors.push(e);
+      });
+
     console.log(this.appName + " Finished Created");
   },
   beforeRouteUpdate(to, from, next) {
@@ -239,6 +281,19 @@ export default {
   computed: {
     coinCount: function(row) {
       return this.activeCoins.length;
+    },
+    availableMarkets: function(){
+      let arrMarketPairs = new Array()
+      if(this.isMyCoinBase){
+        for( let coin = 0 ; coin < this.activeCoins.length ; coin++ ){
+          arrMarketPairs.push( { text: this.myCoin + " / " + this.activeCoins[coin].ticker })
+        }
+      } else {
+        for( let coin = 0 ; coin < this.activeCoins.length ; coin++ ){
+          arrMarketPairs.push( { text: this.activeCoins[coin].ticker + " / " + this.myCoin })
+        }
+      }
+      return arrMarketPairs
     }
   }
 };

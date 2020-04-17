@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-card class="mx-auto" max-width="auto" outlined>
-      <v-toolbar flat dense color="blue-grey lighten-5">
+      <v-toolbar flat dense color="red lighten-1">
         <v-toolbar-title>
           <span class="subheading">Single Order {{wallets.base.ticker}}</span>
         </v-toolbar-title>
