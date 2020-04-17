@@ -397,6 +397,7 @@ export default {
   },
   created: function() {
     console.log(this.appName + " Created");
+    // this.getMyOrders();
     axios
       .get(process.env.VUE_APP_MMBOTURL + "/coinsenabled")
       .then(response => {
@@ -411,7 +412,7 @@ export default {
       .catch(e => {
         this.customerrors.push(e);
       });
-    // default values for GUI
+    // this.showMarket("RICK", "MORTY");
     this.newmarket.base.ticker = "KMD"
     this.newmarket.rel.ticker = "BTC"
     console.log(this.appName + " Finished Created");

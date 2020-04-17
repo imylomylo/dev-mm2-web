@@ -3,15 +3,12 @@
     <v-card max-width="auto" class="mx-auto" outlined>
       <v-toolbar flat dense color="blue-grey lighten-5">
         <v-toolbar-title>
-          <span class="subheading">Orders For {{ meName || "This Node"}}</span>
+          <span class="subheading">My Orders</span>
         </v-toolbar-title>
         <div class="flex-grow-1"></div>
-<!-- mePrivate and mePublic are set in .env* files of the root of the webapp project and read in at runtime -->
-<div v-if="mePrivate == 'true' && mePublic == 'false'">
         <v-chip class="ma-2" color="error" outlined @click="cancelAllOrders()">
           <v-icon left>mdi-server-plus</v-icon>Cancel All
         </v-chip>
-</div>
       </v-toolbar>
       <v-divider class="mx-4"></v-divider>
       <div v-if="myOrders !== undefined && Object.keys(myOrders).length > 0">
@@ -38,12 +35,9 @@
                   <!-- <v-chip class="ma-2" color="success" @click="gotoMarket(row.base, row.rel)">
                 <v-icon left>mdi-server-plus</v-icon>Go to market
                   </v-chip>-->
-<!-- mePrivate and mePublic are set in .env* files of the root of the webapp project and read in at runtime -->
-<div v-if="mePrivate == 'true' && mePublic == 'false'">
                   <v-chip class="ma-2" color="red" dark @click="cancelOrder(myOrders[row].uuid)">
                     <v-icon left>mdi-server-plus</v-icon>Cancel
                   </v-chip>
-</div>
                 </div>
               </td>
             </tr>
@@ -60,9 +54,6 @@ import axios from "axios";
 export default {
   data: function() {
     return {
-      meName: process.env.VUE_APP_MENAME,
-      mePrivate: process.env.VUE_APP_MEPRIVATE,
-      mePublic: process.env.VUE_APP_MEPUBLIC,
       myOrders: {},
       customerrors: []
     };
