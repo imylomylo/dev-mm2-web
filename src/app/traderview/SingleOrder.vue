@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-card class="mx-auto" max-width="auto" outlined>
-      <v-toolbar flat dense color="blue-grey lighten-5">
+      <v-toolbar flat dense color="red lighten-1">
         <v-toolbar-title>
           <span class="subheading">Single Order {{wallets.base.ticker}}</span>
         </v-toolbar-title>
@@ -11,7 +11,7 @@
       <v-divider class="mx-4"></v-divider>
 
       <v-form ref="form">
-        <v-text-field v-model="price" label="Price in other coin" required></v-text-field>
+        <v-text-field v-model="price" :label="priceInOtherCoinLabel()" required></v-text-field>
         <v-text-field v-model="amount" label="Amount" required></v-text-field>
         <v-card-text>
           <v-chip-group
@@ -62,6 +62,9 @@ export default {
     };
   },
   methods: {
+    priceInOtherCoinLabel: function() {
+      return "Price in other coin (" + this.wallets.rel.ticker + ")"
+    },
     ordersize_pc: function(pc) {
       console.log(pc);
     },
