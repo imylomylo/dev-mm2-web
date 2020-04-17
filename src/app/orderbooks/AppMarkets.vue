@@ -405,7 +405,7 @@ export default {
         // JSON responses are automatically parsed.
         if (response !== undefined) {
           console.log(response)
-          this.activeCoins = response.data.result;
+          this.activeCoins = response.data.result.sort((a,b) => a.ticker.localeCompare(b.ticker))
           console.log("this.activeCoins: " + this.activeCoins)
         }
       })
