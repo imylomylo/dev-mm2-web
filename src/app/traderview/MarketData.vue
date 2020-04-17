@@ -68,7 +68,7 @@
       </div>
     </div>
     <div v-else>No current asks to display.</div>
-    <h2 class="pl-3">{{ middlePrice }} Middle Price</h2>
+    <h2 class="pl-3">{{ middlePriceSpreadData.middle }} Middle Price (Spread: {{ middlePriceSpreadData.spread}} %)</h2>
 
     <div v-if="marketdata.bids">
       <div>
@@ -428,16 +428,22 @@ export default {
     coinCount: function() {
       return this.activeCoins.length;
     },
-    middlePrice: function(lowAsk, highBid) {
-      let middle = "No"
+    middlePriceSpreadData: function(lowAsk, highBid) {
+      // middlePriceSpreadData.middle & middlePriceSpreadData.spread
+      let middlePriceSpreadData = {}
+      middlePriceSpreadData.middle = "No"
+      middlePriceSpreadData.spread = 0
       if( this.marketdata.asks.length > 0 && this.marketdata.bids.length > 0) {
         let lowestAsk = this.marketdata.asks.sort((a,b) => a.price - b.price)[0].price 
         let highestBid = this.marketdata.bids.sort((a,b) => b.price - a.price)[0].price
-        middle = parseFloat(parseFloat(highestBid) + (parseFloat(lowestAsk) - parseFloat(highestBid))/2)
-        return middle.toFixed(8) + " Approx. "
+        let spread = (parseFloat(lowestAsk) - parseFloat(highestBid))
+        let middle = parseFloat(parseFloat(highestBid) + (parseFloat(lowestAsk) - parseFloat(highestBid))/2)
+        middlePriceSpreadData.middle = middle.toFixed(8) + " Approx. "
+        middlePriceSpreadData.spread = (parseFloat(spread/middle) * 100).toFixed(1)
+        return middlePriceSpreadData 
       }
       else {
-        return middle
+        return middlePriceSpreadData
       }
     }
   }
