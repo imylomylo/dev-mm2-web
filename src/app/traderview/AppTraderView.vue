@@ -284,16 +284,21 @@ export default {
     },
     availableMarkets: function(){
       let arrMarketPairs = new Array()
+      let arrInvertedPairs = new Array()
       if(this.isMyCoinBase){
         for( let coin = 0 ; coin < this.activeCoins.length ; coin++ ){
           arrMarketPairs.push( { text: this.myCoin + " / " + this.activeCoins[coin].ticker })
+          arrInvertedPairs.push( { text: this.activeCoins[coin].ticker + " / " + this.myCoin })
         }
       } else {
         for( let coin = 0 ; coin < this.activeCoins.length ; coin++ ){
           arrMarketPairs.push( { text: this.activeCoins[coin].ticker + " / " + this.myCoin })
+          arrInvertedPairs.push( { text: this.myCoin + " / " + this.activeCoins[coin].ticker })
         }
       }
-      return arrMarketPairs
+      arrMarketPairs.sort((a,b) => a.text.localeCompare(b.text))
+      arrInvertedPairs.sort((a,b) => a.text.localeCompare(b.text))
+      return arrMarketPairs.concat(arrInvertedPairs)
     }
   }
 };
