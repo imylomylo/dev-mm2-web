@@ -49,7 +49,7 @@ export default {
         )
         .then(response => {
           console.log(JSON.stringify(response.data.result))
-          this.allwallets = response.data.result;
+          this.allwallets = response.data.result.sort((a,b) => a.ticker.localeCompare(b.ticker))
           this.$refs.dashboardWallets.allwallets = this.allwallets
         })
         .catch(e => {
