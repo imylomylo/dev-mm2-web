@@ -69,6 +69,8 @@
               <MyOrders ref="myordersref" />
             </v-col>
           </v-row>
+<!-- mePrivate and mePublic are set in .env* files of the root of the webapp project and read in at runtime -->
+<div v-if="mePrivate == 'true' && mePublic == 'false'">
           <v-row class="px-4 pb-6">
             <v-col>
               <SingleOrder
@@ -77,6 +79,7 @@
               />
             </v-col>
           </v-row>
+</div>
         </v-flex>
         <v-flex md6 lg6>
           <v-row class="px-4">
@@ -149,6 +152,8 @@ export default {
   // props: ['rows'],
   data: function() {
     return {
+      mePrivate: process.env.VUE_APP_MEPRIVATE,
+      mePublic: process.env.VUE_APP_MEPUBLIC,
       myOrders: "",
       wallets: {
         base: {
