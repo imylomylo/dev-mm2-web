@@ -22,7 +22,10 @@
               <th class="text-left">Status</th>
               <th class="text-left">Order Price</th>
               <th class="text-left">Amount</th>
+<!-- mePrivate and mePublic are set in .env* files of the root of the webapp project and read in at runtime -->
+<div v-if="mePrivate == 'true' && mePublic == 'false'">
               <th class="text-left">Shortcut</th>
+</div>
             </tr>
           </thead>
           <tbody>
