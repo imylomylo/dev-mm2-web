@@ -20,6 +20,11 @@
             <AppExport />
           </v-col>
         </v-row>
+        <v-row class="px-4">
+          <v-col>
+            <MyOrders />
+          </v-col>
+        </v-row>
       </v-flex>
     </v-layout>
   </div>
@@ -29,9 +34,10 @@ import axios from 'axios'
 import DashboardWalletInfo from "./DashboardWalletInfo"
 import AppStrategy from "../strategy/AppStrategy"
 import AppExport from "../export/AppExport"
+import MyOrders from '../traderview/MyOrders'
 
 export default {
-  components: { DashboardWalletInfo, AppStrategy, AppExport },
+  components: { DashboardWalletInfo, AppStrategy, AppExport, MyOrders },
   data: function() {
     return {
       appName: "Dashboard",

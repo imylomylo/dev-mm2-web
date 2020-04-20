@@ -21,11 +21,13 @@
               </v-chip>
               <v-btn v-if="!ammdisabled" depressed small color="success">Automated</v-btn>
               <v-btn v-else depressed small color="error">No Automation</v-btn>
+              <FiatPrice :base=wallets.base.ticker :rel=wallets.rel.ticker></FiatPrice>
+<!--
               <div class="flex-grow-1">
                 <v-divider class="mx-4" vertical></v-divider>
                 <v-btn depressed small>Global Average Price: 777</v-btn>
               </div>
-
+-->
               <v-toolbar-items class="hidden-sm-and-down">
                 <v-divider vertical></v-divider>
                 <template v-if="!ammdisabled">
@@ -130,14 +132,15 @@
   </div>
 </template>
 <script>
-import axios from "axios";
-import Description from "./Description";
+import axios from "axios"
+import Description from "./Description"
+import FiatPrice from './FiatPrice'
 import MyOrders from "./MyOrders"
-import WalletInfo from "./WalletInfo";
-import AutomatedMarketMaking from "./AutomatedMarketMaking";
-import SingleOrder from "./SingleOrder";
-import MarketData from "./MarketData";
-import { log } from "util";
+import WalletInfo from "./WalletInfo"
+import AutomatedMarketMaking from "./AutomatedMarketMaking"
+import SingleOrder from "./SingleOrder"
+import MarketData from "./MarketData"
+import { log } from "util"
 
 export default {
   name: "TraderView",
@@ -147,7 +150,8 @@ export default {
     WalletInfo,
     AutomatedMarketMaking,
     SingleOrder,
-    MarketData
+    MarketData,
+    FiatPrice
   },
   // props: ['rows'],
   data: function() {
