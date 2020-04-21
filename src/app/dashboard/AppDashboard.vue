@@ -56,7 +56,32 @@ export default {
         .then(response => {
           console.log(JSON.stringify(response.data.result))
           this.allwallets = response.data.result.sort((a,b) => a.ticker.localeCompare(b.ticker))
+          this.updateBalances()
           this.$refs.dashboardWallets.allwallets = this.allwallets
+        })
+        .catch(e => {
+          this.customerrors.push(e);
+        });
+    },
+    updateBalances: function() {
+      console.log("Update balances");
+      this.allwallets.forEach(function(item, index) {
+        console.log("Updating " + item.ticker)
+        this.myBalance(item, index);
+      });
+    },
+    myBalance: function(wallet, index) {
+      console.log("Fetch myBalance: " + JSON.stringify(wallet));
+      axios
+        .get(
+            process.env.VUE_APP_MMBOTURL +
+            "/getBalance?coin=" +
+            wallet.ticker
+        )
+        .then(response => {
+          console.log(response.data);
+          this.allwallets[index].balance = response.data.balance;
+          this.allwallets[index].address = response.data.address;
         })
         .catch(e => {
           this.customerrors.push(e);

@@ -4,6 +4,16 @@
       <v-toolbar-title>
         <span class="subheading">Wallets</span>
       </v-toolbar-title>
+      <div class="flex-grow-1"></div>
+      <v-chip
+        class="ma-2"
+        color="purple"
+        outlined
+        @click="updateBalances()"
+      >
+        <v-icon left>mdi-server-plus</v-icon>Show/Refresh
+      </v-chip>
+
     </v-toolbar>
     <v-divider class="mx-4"></v-divider>
 
@@ -60,6 +70,7 @@ import QrcodeVue from "qrcode.vue";
 
 export default {
   components: { QrcodeVue },
+  props: [ 'wallets' ],
   data: function() {
     return {
       mePrivate: process.env.VUE_APP_MEPRIVATE,
@@ -70,7 +81,6 @@ export default {
       depositTicker: "",
       depositAddress: "",
       customerrors: [],
-      allwallets: []
     };
   },
   methods: {
@@ -81,10 +91,25 @@ export default {
       }
     },
     updateBalances: function() {
-      console.log("Update balances");
       this.allwallets.forEach(function(item, index) {
-        this.myBalance(item, index);
-      });
+        console.log("Updating [" + index + "]" + item.ticker)
+      axios
+        .get(
+            process.env.VUE_APP_MMBOTURL +
+            "/getBalance?coin=" +
+            item.ticker
+        )
+        .then(response => {
+          console.log(response.data);
+          item.balance = response.data.balance;
+          item.address = response.data.address;
+          console.log(JSON.stringify(item, null, 2))
+        })
+        .catch(e => {
+          console.log("update balance error" + e)
+        })
+      })
+      this.$forceUpdate()
     },
     hideDepositOverlay: function() {
       (this.depositOverlay = false),
@@ -99,23 +124,11 @@ export default {
     },
     withdraw: function(ticker) {
       console.log("Withdraw: " + ticker);
-    },
-    myBalance: function(wallet, index) {
-      console.log("Fetch myBalance: " + JSON.stringify(wallet));
-      axios
-        .get(
-            process.env.VUE_APP_MMBOTURL +
-            "/getBalance?coin=" +
-            wallet.ticker
-        )
-        .then(response => {
-          console.log(response.data);
-          this.wallets[index].balance = response.data.balance;
-          this.wallets[index].address = response.data.address;
-        })
-        .catch(e => {
-          this.customerrors.push(e);
-        });
+    }
+  },
+  computed:  {
+    allwallets: function(){
+      return this.wallets
     }
   },
   created: function() {
@@ -128,10 +141,10 @@ export default {
         "Old val & new val: " +
           JSON.stringify(oldval + " *** " + JSON.stringify(newval))
       );
-      this.updateBalances();
+      this.updateBalances()
     }
   }
-};
+}
 </script>
 <style scoped>
 </style>
