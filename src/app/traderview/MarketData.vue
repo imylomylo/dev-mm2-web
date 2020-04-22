@@ -433,6 +433,9 @@ export default {
       let middlePriceSpreadData = {}
       middlePriceSpreadData.middle = "No"
       middlePriceSpreadData.spread = 0
+      if( this.marketdata.asks === undefined || this.marketdata.bids === undefined){
+        return middlePriceSpreadData
+      }
       if( this.marketdata.asks.length > 0 && this.marketdata.bids.length > 0) {
         let lowestAsk = this.marketdata.asks.sort((a,b) => a.price - b.price)[0].price 
         let highestBid = this.marketdata.bids.sort((a,b) => b.price - a.price)[0].price
