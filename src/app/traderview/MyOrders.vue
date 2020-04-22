@@ -146,6 +146,23 @@ export default {
         .catch(e => {
           this.customerrors.push(e);
         });
+    },
+    getMyOrders2: function() {
+      axios
+        .get(
+            process.env.VUE_APP_MMBOTURL +
+            "/getOrders"
+        )
+        .then(response => {
+          console.log(
+            "My Orders: " +
+              JSON.stringify(response.data.result.maker_orders, null, 4)
+          );
+          return response.data.result.maker_orders
+        })
+        .catch(e => {
+          this.customerrors.push(e);
+        });
     }
   },
   created: function() {
