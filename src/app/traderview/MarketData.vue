@@ -49,12 +49,12 @@
               <template v-slot:item.price="{ item }">{{ Number(Math.round(item.price+'e8')+'e-8') }}</template>
 
               <!-- For highlighting my orders               -->
-<!--
+<!--               
               <template v-slot:item.price="{ item }">
                 {{ Number(Math.round(item.price+'e8')+'e-8') }}
                 <v-chip v-if="item.myOrder" color="purple" dark>*</v-chip>
               </template> 
--->
+ -->
 
               <template
                 v-slot:item.maxvolume="{ item }"
@@ -106,7 +106,7 @@
               <template v-slot:item.price="{ item }">{{ Number(Math.round(item.price+'e8')+'e-8') }}</template>
               
               <!-- for highlighting my order -->
-<!--
+<!--               
               <template v-slot:item.price="{ item }">
                 {{ Number(Math.round(item.price+'e8')+'e-8') }}
                 <v-chip v-if="item.myOrder" color="purple" dark>*</v-chip>
@@ -298,8 +298,8 @@ export default {
           tmpmarketdata.bids = this.groupByPrice2(this.marketdataraw.bids, "price");
           this.marketdata = tmpmarketdata
 
-          //console.log(JSON.stringify(this.marketdata, null, 4))
-          //console.log("Lowest ask: " + this.marketdata.asks.sort((a,b) => a.price - b.price)[0].price + "\nHighest bid: " + this.marketdata.bids.sort((a,b) => b.price - a.price)[0].price)
+          console.log(JSON.stringify(this.marketdata, null, 4))
+          console.log("Lowest ask: " + this.marketdata.asks.sort((a,b) => a.price - b.price)[0].price + "\nHighest bid: " + this.marketdata.bids.sort((a,b) => b.price - a.price)[0].price)
 
         })
         .catch(e => {
@@ -307,7 +307,7 @@ export default {
         });
     },
     NOTUSEDgetCEXprice: function(base, rel) {
-      //console.log("Getting CEX Price:" + base + "/" + rel);
+      console.log("Getting CEX Price:" + base + "/" + rel);
       axios
         .get(
           "http://" +
@@ -345,13 +345,13 @@ export default {
         values = [],
         result = [];
       for (; i < raw.length; i++) { // for every "ask" or "bid" in the respective arrays
-        //console.log("LOOP:" + JSON.stringify(result, null, 2))
+        console.log("LOOP:" + JSON.stringify(result, null, 2))
         val = raw[i][groupBy]; // this object val for the groupBy attribute
         index = values.indexOf(val);// has this val already been processed in a previous iteration
-        //console.log("val:" + val + " & index: " + index )
+        console.log("val:" + val + " & index: " + index )
         if (index > -1){
           // this matches an already processed groupBy item
-          //console.log("Adding maxvolume: " + result[val.toString()].maxvolume + " and " + raw[i].maxvolume)
+          console.log("Adding maxvolume: " + result[val.toString()].maxvolume + " and " + raw[i].maxvolume)
           result[val.toString()].maxvolume += raw[i].maxvolume
           // result[index].push(raw[i]);
         }
@@ -360,10 +360,10 @@ export default {
           values.push(val);
           // result.push([raw[i]]);
           result[val.toString()] = raw[i]
-          //console.log("NEW PRICE: " +  JSON.stringify(result[val.toString()],null,2) )
+          console.log("NEW PRICE: " +  JSON.stringify(result[val.toString()],null,2) )
         }
       }
-      //console.log(JSON.stringify(result, null, 4))
+      console.log(JSON.stringify(result, null, 4))
     },
     groupByPrice2: function(raw, groupBy) {
       // from https://stackoverflow.com/questions/21776389/javascript-object-grouping
@@ -393,15 +393,14 @@ export default {
         let orderTemplate = {}
         for( let j = 0 ; j < interim[i].length ; j++ ){
           if( j == 0 ){
-            //console.log("First grouped price to add maxvolume: " + interim[i][j].price)
+            console.log("First grouped price to add maxvolume: " + interim[i][j].price)
             orderTemplate = interim[i][j]
             orderTemplate.address = ''
             orderTemplate.pubkey = ''
-            //console.log("MYLO" + this.$refs.myorderrefs.getMyOrders)
             // for highlighting my orders in the OB, set prices within these ranges to activate
-            //if( orderTemplate.price < 100 && orderTemplate.price > 15 || orderTemplate.price < 0.05 ){
-            //  orderTemplate.myOrder = true
-            //}
+            // if( orderTemplate.price < 100 && orderTemplate.price > 15 || orderTemplate.price < 0.05 ){
+            //   orderTemplate.myOrder = true
+            // }
           }
           else {
             orderTemplate.maxvolume += interim[i][j].maxvolume
@@ -434,12 +433,6 @@ export default {
       let middlePriceSpreadData = {}
       middlePriceSpreadData.middle = "No"
       middlePriceSpreadData.spread = 0
-      if( this.marketdata.asks === undefined || this.marketdata.bids === undefined){
-        console.log("MYLO1 " + this.marketdata.asks)
-        console.log("MYLO2 " + this.marketdata.bids)
-        console.log("Undefined, returning")
-        return middlePriceSpreadData
-      }
       if( this.marketdata.asks.length > 0 && this.marketdata.bids.length > 0) {
         let lowestAsk = this.marketdata.asks.sort((a,b) => a.price - b.price)[0].price 
         let highestBid = this.marketdata.bids.sort((a,b) => b.price - a.price)[0].price
