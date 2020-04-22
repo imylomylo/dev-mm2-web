@@ -138,6 +138,7 @@ export default {
               JSON.stringify(response.data.result.maker_orders, null, 4)
           );
           this.myOrders = response.data.result.maker_orders
+          this.$emit("myOrdersResponse", response.data.result.maker_orders)
           // this.myOrders = Object.keys(response.data.result.maker_orders).map(function(key) {
           //   return response.data.result.maker_orders[key]
           // });

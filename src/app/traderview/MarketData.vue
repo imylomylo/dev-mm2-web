@@ -293,6 +293,7 @@ export default {
           tmpmarketdata.asks = this.groupByPrice2(this.marketdataraw.asks, "price");
           tmpmarketdata.bids = this.groupByPrice2(this.marketdataraw.bids, "price");
           this.marketdata = tmpmarketdata
+          this.$emit("marketResponse")
 
           console.log(JSON.stringify(this.marketdata, null, 4))
           console.log("Lowest ask: " + this.marketdata.asks.sort((a,b) => a.price - b.price)[0].price + "\nHighest bid: " + this.marketdata.bids.sort((a,b) => b.price - a.price)[0].price)
@@ -389,7 +390,7 @@ export default {
         let orderTemplate = {}
         for( let j = 0 ; j < interim[i].length ; j++ ){
           if( j == 0 ){
-            console.log("First grouped price to add maxvolume: " + interim[i][j].price)
+            // console.log("First grouped price to add maxvolume: " + interim[i][j].price)
             orderTemplate = interim[i][j]
             orderTemplate.address = ''
             orderTemplate.pubkey = ''
@@ -406,6 +407,9 @@ export default {
       }
       // console.log(JSON.stringify(result, null, 4))
       return result
+    },
+    highlightOrders: function(marketOrders) {
+      console.log("MarketData.highlightOrders:" + JSON.stringify(marketOrders, null, 2))
     }
   },
   created: function() {

@@ -68,7 +68,7 @@
           </v-row>
           <v-row class="px-4 pb-6">
             <v-col>
-              <MyOrders ref="myordersref" />
+              <MyOrders v-on:myOrdersResponse="handleMyOrders" ref="myordersref" />
             </v-col>
           </v-row>
 <!-- mePrivate and mePublic are set in .env* files of the root of the webapp project and read in at runtime -->
@@ -86,7 +86,7 @@
         <v-flex md6 lg6>
           <v-row class="px-4">
             <v-col>
-              <MarketData v-bind:wallets="wallets" />
+              <MarketData v-bind:wallets="wallets" ref="marketdataref" v-on:marketResponse="handleMarket" />
             </v-col>
           </v-row>
 
@@ -156,6 +156,9 @@ export default {
   // props: ['rows'],
   data: function() {
     return {
+      componentReadyOrders: false,
+      componentReadyMarket: false,
+      marketOrders: [],
       mePrivate: process.env.VUE_APP_MEPRIVATE,
       mePublic: process.env.VUE_APP_MEPUBLIC,
       myOrders: "",
@@ -239,6 +242,41 @@ export default {
     };
   },
   methods: {
+    handleMyOrders: function(result) {
+      console.log("AppTraderView.handleMyOrders: " + JSON.stringify(result, null, 2))
+      // filter orders for current market pair, orders comes in as [uuid: {.base .rel}, uuid: {.base .rel}]
+      // wallet base matches orders base
+      // wallet rel matches orders base
+      // wallet base matches orders rel
+      // wallet rel matches orders re.
+      //let tmpArr = result.filter(function(ord){
+      //  (ord.base == this.wallets.base.ticker && ord.rel == this.wallets.rel.ticker) || (ord.rel == this.wallets.base.ticker && ord.base == this.wallets.rel.ticker)
+      //})
+
+// from: https://stackoverflow.com/questions/44025984/how-to-filter-an-object-with-its-values-in-es6
+let acceptedValues = [this.wallets.base.ticker, this.wallets.rel.ticker]
+let tmpArr = Object.keys(result).reduce(function(r, e) {
+  if (acceptedValues.includes(result[e])) r[e] = result[e]
+  return r;
+}, {})
+      console.log("filtered orders this market: " + JSON.stringify(tmpArr, null, 2))
+      // store uuid
+      this.marketOrders = tmpArr
+      this.componentReadyOrders = true
+      // check if market response exists to trigger data flow, passing UUIDs
+      if( this.componentReadyMarket ){
+        this.$refs.marketdataref("highlightOrders", this.marketOrders)
+      }
+    },
+    handleMarket: function(result) {
+      console.log("AppTraderView.handleMarket") // the data is not important, only that it is received
+      // check & get uuid(s) for orders in this market
+      if( this.marketOrders.length > 0){
+        this.$refs.marketdataref("highlightOrders", this.marketOrders)
+      }
+      // signal it is ready if first component ready
+      this.componentReadyMarket = true
+    },
     orderResponse: function(result) {
       console.log(JSON.stringify(result, null, 4));
       this.$refs.myordersref.newOrder(result)
