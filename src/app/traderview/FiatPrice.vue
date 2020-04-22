@@ -27,14 +27,14 @@ export default {
       this.getCoinGeckoFiat(this.base, this.rel)
     },
     getCoinGeckoFiat: function(base, rel) {
-      console.log("Coin Gecko fiat:" + base + "/BTC");
+      //console.log("Coin Gecko fiat:" + base + "/BTC");
       axios
         .get(
             process.env.VUE_APP_MMBOTURL +
             "/getpricecoingecko?coin="+base
         )
         .then(response => {
-          console.log(JSON.stringify(response.data, null, 4));
+          //console.log(JSON.stringify(response.data, null, 4));
           this.market.base.price = response.data.current_prices.usd
         })
         .catch(e => {
@@ -47,7 +47,7 @@ export default {
         )
         .then(response => {
           this.market.rel.price = response.data.current_prices.usd
-          console.log(JSON.stringify(response.data, null, 4));
+          //console.log(JSON.stringify(response.data, null, 4));
         })
         .catch(e => {
           this.customerrors.push(e);
