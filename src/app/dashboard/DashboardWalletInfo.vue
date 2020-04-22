@@ -5,20 +5,18 @@
         <span class="subheading">Wallets</span>
       </v-toolbar-title>
       <div class="flex-grow-1"></div>
-      <span class="ma-5 mt-11"><v-checkbox v-model="hideZero" :disabled="hideZeroDisable" label="Hide Zero Balance"></v-checkbox></span>
       <v-chip
         class="ma-2"
         color="purple"
-        :disabled="hideZeroDisable"
         outlined
         @click="updateBalances()"
       >
-        <v-icon left>mdi-server-plus</v-icon>
-        <template v-if="hideZeroDisable">Loading {{allwallets.length}} Wallets</template>
-        <template v-else>Refresh</template>
+        <v-icon left>mdi-server-plus</v-icon>Show/Refresh
       </v-chip>
+
     </v-toolbar>
     <v-divider class="mx-4"></v-divider>
+
     <v-simple-table fixed-header height="auto">
       <thead>
         <tr>
@@ -29,32 +27,6 @@
         </tr>
       </thead>
       <tbody v-if="allwallets">
-        <template v-if="hideZero">
-        <tr v-for="(row, key) in visible">
-<td>{{row.ticker}}</td>
-<td>{{row.balance}}</td>
-<td>{{row.address}}</td>
-          <td>
-            <div class="text-left">
-<!-- mePrivate and mePublic are set in .env* files of the root of the webapp project and read in at runtime -->
-<div v-if="mePrivate == 'true' && mePublic == 'false'">
-              <v-chip class="ma-2" color="success" @click="deposit(row.ticker, row.address)">
-                <v-icon left>mdi-server-plus</v-icon>Deposit
-              </v-chip>
-              <v-chip class="ma-2" color="red" dark @click="showWithdrawOverlay(row.ticker)">
-                <v-icon left>mdi-server-plus</v-icon>Withdraw
-              </v-chip>
-</div>
-<div v-else>
-              <v-chip class="ma-2" color="success" @click="deposit(row.ticker, row.address)">
-                <v-icon left>mdi-server-plus</v-icon>Donate
-              </v-chip>
-</div>
-            </div>
-          </td>
-        </tr>
-        </template>
-        <template v-else >
         <tr v-for="row in allwallets" v-bind:key="row.ticker">
           <td>{{ row.ticker }}</td>
           <td>{{ row.balance }}</td>
@@ -78,7 +50,6 @@
             </div>
           </td>
         </tr>
-        </template>
       </tbody>
       <tbody v-else>
         <tr>
@@ -109,8 +80,6 @@ export default {
       depositOverlaySize: 400,
       depositTicker: "",
       depositAddress: "",
-      hideZero: false,
-      hideZeroDisable: true,
       customerrors: [],
     };
   },
@@ -122,8 +91,6 @@ export default {
       }
     },
     updateBalances: function() {
-      this.hideZeroDisable = true
-      let lastticker=this.allwallets[this.allwallets.length-1].ticker
       this.allwallets.forEach(function(item, index) {
         console.log("Updating [" + index + "]" + item.ticker)
       axios
@@ -132,22 +99,17 @@ export default {
             "/getBalance?coin=" +
             item.ticker
         )
-        .then((response) => {
+        .then(response => {
+          console.log(response.data);
           item.balance = response.data.balance;
           item.address = response.data.address;
-          this.allwallets[index].balance = item.balance
-          console.log(JSON.stringify(this.allwallets[index], null, 2))
-          if( lastticker == item.ticker ){
-            console.log("All updated")
-            this.hideZeroDisable = false
-          }
+          console.log(JSON.stringify(item, null, 2))
         })
-        .catch(function(e) {
+        .catch(e => {
           console.log("update balance error" + e)
         })
-      }.bind(this))
+      })
       this.$forceUpdate()
-      //this.hideZeroDisable = false
     },
     hideDepositOverlay: function() {
       (this.depositOverlay = false),
@@ -167,18 +129,6 @@ export default {
   computed:  {
     allwallets: function(){
       return this.wallets
-    },
-    visible() {
-      let result = {}
-      for( let i in this.allwallets) {
-        if(this.allwallets[i].balance == 0){
-          continue
-        }
-        else {
-          result[i] = this.allwallets[i]
-        }
-      }
-      return result
     }
   },
   created: function() {
@@ -186,15 +136,12 @@ export default {
     console.log("DashboardWalletInfo Finished");
   },
   watch: {
-    allwallets: {
-      deep: true,
-      handler(newval, oldval) {
+    allwallets: function(newval, oldval) {
       console.log(
         "Old val & new val: " +
           JSON.stringify(oldval + " *** " + JSON.stringify(newval))
-      )
+      );
       this.updateBalances()
-      }
     }
   }
 }
