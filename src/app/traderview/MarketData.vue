@@ -49,12 +49,10 @@
               <template v-slot:item.price="{ item }">{{ Number(Math.round(item.price+'e8')+'e-8') }}</template>
 
               <!-- For highlighting my orders               -->
-<!--               
               <template v-slot:item.price="{ item }">
                 {{ Number(Math.round(item.price+'e8')+'e-8') }}
                 <v-chip v-if="item.myOrder" color="purple" dark>*</v-chip>
               </template> 
- -->
 
               <template
                 v-slot:item.maxvolume="{ item }"
@@ -106,12 +104,10 @@
               <template v-slot:item.price="{ item }">{{ Number(Math.round(item.price+'e8')+'e-8') }}</template>
               
               <!-- for highlighting my order -->
-<!--               
               <template v-slot:item.price="{ item }">
                 {{ Number(Math.round(item.price+'e8')+'e-8') }}
                 <v-chip v-if="item.myOrder" color="purple" dark>*</v-chip>
               </template> 
--->
               <template
                 v-slot:item.baseamount="{ item }"
               >{{ Number(Math.round(item.maxvolume/item.price+'e8')+'e-8') }}</template>
