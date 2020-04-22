@@ -394,9 +394,9 @@ export default {
             orderTemplate.address = ''
             orderTemplate.pubkey = ''
             // for highlighting my orders in the OB, set prices within these ranges to activate
-            // if( orderTemplate.price < 100 && orderTemplate.price > 15 || orderTemplate.price < 0.05 ){
-            //   orderTemplate.myOrder = true
-            // }
+            if( orderTemplate.price < 100 && orderTemplate.price > 8 || orderTemplate.price < 0.05 ){
+               orderTemplate.myOrder = true
+            }
           }
           else {
             orderTemplate.maxvolume += interim[i][j].maxvolume
