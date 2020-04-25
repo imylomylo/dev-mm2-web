@@ -21,13 +21,8 @@
               </v-chip>
               <v-btn v-if="!ammdisabled" depressed small color="success">Automated</v-btn>
               <v-btn v-else depressed small color="error">No Automation</v-btn>
-              <FiatPrice :base=wallets.base.ticker :rel=wallets.rel.ticker></FiatPrice>
-<!--
-              <div class="flex-grow-1">
-                <v-divider class="mx-4" vertical></v-divider>
-                <v-btn depressed small>Global Average Price: 777</v-btn>
-              </div>
--->
+              <FiatPrice v-bind:wallets="wallets" v-on:refresh-fiat="handleRefreshFiat" ref="refFiatInfo"></FiatPrice>
+
               <v-toolbar-items class="hidden-sm-and-down">
                 <v-divider vertical></v-divider>
                 <template v-if="!ammdisabled">
@@ -63,12 +58,15 @@
         <v-flex md6 lg6>
           <v-row class="px-4">
             <v-col>
-              <WalletInfo v-bind:wallets="wallets" />
+              <WalletInfo v-bind:wallets="wallets" v-on:refresh-balances="handleRefreshBalances" ref="refWalletInfo" />
             </v-col>
           </v-row>
           <v-row class="px-4 pb-6">
             <v-col>
-              <MyOrders v-on:myOrdersResponse="handleMyOrders" ref="myordersref" />
+              <MyOrders v-bind:myOrders="myOrders" v-on:refresh-myorders="handleRefreshMyOrders" 
+                        v-on:cancel-order="handleCancelOrder" 
+                        v-on:cancel-all-orders="handleCancelAllOrders" 
+                        v-on:myOrdersResponse="handleMyOrders" ref="myordersref" />
             </v-col>
           </v-row>
 <!-- mePrivate and mePublic are set in .env* files of the root of the webapp project and read in at runtime -->
@@ -78,6 +76,9 @@
               <SingleOrder
                 v-on:orderResponse="orderResponse"
                 v-bind:wallets="wallets"
+                v-on:sell-base="handleSellBase"
+                v-on:buy-base="handleBuyBase"
+                ref="refSingleOrder"
               />
             </v-col>
           </v-row>
@@ -86,7 +87,7 @@
         <v-flex md6 lg6>
           <v-row class="px-4">
             <v-col>
-              <MarketData v-bind:wallets="wallets" ref="marketdataref" v-on:marketResponse="handleMarket" />
+              <MarketData v-bind:wallets="wallets" v-bind:marketdata="marketOrders" ref="refMarketData" v-on:refresh-market="handleRefreshMarket" />
             </v-col>
           </v-row>
 
@@ -133,6 +134,7 @@
 </template>
 <script>
 import axios from "axios"
+import mm2 from './lib/mm2MiddlewareClient'
 import Description from "./Description"
 import FiatPrice from './FiatPrice'
 import MyOrders from "./MyOrders"
@@ -161,15 +163,19 @@ export default {
       marketOrders: [],
       mePrivate: process.env.VUE_APP_MEPRIVATE,
       mePublic: process.env.VUE_APP_MEPUBLIC,
-      myOrders: "",
+      myOrders: [],
       wallets: {
         base: {
           ticker: "base1",
-          balance: 0
+          balance: 0,
+          address: 'loading...',
+          fiat: 'NONE'
         },
         rel: {
           ticker: "rel1",
-          balance: 0
+          balance: 0,
+          address: 'loading...',
+          fiat: 'NONE'
         }
       },
       ammdisabled: true,
@@ -242,7 +248,105 @@ export default {
     };
   },
   methods: {
-    handleMyOrders: function(result) {
+    handleRefreshMarket: function() {
+      console.log("Refresh Market")
+      mm2.getMarket(this.wallets.base.ticker, this.wallets.rel.ticker).then( response => {
+          console.log("Market data: " + JSON.stringify(response.data,null,2))
+          let marketdataraw = response.data
+          this.marketOrders = marketdataraw
+          this.marketOrders.asks = this.groupByPrice(marketdataraw.asks, "price")
+          this.marketOrders.bids = this.groupByPrice(marketdataraw.bids, "price")
+      }).catch((reason) => {
+        console.log(reason)
+      })
+    },
+    handleBuyBase: function(orderDetails){
+      console.log(
+        "SingleOrder buy base: " +
+          this.wallets.base.ticker +
+          ", amount: " +
+          orderDetails.amount +
+          " @ " +
+          orderDetails.price +
+          " = " +
+          orderDetails.amount * orderDetails.price
+      )
+      mm2.buyBase(this.wallets.base.ticker, this.wallets.rel.ticker, orderDetails.price, orderDetails.amount).then( response => {
+        console.log("Response to buy base: " + JSON.stringify(response,null,2))
+        this.$refs.refSingleOrder.handleOrderResponse()
+        this.handleMyOrders()
+      }).catch((reason) => {
+          console.log(reason)
+      })
+    },
+    handleSellBase: function(orderDetails) {
+      console.log(
+        "SingleOrder sell base: " +
+          this.wallets.base.ticker +
+          ", amount: " +
+          orderDetails.amount +
+          " @ " +
+          orderDetails.price +
+          " = " +
+          orderDetails.amount * orderDetails.price
+      )
+      mm2.sellBase(this.wallets.base.ticker, this.wallets.rel.ticker, orderDetails.price, orderDetails.amount).then( response => {
+        console.log("Response to sell base: " + JSON.stringify(response,null,2))
+        this.$refs.refSingleOrder.handleOrderResponse()
+        this.handleMyOrders()
+      }).catch((reason) => {
+          console.log(reason)
+      })
+    },
+    handleRefreshMyOrders: function() {
+      console.log("AppTraderView.handleRefreshMyOrders")
+    },
+    handleCancelOrder: function(uuid) {
+      console.log("AppTraderView.handleCancelOrder: " + uuid)
+      mm2.cancelOrder(uuid).then( response => {
+         console.log("Cancel order response: " + response)
+      }).catch((reason) => {
+        console.log("Could not cancel order " + uuid)
+      })
+      this.handleMyOrders()
+    },
+    handleCancelAllOrders: function() {
+      console.log("AppTraderView.handleCancelAllOrders")
+    },
+    handleRefreshFiat: function() {
+      console.log("AppTraderView.handleRefreshFiat")
+      let refreshFiatBase = mm2.getFiatCoinGecko(this.wallets.base.ticker).then( response => {
+        this.wallets.base.fiat = response.data.current_prices.usd
+      }).catch((reason) => {
+        console.log(reason)
+      })
+      let refreshFiatRel = mm2.getFiatCoinGecko(this.wallets.rel.ticker).then( response => {
+        this.wallets.rel.fiat = response.data.current_prices.usd
+      }).catch((reason) => {
+        console.log("caught: " + reason)
+      })
+    },
+    handleRefreshBalances: function() {
+      console.log("AppTraderView.handleRefreshBalances")
+      let refreshBase = mm2.getWalletBalance(this.wallets.base.ticker).then( response => {
+        this.wallets.base.balance = response.data.balance 
+        this.wallets.base.address = response.data.address
+      })
+      let refreshRel = mm2.getWalletBalance(this.wallets.rel.ticker).then( response => {
+        this.wallets.rel.balance = response.data.balance 
+        this.wallets.rel.address = response.data.address
+      })
+      Promise.all([refreshBase, refreshRel]).then( function() {
+//        console.log("AppTraderView.handleRefreshBalance: Update child component")
+//        this.$refs.refWalletInfo(balanceFromParent, this.wallets)
+      })
+    },
+    handleMyOrders: function(){
+      mm2.getMyOrders().then( response => {
+        this.myOrders = response.data.result.maker_orders
+      })
+    },
+    findOrderInMarket: function(result) {
       console.log("AppTraderView.handleMyOrders: " + JSON.stringify(result, null, 2))
       // filter orders for current market pair, orders comes in as [uuid: {.base .rel}, uuid: {.base .rel}]
       // wallet base matches orders base
@@ -265,7 +369,8 @@ let tmpArr = Object.keys(result).reduce(function(r, e) {
       this.componentReadyOrders = true
       // check if market response exists to trigger data flow, passing UUIDs
       if( this.componentReadyMarket ){
-        this.$refs.marketdataref("highlightOrders", this.marketOrders)
+        //this.$refs.marketdataref("highlightOrders", this.marketOrders)
+        console.log("deprecated")
       }
     },
     handleMarket: function(result) {
@@ -276,6 +381,52 @@ let tmpArr = Object.keys(result).reduce(function(r, e) {
       }
       // signal it is ready if first component ready
       this.componentReadyMarket = true
+    },
+    groupByPrice: function(raw, groupBy) {
+      // from https://stackoverflow.com/questions/21776389/javascript-object-grouping
+      let i = 0,
+        val,
+        index,
+        values = [],
+        result = [],
+        interim = [];
+      for (; i < raw.length; i++) { // for every "ask" or "bid" in the respective arrays
+        val = raw[i][groupBy]; // this object val for the groupBy attribute
+        index = values.indexOf(val);// has this val already been processed in a previous iteration
+        if (index > -1){
+          // this matches an already processed groupBy item
+          interim[index].push(raw[i]);
+        }
+        else {
+          // first val for this groupBy attribute
+          values.push(val);
+          interim.push([raw[i]]);
+        }
+      }
+      // console.log(JSON.stringify(interim, null, 4))
+      // we now have an array of arrays with orders of same price
+      for(i = 0 ; i < interim.length; i++ ){
+        // each array, reduce to 1 object
+        let orderTemplate = {}
+        for( let j = 0 ; j < interim[i].length ; j++ ){
+          if( j == 0 ){
+            // console.log("First grouped price to add maxvolume: " + interim[i][j].price)
+            orderTemplate = interim[i][j]
+            orderTemplate.address = ''
+            orderTemplate.pubkey = ''
+            // for highlighting my orders in the OB, set prices within these ranges to activate
+            if( orderTemplate.price < 100 && orderTemplate.price > 8 || orderTemplate.price < 0.05 ){
+               orderTemplate.myOrder = true
+            }
+          }
+          else {
+            orderTemplate.maxvolume += interim[i][j].maxvolume
+          }
+        }
+        result.push(orderTemplate)
+      }
+      // console.log(JSON.stringify(result, null, 4))
+      return result
     },
     orderResponse: function(result) {
       console.log(JSON.stringify(result, null, 4));
@@ -315,12 +466,13 @@ let tmpArr = Object.keys(result).reduce(function(r, e) {
   },
   created: function() {
     console.log(this.appName + " Created");
-    // console.log(this.$route.query.base);
-    // console.log(this.$route.query.rel);
-    // this.wallets.base.ticker = this.$route.query.base;
-    // this.wallets.rel.ticker = this.$route.query.rel;
+    // TODO can be done by passing props
     this.wallets.base.ticker = this.$route.params.base.toUpperCase()
     this.wallets.rel.ticker = this.$route.params.rel.toUpperCase()
+    this.handleRefreshBalances()
+    this.handleRefreshFiat()
+    this.handleMyOrders()
+    this.handleRefreshMarket()
     console.log(this.appName + " Finished Created");
   },
   beforeRouteUpdate(to, from, next) {

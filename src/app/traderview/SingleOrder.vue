@@ -68,84 +68,32 @@ export default {
     ordersize_pc: function(pc) {
       console.log(pc);
     },
-    sellBase: function(base) {
-      console.log(
-        "SingleOrder sell base: " +
-          base +
-          ", amount: " +
-          this.amount +
-          " @ " +
-          this.price +
-          " = " +
-          this.total
-      );
-      this.orderSentOverlay = true 
-      let requestData = {}
-      requestData["base"] = this.wallets.base.ticker
-      requestData["rel"] = this.wallets.rel.ticker
-      requestData["method"] = "setprice"
-      requestData["volume"] = this.amount
-      requestData["price"] = this.price
- //     requestData["userpass"] = "YOUR_PASSWORD_HERE"
-      console.log("Sell BASE: " + JSON.stringify(requestData, null, 4))
-
-      axios
-        .post(
-            process.env.VUE_APP_MMBOTURL +
-            "/doMaker?base="+requestData.base+"&rel="+requestData.rel+"&volume="+requestData.volume+"&price="+requestData.price
-        )
-        .then(response => {
-          console.log(JSON.stringify(response.data))
-          this.$emit("orderResponse", response.data.result)
-          this.price = ""
-          this.amount = ""
-          this.orderSentOverlay = false
-        })
-        .catch(e => {
-          this.customerrors.push(e);
-        });
+    handleOrderResponse: function(){
+      this.orderSentOverlay = false
     },
-    buyBase: function(base) {
-      console.log(
-        "SingleOrder buy base: " +
-          base +
-          ", amount: " +
-          this.amount +
-          " @ " +
-          this.price +
-          " = " +
-          this.total
-      )
+    sellBase: function() {
+      console.log("SingleOrder sell (base): " + this.wallets.base.ticker )
+      let orderDetails = {}
+      orderDetails.price = this.price
+      orderDetails.amount = this.amount
       this.orderSentOverlay = true 
-      let requestData = {}
-      requestData["rel"] = this.wallets.base.ticker //flipped for a buy because of underlying mm2 mechanism
-      requestData["base"] = this.wallets.rel.ticker //flipped for a buy because of underlying mm2 mechanism
-      requestData["method"] = "setprice"
-      requestData["volume"] = this.total.toString()
-      requestData["price"] = (1/this.price).toString()  // 1/price for a buy & needs to be a string for the makerbot api
-//      requestData["userpass"] = "YOUR_PASSWORD_HERE"
-
-      console.log("Buy BASE: " + JSON.stringify(requestData, null, 4))
-      axios
-        .post(
-            process.env.VUE_APP_MMBOTURL +
-            "/doMaker?base="+requestData.base+"&rel="+requestData.rel+"&volume="+requestData.volume+"&price="+requestData.price
-        )
-        .then(response => {
-          console.log(JSON.stringify(response.data))
-          this.$emit("orderResponse", response.data.result)
-          this.price = ""
-          this.amount = ""
-          this.orderSentOverlay = false
-        })
-        .catch(e => {
-          this.customerrors.push(e);
-        })
+      this.$emit("sell-base", orderDetails)
+      this.price = ""
+      this.amount = ""
+    },
+    buyBase: function() {
+      console.log("SingleOrder buy base: " + this.wallets.base.ticker )
+      let orderDetails = {}
+      orderDetails.price = this.price
+      orderDetails.amount = this.amount
+      this.orderSentOverlay = true 
+      this.$emit("buy-base", orderDetails)
+      this.price = ""
+      this.amount = ""
     }
   },
   created: function() {
     console.log("SingleOrder Created");
-    console.log("wallets: " + JSON.stringify(this.wallets))
   },
   computed: {
     total: function() {

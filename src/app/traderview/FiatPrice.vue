@@ -1,7 +1,7 @@
 <template>
   <div class="flex-grow-1">
     <v-divider class="mx-4" vertical></v-divider>
-    <v-btn depressed small @click=refresh()>Coin Gecko {{ fiat.toUpperCase() }}: {{ base }}: {{ market.base.price }} | {{ rel }}: {{ market.rel.price }}</v-btn>
+    <v-btn depressed small @click=refresh()>Coin Gecko {{ fiat.toUpperCase() }}: {{ this.wallets.base.ticker }}: {{ this.wallets.base.fiat }} | {{ this.wallets.rel.ticker }}: {{ this.wallets.rel.fiat }}</v-btn>
   </div>
 </template>
 <script>
@@ -10,7 +10,7 @@ export default {
   components: {
     // CurrentStrategies
   },
-  props: ["base", "rel"],
+  props: ["wallets"],
   data: function() {
     return {
       currentStrategyInfo: "ONLY BUY KMD, 1.8% SPREAD WITH 10% ORDER SIZE",
@@ -24,38 +24,11 @@ export default {
   },
   methods: {
     refresh: function() {
-      this.getCoinGeckoFiat(this.base, this.rel)
-    },
-    getCoinGeckoFiat: function(base, rel) {
-      //console.log("Coin Gecko fiat:" + base + "/BTC");
-      axios
-        .get(
-            process.env.VUE_APP_MMBOTURL +
-            "/getpricecoingecko?coin="+base
-        )
-        .then(response => {
-          //console.log(JSON.stringify(response.data, null, 4));
-          this.market.base.price = response.data.current_prices.usd
-        })
-        .catch(e => {
-          this.customerrors.push(e);
-        })
-      axios
-        .get(
-            process.env.VUE_APP_MMBOTURL +
-            "/getpricecoingecko?coin="+rel
-        )
-        .then(response => {
-          this.market.rel.price = response.data.current_prices.usd
-          //console.log(JSON.stringify(response.data, null, 4));
-        })
-        .catch(e => {
-          this.customerrors.push(e);
-        })
+      this.$emit("refresh-fiat")
     }
   },
   created: function() {
-    this.getCoinGeckoFiat(this.base, this.rel)
+    console.log("Fiat.created")
   }
 }
 </script>

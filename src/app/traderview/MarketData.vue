@@ -9,7 +9,7 @@
         class="ma-2"
         color="purple"
         outlined
-        @click="showDEXMarket(wallets.base.ticker, wallets.rel.ticker)"
+        @click="refreshMarket()"
       >
         <v-icon left>mdi-server-plus</v-icon>Refresh
       </v-chip>
@@ -127,7 +127,7 @@ import axios from "axios";
 
 export default {
   // name: "MarketData",
-  props: ["base", "rel", "wallets"],
+  props: ["wallets", "marketdata"],
   data: function() {
     return {
       cexprice: "",
@@ -136,8 +136,6 @@ export default {
       makerDialog: false,
       activeCoins: [],
       walletBalance: { base: 0, rel: 0 },
-      marketdata: {},
-      marketdataraw: {},
       trade: { base: "", rel: "", price: "", amount: "0" },
       appName: "MarketData",
       customerrors: [],
@@ -277,7 +275,10 @@ export default {
     };
   },
   methods: {
-    showDEXMarket: function(base, rel) {
+    refreshMarket: function() {
+      this.$emit("refresh-market")
+    },
+    oldshowDEXMarket: function(base, rel) {
       console.log("Show market:" + base + "/" + rel);
       axios
         .post(
@@ -415,7 +416,7 @@ export default {
   created: function() {
     console.log(this.appName + " Created");
     // original prod code
-    this.showDEXMarket(this.wallets.base.ticker, this.wallets.rel.ticker)
+//    this.showDEXMarket(this.wallets.base.ticker, this.wallets.rel.ticker)
     // working fake data
     // this.marketdata = this.fakeData
     // test grouping

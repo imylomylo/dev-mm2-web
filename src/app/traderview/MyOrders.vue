@@ -61,12 +61,12 @@
 import axios from "axios";
 
 export default {
+  props: ["myOrders"],
   data: function() {
     return {
       meName: process.env.VUE_APP_MENAME,
       mePrivate: process.env.VUE_APP_MEPRIVATE,
       mePublic: process.env.VUE_APP_MEPUBLIC,
-      myOrders: {},
       customerrors: []
     };
   },
@@ -77,81 +77,15 @@ export default {
       this.$router.go(this.$router.currentRoute);
     },
     cancelAllOrders: function() {
-      console.log("Cancel All Orders");
-      let requestData = {};
-      requestData["method"] = "cancel_all_orders";
-      requestData["cancel_by"] = { type: "All" };
- //     requestData["userpass"] = "YOUR_PASSWORD_HERE";
-
-      axios
-        .get(
-            process.env.VUE_APP_MMBOTURL +
-            "/cancelAllOrders",
-          requestData
-        )
-        .then(response => {
-          console.log(JSON.stringify(response.data, null, 4));
-          this.myOrders = [];
-        })
-        .catch(e => {
-          this.customerrors.push(e);
-        });
+      this.$emit("cancel-all-orders")
     },
     cancelOrder: function(uuid) {
-      console.log("Cancel order: " + uuid);
-      let requestData = {};
-      requestData["method"] = "cancel_order";
-      requestData["uuid"] = uuid;
- //     requestData["userpass"] = "YOUR_PASSWORD_HERE";
-
-      axios
-        .post(
-            process.env.VUE_APP_MMBOTURL +
-            "/cancelOrder?uuid="+requestData.uuid
-        )
-        .then(response => {
-          console.log("Order result: " + JSON.stringify(response.data, null, 4));
-          if( response.data.result === "success" ){
-            console.log("success cancel, remove from myOrders array")
-            this.getMyOrders()
-          }
-        })
-        .catch(e => {
-          this.customerrors.push(e);
-        });
-    },
-    newOrder: function(orderDetails) {
-      // console.log(JSON.stringify(orderDetails, null, 4));
-      // let newUUID = orderDetails.uuid 
-      // this.myOrders.newUUID = orderDetails
-      this.getMyOrders()
-    },
-    getMyOrders: function() {
-      axios
-        .get(
-            process.env.VUE_APP_MMBOTURL +
-            "/getOrders"
-        )
-        .then(response => {
-          console.log(
-            "My Orders: " +
-              JSON.stringify(response.data.result.maker_orders, null, 4)
-          );
-          this.myOrders = response.data.result.maker_orders
-          this.$emit("myOrdersResponse", response.data.result.maker_orders)
-          // this.myOrders = Object.keys(response.data.result.maker_orders).map(function(key) {
-          //   return response.data.result.maker_orders[key]
-          // });
-          // console.log(JSON.stringify(this.myOrders))
-        })
-        .catch(e => {
-          this.customerrors.push(e);
-        });
+      console.log("Cancel order: " + uuid)
+      this.$emit("cancel-order", uuid)
     }
   },
   created: function() {
     console.log("MyOrders Created");
-    this.getMyOrders();
     console.log("MyOrders Finished");
   }
 };
