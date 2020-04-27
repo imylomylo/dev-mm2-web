@@ -63,7 +63,7 @@
           </v-row>
           <v-row class="px-4 pb-6">
             <v-col>
-              <MyOrders v-bind:myOrders="myOrders" v-on:refresh-myorders="handleRefreshMyOrders" 
+              <MyOrders v-bind:myOrders="myOrders" v-bind:myOrdersThisMarket="myOrdersThisMarket" v-on:refresh-myorders="handleRefreshMyOrders" 
                         v-on:cancel-order="handleCancelOrder" 
                         v-on:cancel-all-orders="handleCancelAllOrders" 
                         v-on:myOrdersResponse="handleMyOrders" ref="myordersref" />
@@ -164,6 +164,7 @@ export default {
       mePrivate: process.env.VUE_APP_MEPRIVATE,
       mePublic: process.env.VUE_APP_MEPUBLIC,
       myOrders: [],
+      myOrdersThisMarket: [],
       wallets: {
         base: {
           ticker: "base1",
@@ -300,6 +301,7 @@ export default {
     },
     handleRefreshMyOrders: function() {
       console.log("AppTraderView.handleRefreshMyOrders")
+      this.handleMyOrders
     },
     handleCancelOrder: function(uuid) {
       console.log("AppTraderView.handleCancelOrder: " + uuid)
@@ -343,7 +345,35 @@ export default {
     },
     handleMyOrders: function(){
       mm2.getMyOrders().then( response => {
-        this.myOrders = response.data.result.maker_orders
+        // because working with an object of objects in js sucks, convert to array
+        this.myOrders = Object.values(response.data.result.maker_orders)
+      }).then( () => {
+        console.log("AppTraderview.myOrders -> highlightOrders")
+
+// deprecated: when trying to use the output from mm2 (object with objects) it started to work but sucked
+//  from https://stackoverflow.com/questions/2722159/how-to-filter-object-array-based-on-attributes
+//for (let [key,value] of Object.entries(this.myOrders)) {
+//  console.log(key + ":" + value.base + "/" + value.rel)
+//  if((value.base == this.wallets.base.ticker && value.rel == this.wallets.rel.ticker) ||
+//     (value.rel == this.wallets.base.ticker && value.rel == this.wallets.base.ticker) ){
+//    //this.myOrders.key.thisMarket = true
+//    console.log("Found! Order in this market: " + key)
+//  }
+//}
+
+
+// from https://stackoverflow.com/questions/2722159/how-to-filter-object-array-based-on-attributes
+// because passing data from this vue instance sucks in promises, create tmp var for comparisons
+        let x_base = this.wallets.base.ticker
+        let x_rel = this.wallets.rel.ticker
+// filter the array of my orders finding the ones in this market, putting them into their own array
+        this.myOrdersThisMarket = this.myOrders.filter(function (x_order) {
+          return (( x_order.base == x_base &&
+                    x_order.rel == x_rel ) ||
+                  ( x_order.base == x_rel && 
+                    x_order.rel == x_base ))
+        })
+        console.log("AppTraderview.myOrdersThisMarket: " + JSON.stringify(this.myOrdersThisMarket,null,2))
       })
     },
     findOrderInMarket: function(result) {
@@ -366,12 +396,6 @@ let tmpArr = Object.keys(result).reduce(function(r, e) {
       console.log("filtered orders this market: " + JSON.stringify(tmpArr, null, 2))
       // store uuid
       this.marketOrders = tmpArr
-      this.componentReadyOrders = true
-      // check if market response exists to trigger data flow, passing UUIDs
-      if( this.componentReadyMarket ){
-        //this.$refs.marketdataref("highlightOrders", this.marketOrders)
-        console.log("deprecated")
-      }
     },
     groupByPrice: function(raw, groupBy) {
       // from https://stackoverflow.com/questions/21776389/javascript-object-grouping

@@ -29,13 +29,13 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="row in Object.keys(myOrders)" v-bind:key="row.ticker">
+            <tr v-for="row in Object.keys(tidyMarketOrders)" v-bind:key="row.ticker">
               <td>
-                <a @click="gotoMarket(myOrders[row].base,myOrders[row].rel)">{{ myOrders[row].base }} / {{ myOrders[row].rel }}</a>              
+                <a @click="gotoMarket(tidyMarketOrders[row].base,tidyMarketOrders[row].rel)">{{ tidyMarketOrders[row].base }} / {{ tidyMarketOrders[row].rel }}</a>              
               </td>
               <td>Not implemented yet</td>
-              <td>{{ myOrders[row].price }}</td>
-              <td>{{myOrders[row].max_base_vol }}</td>
+              <td>{{ tidyMarketOrders[row].price }}</td>
+              <td>{{tidyMarketOrders[row].max_base_vol }}</td>
               <td>
                 <div class="text-right">
                   <!-- <v-chip class="ma-2" color="success" @click="gotoMarket(row.base, row.rel)">
@@ -43,7 +43,7 @@
                   </v-chip>-->
 <!-- mePrivate and mePublic are set in .env* files of the root of the webapp project and read in at runtime -->
 <div v-if="mePrivate == 'true' && mePublic == 'false'">
-                  <v-chip class="ma-2" color="red" dark @click="cancelOrder(myOrders[row].uuid)">
+                  <v-chip class="ma-2" color="red" dark @click="cancelOrder(tidyMarketOrders[row].uuid)">
                     <v-icon left>mdi-server-plus</v-icon>Cancel
                   </v-chip>
 </div>
@@ -61,7 +61,7 @@
 import axios from "axios";
 
 export default {
-  props: ["myOrders"],
+  props: ["myOrders", "myOrdersThisMarket"],
   data: function() {
     return {
       meName: process.env.VUE_APP_MENAME,
@@ -87,6 +87,15 @@ export default {
   created: function() {
     console.log("MyOrders Created");
     console.log("MyOrders Finished");
+  },
+  computed: {
+    tidyMarketOrders: function(){
+      const testArr = [...this.myOrdersThisMarket, ...this.myOrders]
+// from https://stackoverflow.com/a/23080662
+      let testx = testArr.filter((item, pos) => testArr.indexOf(item) === pos)
+      console.log("Test array: " + testArr.length + testx.length)
+      return testx
+    }
   }
 };
 </script>
