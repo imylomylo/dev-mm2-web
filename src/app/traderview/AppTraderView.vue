@@ -373,15 +373,6 @@ let tmpArr = Object.keys(result).reduce(function(r, e) {
         console.log("deprecated")
       }
     },
-    handleMarket: function(result) {
-      console.log("AppTraderView.handleMarket") // the data is not important, only that it is received
-      // check & get uuid(s) for orders in this market
-      if( this.marketOrders.length > 0){
-        this.$refs.marketdataref("highlightOrders", this.marketOrders)
-      }
-      // signal it is ready if first component ready
-      this.componentReadyMarket = true
-    },
     groupByPrice: function(raw, groupBy) {
       // from https://stackoverflow.com/questions/21776389/javascript-object-grouping
       let i = 0,
