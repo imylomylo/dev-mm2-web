@@ -48,10 +48,11 @@
               <!-- Better to move to computed function for maintainability/non-repetitive -->
               <template v-slot:item.price="{ item }">{{ Number(Math.round(item.price+'e8')+'e-8') }}</template>
 
-              <!-- For highlighting my orders               -->
+              <!-- For highlighting my orders, TODO need a price:uuid array before grouping by price in AppTraderview   -->
               <template v-slot:item.price="{ item }">
                 {{ Number(Math.round(item.price+'e8')+'e-8') }}
                 <v-chip v-if="hasMyOrder(item.price)" color="purple" dark>me</v-chip>
+                <v-chip v-if="item.myOrder" color="purple" dark>my</v-chip>
               </template> 
 
               <template
@@ -103,10 +104,11 @@
               <!-- Better to move to computed function for maintainability/non-repetitive -->
               <template v-slot:item.price="{ item }">{{ Number(Math.round(item.price+'e8')+'e-8') }}</template>
               
-              <!-- for highlighting my order -->
+              <!-- For highlighting my orders, TODO need a price:uuid array before grouping by price in AppTraderview   -->
               <template v-slot:item.price="{ item }">
                 {{ Number(Math.round(item.price+'e8')+'e-8') }}
                 <v-chip v-if="hasMyOrder(item.price)" color="purple" dark>me</v-chip>
+                <v-chip v-if="item.myOrder" color="purple" dark>my</v-chip>
               </template> 
               <template
                 v-slot:item.baseamount="{ item }"

@@ -94,7 +94,8 @@ export function getMyOrders(){
         .then(response => {
           console.log(
             "My Orders: " +
-              JSON.stringify(response.data.result.maker_orders, null, 4)
+//              JSON.stringify(response.data.result.maker_orders, null, 4)
+              response.data.result.maker_orders
           )
           return response
         })

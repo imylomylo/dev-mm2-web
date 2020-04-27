@@ -165,6 +165,7 @@ export default {
       mePublic: process.env.VUE_APP_MEPUBLIC,
       myOrders: [],
       myOrdersThisMarket: [],
+      priceuuid: [],
       wallets: {
         base: {
           ticker: "base1",
@@ -252,7 +253,7 @@ export default {
     handleRefreshMarket: function() {
       console.log("Refresh Market")
       mm2.getMarket(this.wallets.base.ticker, this.wallets.rel.ticker).then( response => {
-          console.log("Market data: " + JSON.stringify(response.data,null,2))
+//          console.log("Market data: " + JSON.stringify(response.data,null,2))
           let marketdataraw = response.data
           this.marketOrders = marketdataraw
           this.marketOrders.asks = this.groupByPrice(marketdataraw.asks, "price")
@@ -376,7 +377,7 @@ export default {
             return x_order
           }
         })
-        console.log("AppTraderview.myOrdersThisMarket: " + JSON.stringify(this.myOrdersThisMarket,null,2))
+//        console.log("AppTraderview.myOrdersThisMarket: " + JSON.stringify(this.myOrdersThisMarket,null,2))
       })
     },
     findOrderInMarket: function(result) {
@@ -428,13 +429,21 @@ let tmpArr = Object.keys(result).reduce(function(r, e) {
         let orderTemplate = {}
         for( let j = 0 ; j < interim[i].length ; j++ ){
           if( j == 0 ){
-            // console.log("First grouped price to add maxvolume: " + interim[i][j].price)
+//            console.log("First grouped price to add maxvolume: " + interim[i][j].price)
             orderTemplate = interim[i][j]
             orderTemplate.address = ''
             orderTemplate.pubkey = ''
-            // for highlighting my orders in the OB, set prices within these ranges to activate
-            if( orderTemplate.price < 100 && orderTemplate.price > 8 || orderTemplate.price < 0.05 ){
-               orderTemplate.myOrder = true
+// for highlighting my orders in the OB, set example with prices within these ranges to activate
+//            if( orderTemplate.price && orderTemplate.price > 8 || orderTemplate.price < 0.05 ){
+//               orderTemplate.myOrder = true
+//            }
+
+console.log("Looking for match in MOTM: " + orderTemplate.uuid )
+            let tmpz = this.myOrdersThisMarket.filter( x => x.uuid === orderTemplate.uuid )
+//            console.log(JSON.stringify(tmpz, null, 1) + " AND " + orderTemplate)
+            if( tmpz[0] != undefined){ // ugly but works
+              console.log("UUID Match Found: " + JSON.stringify(tmpz, null, 1))
+              orderTemplate.myOrder = true 
             }
           }
           else {
