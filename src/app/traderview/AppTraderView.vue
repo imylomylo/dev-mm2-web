@@ -368,10 +368,13 @@ export default {
         let x_rel = this.wallets.rel.ticker
 // filter the array of my orders finding the ones in this market, putting them into their own array
         this.myOrdersThisMarket = this.myOrders.filter(function (x_order) {
-          return (( x_order.base == x_base &&
+          if (( x_order.base == x_base &&
                     x_order.rel == x_rel ) ||
                   ( x_order.base == x_rel && 
-                    x_order.rel == x_base ))
+                    x_order.rel == x_base )){
+            x_order.highlight = true
+            return x_order
+          }
         })
         console.log("AppTraderview.myOrdersThisMarket: " + JSON.stringify(this.myOrdersThisMarket,null,2))
       })
