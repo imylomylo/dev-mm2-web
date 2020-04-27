@@ -34,6 +34,11 @@
                         ref="myordersref" />
           </v-col>
         </v-row>
+        <v-row class="px-4">
+          <v-col>
+            <RecentSwaps />
+          </v-col>
+        </v-row>
       </v-flex>
     </v-layout>
   </div>
@@ -45,9 +50,10 @@ import DashboardWalletInfo from "./DashboardWalletInfo"
 import AppStrategy from "../strategy/AppStrategy"
 import AppExport from "../export/AppExport"
 import MyOrders from '../traderview/MyOrders'
+import RecentSwaps from '../history/RecentSwaps'
 
 export default {
-  components: { DashboardWalletInfo, AppStrategy, AppExport, MyOrders },
+  components: { DashboardWalletInfo, AppStrategy, AppExport, MyOrders, RecentSwaps },
   data: function() {
     return {
       appName: "Dashboard",
