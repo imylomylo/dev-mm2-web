@@ -51,7 +51,7 @@
               <!-- For highlighting my orders               -->
               <template v-slot:item.price="{ item }">
                 {{ Number(Math.round(item.price+'e8')+'e-8') }}
-                <v-chip v-if="item.myOrder" color="purple" dark>*</v-chip>
+                <v-chip v-if="hasMyOrder(item.price)" color="purple" dark>me</v-chip>
               </template> 
 
               <template
@@ -106,7 +106,7 @@
               <!-- for highlighting my order -->
               <template v-slot:item.price="{ item }">
                 {{ Number(Math.round(item.price+'e8')+'e-8') }}
-                <v-chip v-if="item.myOrder" color="purple" dark>*</v-chip>
+                <v-chip v-if="hasMyOrder(item.price)" color="purple" dark>me</v-chip>
               </template> 
               <template
                 v-slot:item.baseamount="{ item }"
@@ -127,7 +127,7 @@ import axios from "axios";
 
 export default {
   // name: "MarketData",
-  props: ["wallets", "marketdata"],
+  props: ["wallets", "marketdata", "myOrdersThisMarket"],
   data: function() {
     return {
       cexprice: "",
@@ -171,6 +171,9 @@ export default {
         toArray.push(obj[key]);
       });
       return toArray;
+    },
+    hasMyOrder: function(price){
+      return this.myOrdersThisMarket.find(x => x.price == price)
     }
   },
   created: function() {

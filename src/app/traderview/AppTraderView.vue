@@ -87,7 +87,7 @@
         <v-flex md6 lg6>
           <v-row class="px-4">
             <v-col>
-              <MarketData v-bind:wallets="wallets" v-bind:marketdata="marketOrders" ref="refMarketData" v-on:refresh-market="handleRefreshMarket" />
+              <MarketData v-bind:wallets="wallets" v-bind:marketdata="marketOrders" v-bind:myOrdersThisMarket="myOrdersThisMarket" ref="refMarketData" v-on:refresh-market="handleRefreshMarket" />
             </v-col>
           </v-row>
 
