@@ -22,7 +22,16 @@
         </v-row>
         <v-row class="px-4">
           <v-col>
-            <MyOrders />
+<!--
+              <MyOrders v-bind:myOrders="myOrders" v-bind:myOrdersThisMarket="myOrdersThisMarket" v-on:refresh-myorders="handleRefreshMyOrders" 
+                        v-on:cancel-order="handleCancelOrder" 
+                        v-on:cancel-all-orders="handleCancelAllOrders" 
+                        v-on:myOrdersResponse="handleMyOrders" ref="myordersref" />
+-->
+              <MyOrders v-bind:myOrders="myOrders" v-bind:myOrdersThisMarket="[]" v-on:refresh-myorders="handleRefreshMyOrders" 
+                        v-on:cancel-order="handleCancelOrder" 
+                        v-on:cancel-all-orders="handleCancelAllOrders" 
+                        ref="myordersref" />
           </v-col>
         </v-row>
       </v-flex>
@@ -31,6 +40,7 @@
 </template>
 <script>
 import axios from 'axios'
+import mm2 from '../traderview/lib/mm2MiddlewareClient'
 import DashboardWalletInfo from "./DashboardWalletInfo"
 import AppStrategy from "../strategy/AppStrategy"
 import AppExport from "../export/AppExport"
@@ -42,10 +52,35 @@ export default {
     return {
       appName: "Dashboard",
       customerrors: [],
-      allwallets: []
+      allwallets: [],
+      myOrders: []
     };
   },
   methods: {
+    handleRefreshMyOrders: function() {
+      console.log("AppTraderView.handleRefreshMyOrders")
+      this.handleMyOrders
+    },
+    handleCancelOrder: function(uuid) {
+      console.log("AppTraderView.handleCancelOrder: " + uuid)
+      mm2.cancelOrder(uuid).then( response => {
+         console.log("Cancel order response: " + response)
+      }).catch((reason) => {
+        console.log("Could not cancel order " + uuid)
+      })
+      this.handleMyOrders()
+    },
+    handleCancelAllOrders: function() {
+      console.log("AppTraderView.handleCancelAllOrders")
+    },
+    handleMyOrders: function(){
+      mm2.getMyOrders().then( response => {
+        // because working with an object of objects in js sucks, convert to array
+        this.myOrders = Object.values(response.data.result.maker_orders)
+      }).then( () => {
+        console.log("AppDashboard.myOrders -> highlightOrders")
+      })
+    },
     setAllWallets: function() {
       console.log("Getting enabled coins with MMBOTURL")
       axios
@@ -89,9 +124,10 @@ export default {
     }
   },
   created: function() {
-    console.log(this.appName + " Created");
-    this.setAllWallets();
-    console.log(this.appName + " Finished Created");
+    console.log(this.appName + " Created")
+    this.setAllWallets()
+    this.handleMyOrders()
+    console.log(this.appName + " Finished Created")
   }
 };
 </script>

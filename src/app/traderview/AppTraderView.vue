@@ -350,6 +350,7 @@ export default {
         this.myOrders = Object.values(response.data.result.maker_orders)
       }).then( () => {
         console.log("AppTraderview.myOrders -> highlightOrders")
+        this.handleRefreshMarket()
 
 // deprecated: when trying to use the output from mm2 (object with objects) it started to work but sucked
 //  from https://stackoverflow.com/questions/2722159/how-to-filter-object-array-based-on-attributes
@@ -442,7 +443,7 @@ console.log("Looking for match in MOTM: " + orderTemplate.uuid )
             let tmpz = this.myOrdersThisMarket.filter( x => x.uuid === orderTemplate.uuid )
 //            console.log(JSON.stringify(tmpz, null, 1) + " AND " + orderTemplate)
             if( tmpz[0] != undefined){ // ugly but works
-              console.log("UUID Match Found: " + JSON.stringify(tmpz, null, 1))
+              console.log("UUID Match Found")
               orderTemplate.myOrder = true 
             }
           }
@@ -496,10 +497,11 @@ console.log("Looking for match in MOTM: " + orderTemplate.uuid )
     // TODO can be done by passing props
     this.wallets.base.ticker = this.$route.params.base.toUpperCase()
     this.wallets.rel.ticker = this.$route.params.rel.toUpperCase()
+    this.handleMyOrders()
     this.handleRefreshBalances()
     this.handleRefreshFiat()
-    this.handleMyOrders()
-    this.handleRefreshMarket()
+// this is now handled in MyOrders promise
+//    this.handleRefreshMarket()
     console.log(this.appName + " Finished Created");
   },
   beforeRouteUpdate(to, from, next) {

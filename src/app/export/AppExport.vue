@@ -1,7 +1,9 @@
 <template>
   <v-card max-width="auto" class="mx-auto">
     <v-row justify="center">
-      <!-- <v-btn color="success" class="mt-12" @click="overlay = !overlay">Show Overlay</v-btn> -->
+<!--
+      <v-btn color="success" class="mt-12" @click="overlay = !overlay">Show Overlay</v-btn> 
+-->
 
       <v-overlay opacity="0.88" :absolute="absolute" :value="overlay">
         <v-btn color="warning" @click="disenable(false)">No Export</v-btn>
@@ -44,6 +46,7 @@ export default {
   data: function() {
     return {
       absolute: true,
+      overlay: true,
       strategies: [{}]
     };
   },

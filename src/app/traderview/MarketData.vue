@@ -51,8 +51,11 @@
               <!-- For highlighting my orders, TODO need a price:uuid array before grouping by price in AppTraderview   -->
               <template v-slot:item.price="{ item }">
                 {{ Number(Math.round(item.price+'e8')+'e-8') }}
+<!--
+better implementation handled in parent component on load of orders, then promise to set flag
                 <v-chip v-if="hasMyOrder(item.price)" color="purple" dark>me</v-chip>
-                <v-chip v-if="item.myOrder" color="purple" dark>my</v-chip>
+-->
+                <v-chip v-if="item.myOrder" color="purple" dark>*</v-chip>
               </template> 
 
               <template
@@ -107,8 +110,11 @@
               <!-- For highlighting my orders, TODO need a price:uuid array before grouping by price in AppTraderview   -->
               <template v-slot:item.price="{ item }">
                 {{ Number(Math.round(item.price+'e8')+'e-8') }}
+<!--
+better implementation in parent component
                 <v-chip v-if="hasMyOrder(item.price)" color="purple" dark>me</v-chip>
-                <v-chip v-if="item.myOrder" color="purple" dark>my</v-chip>
+-->
+                <v-chip v-if="item.myOrder" color="purple" dark>*</v-chip>
               </template> 
               <template
                 v-slot:item.baseamount="{ item }"
