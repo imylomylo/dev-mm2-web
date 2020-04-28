@@ -26,15 +26,15 @@
             <v-chip @click="ordersize_pc(100)">100%</v-chip>
           </v-chip-group>
         </v-card-text>
-        <v-text-field v-model="total" :label="totalInBaseCoinLabel()" required></v-text-field>
+        <v-text-field v-model="total" :label="totalInOtherCoinLabel()" required></v-text-field>
         <div class="text-center">
           <v-chip class="ma-2" color="success" @click="buyBase(wallets.base.ticker)">
             <v-icon left>mdi-server-plus</v-icon>
-            Buy {{ wallets.base.ticker }}
+            Buy {{ amount }} {{ wallets.base.ticker }}
           </v-chip>
           <v-chip class="ma-2" color="red" dark @click="sellBase(wallets.base.ticker)">
             <v-icon left>mdi-server-plus</v-icon>
-            Sell {{ wallets.base.ticker }}
+            Sell {{ amount }} {{ wallets.base.ticker }}
           </v-chip>
         </div>
       </v-form>
@@ -71,8 +71,8 @@ export default {
     amountInBaseCoinLabel: function() {
       return "Amount in base coin (" + this.wallets.base.ticker + ")"
     },
-    totalInBaseCoinLabel: function() {
-      return "Total in base coin (" + this.wallets.base.ticker + ")"
+    totalInOtherCoinLabel: function() {
+      return "Total in rel (quote) coin (" + this.wallets.rel.ticker + ")"
     },
     ordersize_pc: function(pc) {
       this.$emit('ordersize-pc', pc)
