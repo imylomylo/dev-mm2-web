@@ -9,8 +9,9 @@
         class="ma-2"
         color="purple"
         outlined
-        @click="myBalance(wallets.base.ticker, wallets.rel.ticker)"
+        @click="refreshBalances()"
       >
+        <!-- @click="myBalance(wallets.base.ticker, wallets.rel.ticker)" -->
         <v-icon left>mdi-server-plus</v-icon>Refresh
       </v-chip>
     </v-toolbar>
@@ -32,12 +33,20 @@
           <td>{{ row.address }}</td>
           <td>
             <div class="text-left">
+<!-- mePrivate and mePublic are set in .env* files of the root of the webapp project and read in at runtime -->
+<div v-if="mePrivate == 'true' && mePublic == 'false'">
               <v-chip class="ma-2" color="success" @click="deposit(row.ticker, row.address)">
                 <v-icon left>mdi-server-plus</v-icon>Deposit
               </v-chip>
               <v-chip class="ma-2" color="red" dark @click="showWithdrawOverlay(row.ticker)">
                 <v-icon left>mdi-server-plus</v-icon>Withdraw
               </v-chip>
+</div>
+<div v-else>
+              <v-chip class="ma-2" color="success" @click="deposit(row.ticker, row.address)">
+                <v-icon left>mdi-server-plus</v-icon>Donate
+              </v-chip>
+</div>
             </div>
           </td>
         </tr>
@@ -70,6 +79,8 @@ export default {
   components: { QrcodeVue },
   data: function() {
     return {
+      mePrivate: process.env.VUE_APP_MEPRIVATE,
+      mePublic: process.env.VUE_APP_MEPUBLIC,
       absoluteOverlay: false,
       depositOverlay: false,
       depositOverlaySize: 400,
@@ -83,12 +94,6 @@ export default {
     };
   },
   methods: {
-    isEnabled: function(ticker) {
-      console.log("isEnabled(): Checking " + ticker);
-      if (this.activeCoins.some(e => e.ticker === ticker)) {
-        return true;
-      }
-    },
     hideDepositOverlay: function() {
       (this.depositOverlay = false),
         (this.depositTicker = ""),
@@ -98,8 +103,7 @@ export default {
       (this.withdrawOverlay = false),
         (this.withdrawAddress = ""),
         (this.withdrawAmount = 0);
-        //add 1 or 2 seconds of delay
-      this.myBalance(this.wallets.base.ticker, this.wallets.rel.ticker);
+       this.$emit("refresh-balances")
     },
     showWithdrawOverlay: function(ticker) {
       console.log("Withdraw Overlay: " + ticker);
@@ -113,122 +117,64 @@ export default {
       this.depositAddress = address;
       this.depositOverlay = true;
     },
-    withdraw: function(ticker, amount) {
-      console.log("Withdraw: " + ticker);
-      let requestData = {};
-      requestData["coin"] = this.withdrawTicker;
-      requestData["to"] = this.withdrawAddress;
-      requestData["amount"] = this.withdrawAmount;
-      requestData["method"] = "withdraw";
-      requestData["userpass"] = process.env.VUE_APP_USERPASS;
-
-      axios
-        .post(
-          "http://" +
-            process.env.VUE_APP_WEBHOST +
-            ":" +
-            process.env.VUE_APP_WEBPORT +
-            "/" +
-            process.env.VUE_APP_MMBOTHOST +
-            ":" +
-            process.env.VUE_APP_MMBOTPORT +
-            "/api/v1/legacy/mm2/withdraw",
-          requestData
-        )
-        .then(response => {
-          console.log(JSON.stringify(response.data, null, 4));
-          let requestData = {};
-          requestData["coin"] = this.withdrawTicker;
-          requestData["tx_hex"] = response.data.tx_hex;
-          requestData["method"] = "send_raw_transaction";
-          requestData["userpass"] = process.env.VUE_APP_USERPASS;
-
-          axios
-            .post(
-              "http://" +
-                process.env.VUE_APP_MMBOTHOST +
-                ":" +
-                process.env.VUE_APP_MMBOTPORT +
-                "/api/v1/legacy/mm2/send_raw_transaction",
-              requestData
-            )
-            .then(response => {
-              console.log(JSON.stringify(response, null, 4));
-              this.hideWithdrawOverlay();
-            })
-            .catch(e => {
-              this.customerrors.push(e);
-            });
-        })
-        .catch(e => {
-          this.customerrors.push(e);
-        });
-    },
-    myBalance: function(base, rel) {
-      console.log("My balance");
-      axios
-        .get(
-            process.env.VUE_APP_MMBOTURL +
-            "/getBalance?coin=" +
-            base
-        )
-        .then(response => {
-          console.log(response.data);
-          this.wallets.base.balance = response.data.balance;
-          this.wallets.base.address = response.data.address;
-        })
-        .catch(e => {
-          this.customerrors.push(e);
-        });
-
-      axios
-        .get(
-            process.env.VUE_APP_MMBOTURL +
-            "/getBalance?coin=" +
-            rel
-        )
-        .then(response => {
-          console.log(response.data);
-          this.wallets.rel.balance = response.data.balance;
-          this.wallets.rel.address = response.data.address;
-        })
-        .catch(e => {
-          this.customerrors.push(e);
-        });
-      console.log(this.wallets.base.balance);
-      console.log(this.wallets.rel.balance);
-    },
-    enableCoin: function(coin) {
-      console.log("Enable " + JSON.stringify(this.supportedCoins[coin].ticker));
-      console.log(JSON.stringify(this.supportedCoins[coin].servers));
-      let coinservers = this.supportedCoins[coin].servers;
-      axios
-        .post(
-          "http://" +
-            process.env.VUE_APP_WEBHOST +
-            ":7780/connectcoin?coin=" +
-            this.supportedCoins[coin].ticker +
-            "&servers=" +
-            JSON.stringify(coinservers)
-        )
-        .then(response => {
-          // if response.data.result == "success"
-          console.log("enableCoin() response data: " + response.data);
-          let newCoin = response.data;
-          newCoin.papid = this.supportedCoins[coin].ticker;
-          console.log("New PAPID: " + newCoin);
-          this.activeCoins.push(newCoin);
-          this.$parent.$forceUpdate();
-        })
-        .catch(e => {
-          this.customerrors.push(e);
-        });
+// TODO
+//    withdraw: function(ticker, amount) {
+//      console.log("Withdraw: " + ticker);
+//      let requestData = {};
+//      requestData["coin"] = this.withdrawTicker;
+//      requestData["to"] = this.withdrawAddress;
+//      requestData["amount"] = this.withdrawAmount;
+//      requestData["method"] = "withdraw";
+//      requestData["userpass"] = process.env.VUE_APP_USERPASS;
+//
+//      axios
+//        .post(
+//          "http://" +
+//            process.env.VUE_APP_WEBHOST +
+//            ":" +
+//            process.env.VUE_APP_WEBPORT +
+//            "/" +
+//            process.env.VUE_APP_MMBOTHOST +
+//            ":" +
+//            process.env.VUE_APP_MMBOTPORT +
+//            "/api/v1/legacy/mm2/withdraw",
+//          requestData
+//        )
+//        .then(response => {
+//          console.log(JSON.stringify(response.data, null, 4));
+//          let requestData = {};
+//          requestData["coin"] = this.withdrawTicker;
+//          requestData["tx_hex"] = response.data.tx_hex;
+//          requestData["method"] = "send_raw_transaction";
+//          requestData["userpass"] = process.env.VUE_APP_USERPASS;
+//
+//          axios
+//            .post(
+//              "http://" +
+//                process.env.VUE_APP_MMBOTHOST +
+//                ":" +
+//                process.env.VUE_APP_MMBOTPORT +
+//                "/api/v1/legacy/mm2/send_raw_transaction",
+//              requestData
+//            )
+//            .then(response => {
+//              console.log(JSON.stringify(response, null, 4));
+//              this.hideWithdrawOverlay();
+//            })
+//            .catch(e => {
+//              this.customerrors.push(e);
+//            });
+//        })
+//        .catch(e => {
+//          this.customerrors.push(e);
+//        });
+//    },
+    refreshBalances() {
+       this.$emit("refresh-balances")
     }
   },
   created: function() {
     console.log("WalletInfo Created");
-    this.myBalance(this.wallets.base.ticker, this.wallets.rel.ticker);
-    console.log("WalletInfo Finished");
   }
 };
 </script>

@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-card class="mx-auto" max-width="auto" outlined>
-      <v-toolbar flat dense color="blue-grey lighten-5">
+      <v-toolbar flat dense color="red lighten-1">
         <v-toolbar-title>
           <span class="subheading">Single Order {{wallets.base.ticker}}</span>
         </v-toolbar-title>
@@ -11,8 +11,8 @@
       <v-divider class="mx-4"></v-divider>
 
       <v-form ref="form">
-        <v-text-field v-model="price" label="Price in other coin" required></v-text-field>
-        <v-text-field v-model="amount" label="Amount" required></v-text-field>
+        <v-text-field v-model="price" :label="priceInOtherCoinLabel()" required></v-text-field>
+        <v-text-field v-model="amount" :label="amountInBaseCoinLabel()" required></v-text-field>
         <v-card-text>
           <v-chip-group
             class="justify-space-around"
@@ -21,12 +21,12 @@
           >
             <v-chip @click="ordersize_pc(5)">5%</v-chip>
             <v-chip @click="ordersize_pc(10)">10%</v-chip>
-            <v-chip @click="ordersize_pc(125)">25%</v-chip>
+            <v-chip @click="ordersize_pc(25)">25%</v-chip>
             <v-chip @click="ordersize_pc(50)">50%</v-chip>
             <v-chip @click="ordersize_pc(100)">100%</v-chip>
           </v-chip-group>
         </v-card-text>
-        <v-text-field v-model="total" label="Total" required></v-text-field>
+        <v-text-field v-model="total" :label="totalInBaseCoinLabel()" required></v-text-field>
         <div class="text-center">
           <v-chip class="ma-2" color="success" @click="buyBase(wallets.base.ticker)">
             <v-icon left>mdi-server-plus</v-icon>
@@ -62,87 +62,47 @@ export default {
     };
   },
   methods: {
+    ordersizeResponse: function(amount) {
+      this.amount = Number(Math.round(amount+'e8')+'e-8') 
+    },
+    priceInOtherCoinLabel: function() {
+      return "Price in rel (quote) coin (" + this.wallets.rel.ticker + ")"
+    },
+    amountInBaseCoinLabel: function() {
+      return "Amount in base coin (" + this.wallets.base.ticker + ")"
+    },
+    totalInBaseCoinLabel: function() {
+      return "Total in base coin (" + this.wallets.base.ticker + ")"
+    },
     ordersize_pc: function(pc) {
-      console.log(pc);
+      this.$emit('ordersize-pc', pc)
     },
-    sellBase: function(base) {
-      console.log(
-        "SingleOrder sell base: " +
-          base +
-          ", amount: " +
-          this.amount +
-          " @ " +
-          this.price +
-          " = " +
-          this.total
-      );
-      this.orderSentOverlay = true 
-      let requestData = {}
-      requestData["base"] = this.wallets.base.ticker
-      requestData["rel"] = this.wallets.rel.ticker
-      requestData["method"] = "setprice"
-      requestData["volume"] = this.amount
-      requestData["price"] = this.price
- //     requestData["userpass"] = "YOUR_PASSWORD_HERE"
-      console.log("Sell BASE: " + JSON.stringify(requestData, null, 4))
-
-      axios
-        .post(
-            process.env.VUE_APP_MMBOTURL +
-            "/doMaker?base="+requestData.base+"&rel="+requestData.rel+"&volume="+requestData.volume+"&price="+requestData.price
-        )
-        .then(response => {
-          console.log(JSON.stringify(response.data))
-          this.$emit("orderResponse", response.data.result)
-          this.price = ""
-          this.amount = ""
-          this.orderSentOverlay = false
-        })
-        .catch(e => {
-          this.customerrors.push(e);
-        });
+    handleOrderResponse: function(){
+      this.orderSentOverlay = false
     },
-    buyBase: function(base) {
-      console.log(
-        "SingleOrder buy base: " +
-          base +
-          ", amount: " +
-          this.amount +
-          " @ " +
-          this.price +
-          " = " +
-          this.total
-      )
+    sellBase: function() {
+      console.log("SingleOrder sell (base): " + this.wallets.base.ticker )
+      let orderDetails = {}
+      orderDetails.price = this.price
+      orderDetails.amount = this.amount
       this.orderSentOverlay = true 
-      let requestData = {}
-      requestData["rel"] = this.wallets.base.ticker //flipped for a buy because of underlying mm2 mechanism
-      requestData["base"] = this.wallets.rel.ticker //flipped for a buy because of underlying mm2 mechanism
-      requestData["method"] = "setprice"
-      requestData["volume"] = this.total.toString()
-      requestData["price"] = (1/this.price).toString()  // 1/price for a buy & needs to be a string for the makerbot api
-//      requestData["userpass"] = "YOUR_PASSWORD_HERE"
-
-      console.log("Buy BASE: " + JSON.stringify(requestData, null, 4))
-      axios
-        .post(
-            process.env.VUE_APP_MMBOTURL +
-            "/doMaker?base="+requestData.base+"&rel="+requestData.rel+"&volume="+requestData.volume+"&price="+requestData.price
-        )
-        .then(response => {
-          console.log(JSON.stringify(response.data))
-          this.$emit("orderResponse", response.data.result)
-          this.price = ""
-          this.amount = ""
-          this.orderSentOverlay = false
-        })
-        .catch(e => {
-          this.customerrors.push(e);
-        })
+      this.$emit("sell-base", orderDetails)
+      this.price = ""
+      this.amount = ""
+    },
+    buyBase: function() {
+      console.log("SingleOrder buy base: " + this.wallets.base.ticker )
+      let orderDetails = {}
+      orderDetails.price = this.price
+      orderDetails.amount = this.amount
+      this.orderSentOverlay = true 
+      this.$emit("buy-base", orderDetails)
+      this.price = ""
+      this.amount = ""
     }
   },
   created: function() {
     console.log("SingleOrder Created");
-    console.log("wallets: " + JSON.stringify(this.wallets))
   },
   computed: {
     total: function() {

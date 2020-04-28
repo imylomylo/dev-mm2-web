@@ -46,6 +46,7 @@ export default {
   data: function() {
     return {
       absolute: true,
+      overlay: true,
       strategies: []
     };
   },
