@@ -252,7 +252,7 @@ export default {
   },
   methods: {
     handleOrdersizePC: function(pc) {
-      console.log("AppTraderview.handleOrdersizePC: " + pc + " on " + this.wallets.base.balance)
+      console.log("AppTraderview.handleOrdersizePC: " + pc + "% on " + this.wallets.base.balance)
       this.$refs.refSingleOrder.ordersizeResponse(this.wallets.base.balance * (pc / 100))
     },
     handleRefreshMarket: function() {

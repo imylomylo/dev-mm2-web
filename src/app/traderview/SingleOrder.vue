@@ -63,8 +63,7 @@ export default {
   },
   methods: {
     ordersizeResponse: function(amount) {
-      console.log("Amount is: " + amount)
-      this.amount = amount
+      this.amount = Number(Math.round(amount+'e8')+'e-8') 
     },
     priceInOtherCoinLabel: function() {
       return "Price in rel (quote) coin (" + this.wallets.rel.ticker + ")"
@@ -76,7 +75,6 @@ export default {
       return "Total in base coin (" + this.wallets.base.ticker + ")"
     },
     ordersize_pc: function(pc) {
-      console.log(pc);
       this.$emit('ordersize-pc', pc)
     },
     handleOrderResponse: function(){
