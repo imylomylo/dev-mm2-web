@@ -17,12 +17,13 @@
         </v-row>
         <v-row class="px-4">
           <v-col>
-            <AppExport />
+            <AppExport v-bind:swapHistory="recentSwaps" v-on:get-swap-history="handleGetSwapHistory" v-on:hide-swap-history="handleHideSwapHistory" v-on:save-json="handleSaveJSON"/>
           </v-col>
         </v-row>
         <v-row class="px-4">
           <v-col>
 <!--
+not sure if something needed from this definition of component, keeping as comment for now
               <MyOrders v-bind:myOrders="myOrders" v-bind:myOrdersThisMarket="myOrdersThisMarket" v-on:refresh-myorders="handleRefreshMyOrders" 
                         v-on:cancel-order="handleCancelOrder" 
                         v-on:cancel-all-orders="handleCancelAllOrders" 
@@ -34,11 +35,13 @@
                         ref="myordersref" />
           </v-col>
         </v-row>
+<!--
         <v-row class="px-4">
           <v-col>
-            <RecentSwaps />
+            <NewComponent />
           </v-col>
         </v-row>
+-->
       </v-flex>
     </v-layout>
   </div>
@@ -57,12 +60,30 @@ export default {
   data: function() {
     return {
       appName: "Dashboard",
+      recentSwaps: [],
       customerrors: [],
       allwallets: [],
       myOrders: []
     };
   },
   methods: {
+    handleSaveJSON: function(contentObject) {
+// from https://www.4codev.com/javascript/download-save-json-content-to-local-file-in-javascript-idpx473668115863369846.html
+      const a = document.createElement("a")
+      const file = new Blob([JSON.stringify(contentObject,null,4)], { type: 'application/json'})
+      a.href = URL.createObjectURL(file)
+      a.download = contentObject.my_info.my_coin + "-" + contentObject.my_info.other_coin + "-" + contentObject.uuid + ".json"
+      a.click()
+    },
+    handleHideSwapHistory: function() {
+      this.recentSwaps = []
+    },
+    handleGetSwapHistory: function() {
+       console.log("AppDashboard.handleGetSwapHistory")
+       mm2.recentSwaps().then( response => {
+         this.recentSwaps = response.data.result
+       })
+    },
     handleRefreshMyOrders: function() {
       console.log("AppTraderView.handleRefreshMyOrders")
       this.handleMyOrders

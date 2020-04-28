@@ -178,6 +178,19 @@ export function getMarket(base, rel){
         })
 }
 
+export function recentSwaps(limit = 10){
+     return axios
+       .get( process.env.VUE_APP_MMBOTURL + "/recentswaps")
+       .then(response => {
+         if (response.data !== undefined) {
+           return response
+         }
+       })
+       .catch(e => {
+         this.customerrors.push(e)
+       })
+}
+
 export function withdraw(ticker,amount){
   console.log("mm2MiddlewareClient.withdraw - Not Supported Yet")
 // TODO
@@ -243,5 +256,6 @@ export default {
   getWalletBalance,
   buyBase,
   sellBase,
+  recentSwaps,
   withdraw
 }
