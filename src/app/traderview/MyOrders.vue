@@ -19,7 +19,7 @@
           <thead>
             <tr>
               <th class="text-left">Pair</th>
-              <th class="text-left">Status</th>
+              <th class="text-left">Can Cancel</th>
               <th class="text-left">Order Price</th>
               <th class="text-left">Amount</th>
 <!-- mePrivate and mePublic are set in .env* files of the root of the webapp project and read in at runtime -->
@@ -36,7 +36,7 @@
                     <v-icon left>mdi-server-plus</v-icon>*
                   </v-chip>
               </td>
-              <td>Not implemented yet</td>
+              <td>{{ tidyMarketOrders[row].cancellable ? 'YES' : 'NO' }}</td>
               <td>{{ tidyMarketOrders[row].price }}</td>
               <td>{{tidyMarketOrders[row].max_base_vol }}</td>
               <td>
