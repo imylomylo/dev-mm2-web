@@ -78,6 +78,7 @@
                 v-bind:wallets="wallets"
                 v-on:sell-base="handleSellBase"
                 v-on:buy-base="handleBuyBase"
+                v-on:ordersize-pc="handleOrdersizePC"
                 ref="refSingleOrder"
               />
             </v-col>
@@ -250,6 +251,10 @@ export default {
     };
   },
   methods: {
+    handleOrdersizePC: function(pc) {
+      console.log("AppTraderview.handleOrdersizePC: " + pc + " on " + this.wallets.base.balance)
+      this.$refs.refSingleOrder.ordersizeResponse(this.wallets.base.balance * (pc / 100))
+    },
     handleRefreshMarket: function() {
       console.log("Refresh Market")
       mm2.getMarket(this.wallets.base.ticker, this.wallets.rel.ticker).then( response => {

@@ -12,7 +12,7 @@
 
       <v-form ref="form">
         <v-text-field v-model="price" :label="priceInOtherCoinLabel()" required></v-text-field>
-        <v-text-field v-model="amount" label="Amount" required></v-text-field>
+        <v-text-field v-model="amount" :label="amountInBaseCoinLabel()" required></v-text-field>
         <v-card-text>
           <v-chip-group
             class="justify-space-around"
@@ -21,12 +21,12 @@
           >
             <v-chip @click="ordersize_pc(5)">5%</v-chip>
             <v-chip @click="ordersize_pc(10)">10%</v-chip>
-            <v-chip @click="ordersize_pc(125)">25%</v-chip>
+            <v-chip @click="ordersize_pc(25)">25%</v-chip>
             <v-chip @click="ordersize_pc(50)">50%</v-chip>
             <v-chip @click="ordersize_pc(100)">100%</v-chip>
           </v-chip-group>
         </v-card-text>
-        <v-text-field v-model="total" label="Total" required></v-text-field>
+        <v-text-field v-model="total" :label="totalInBaseCoinLabel()" required></v-text-field>
         <div class="text-center">
           <v-chip class="ma-2" color="success" @click="buyBase(wallets.base.ticker)">
             <v-icon left>mdi-server-plus</v-icon>
@@ -62,11 +62,22 @@ export default {
     };
   },
   methods: {
+    ordersizeResponse: function(amount) {
+      console.log("Amount is: " + amount)
+      this.amount = amount
+    },
     priceInOtherCoinLabel: function() {
-      return "Price in other coin (" + this.wallets.rel.ticker + ")"
+      return "Price in rel (quote) coin (" + this.wallets.rel.ticker + ")"
+    },
+    amountInBaseCoinLabel: function() {
+      return "Amount in base coin (" + this.wallets.base.ticker + ")"
+    },
+    totalInBaseCoinLabel: function() {
+      return "Total in base coin (" + this.wallets.base.ticker + ")"
     },
     ordersize_pc: function(pc) {
       console.log(pc);
+      this.$emit('ordersize-pc', pc)
     },
     handleOrderResponse: function(){
       this.orderSentOverlay = false
