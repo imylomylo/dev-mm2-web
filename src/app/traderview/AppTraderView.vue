@@ -10,7 +10,16 @@
               <v-toolbar-title>Trading</v-toolbar-title>
 
               <v-divider class="mx-4" vertical></v-divider>
-              <h2>{{ wallets.base.ticker + " / " + wallets.rel.ticker}}</h2>
+              <div class="d-flex">
+                  <v-overflow-btn :items="availableMarkets"
+                   :label="(wallets.base.ticker +' / '+  wallets.rel.ticker)"
+                   :disabled="loadingNextMarket"
+                    hide-details
+                    class="pa-0 mg-0 tiny font-weight-bold"
+                    item-value="text"
+                    @change="nextMarket($event)"
+                  ></v-overflow-btn>
+              </div>
               <v-chip
                 class="ma-2"
                 color="success"
@@ -20,25 +29,11 @@
                 <v-icon left>mdi-server-plus</v-icon>INVERT
               </v-chip>
               <v-btn v-if="!ammdisabled" depressed small color="success">Automated</v-btn>
-              <v-btn v-else depressed small color="error">No Automation</v-btn>
-              <FiatPrice v-bind:wallets="wallets" v-on:refresh-fiat="handleRefreshFiat" ref="refFiatInfo"></FiatPrice>
-
-              <v-toolbar-items class="hidden-sm-and-down">
-                <v-divider vertical></v-divider>
-                <template v-if="!ammdisabled">
-                  <v-btn rounded depressed dark large color="red" > <!-- @click="dismmenable"> -->
-                    <h3>Disable Automation</h3>
-                  </v-btn>
-                </template>
-                <template v-else>
-                  <v-btn rounded depressed dark large color="green" > <!-- @click="dismmenable"> -->
-                    <h3>Enable Automation</h3>
-                  </v-btn>
-                </template>
-                <v-divider vertical></v-divider>
-              </v-toolbar-items>
-
-              <v-app-bar-nav-icon></v-app-bar-nav-icon>
+              <v-btn v-else depressed small color="error">{{ currentStrategyInfo }}</v-btn>
+              <div class="flex-grow-1">
+                <v-divider class="mx-4" vertical></v-divider>
+              </div>
+              <h2>{{ wallets.base.ticker + " / " + wallets.rel.ticker}}</h2>
             </v-toolbar>
           </v-row>
         </div>
@@ -165,8 +160,10 @@ export default {
       mePrivate: process.env.VUE_APP_MEPRIVATE,
       mePublic: process.env.VUE_APP_MEPUBLIC,
       myOrders: [],
+      myCoin: process.env.VUE_APP_MYCOIN,
       myOrdersThisMarket: [],
       priceuuid: [],
+      loadingNextMarket: false,
       wallets: {
         base: {
           ticker: "base1",
@@ -184,11 +181,13 @@ export default {
       ammdisabled: true,
       //currentStrategyInfo: "ONLY BUY KMD, 1.8% SPREAD WITH 10% ORDER SIZE",
       currentStrategyInfo: "NO AUTOMATION",
-      activeCoins: [],
+      allwallets: [],
       walletBalance: { base: 0, rel: 0 },
       marketData: "",
       trade: { base: "", rel: "", price: "", amount: "0" },
       appName: "VueCryptoTrader",
+      isMyCoinBase: false,
+      isMyCoinRel: false,
       customerrors: [],
       headers: [
         {
@@ -489,12 +488,32 @@ console.log("Looking for match in MOTM: " + orderTemplate.uuid )
       });
       return toArray;
     },
+    nextMarket: function(e){
+        console.log("NEXT MARKET + " + e)
+        this.loadingNextMarket = true
+        let nextMarket = e.split('/')
+        let nextBase = nextMarket[0].trim()
+        let nextRel = nextMarket[1].trim()
+        console.log("Next base & rel is: " + nextBase + " & " + nextRel)
+      window.location.href = "/#/traderview/" + nextBase + "/" + nextRel
+      this.$router.go(this.$router.currentRoute);
+    },
     setAllWallets: function() {
-      this.allwallets = [
-        { ticker: "BTC", balance: 5 },
-        { ticker: "KMD", balance: 11 },
-        { ticker: "DOGE", balance: 123 }
-      ];
+      console.log("Getting enabled coins with MMBOTURL")
+      axios
+        .get(
+            process.env.VUE_APP_MMBOTURL +
+            "/coinsenabled"
+        )
+        .then(response => {
+          console.log(JSON.stringify(response.data.result))
+          this.allwallets = response.data.result.sort((a,b) => a.ticker.localeCompare(b.ticker))
+//          this.updateBalances()
+//          this.$refs.dashboardWallets.allwallets = this.allwallets
+        })
+        .catch(e => {
+          this.customerrors.push(e);
+        });
     }
   },
   created: function() {
@@ -502,11 +521,22 @@ console.log("Looking for match in MOTM: " + orderTemplate.uuid )
     // TODO can be done by passing props
     this.wallets.base.ticker = this.$route.params.base.toUpperCase()
     this.wallets.rel.ticker = this.$route.params.rel.toUpperCase()
+    if( this.myCoin === this.wallets.base.ticker ){
+        this.isMyCoinBase = true
+    } else {
+        this.isMyCoinBase = false
+    }
+    if( this.myCoin === this.wallets.rel.ticker ){
+        this.isMyCoinRel = true
+    } else {
+        this.isMyCoinRel = false
+    }
     this.handleMyOrders()
     this.handleRefreshBalances()
     this.handleRefreshFiat()
 // this is now handled in MyOrders promise
 //    this.handleRefreshMarket()
+    this.setAllWallets()
     console.log(this.appName + " Finished Created");
   },
   beforeRouteUpdate(to, from, next) {
@@ -518,10 +548,28 @@ console.log("Looking for match in MOTM: " + orderTemplate.uuid )
   },
   computed: {
     coinCount: function(row) {
-      return this.activeCoins.length;
+      return this.allwallets.length;
+    },
+    availableMarkets: function(){
+      let arrMarketPairs = new Array()
+      let arrInvertedPairs = new Array()
+      if(this.isMyCoinBase){
+        for( let coin = 0 ; coin < this.allwallets.length ; coin++ ){
+          arrMarketPairs.push( { text: this.myCoin + " / " + this.allwallets[coin].ticker })
+          arrInvertedPairs.push( { text: this.allwallets[coin].ticker + " / " + this.myCoin })
+        }
+      } else {
+        for( let coin = 0 ; coin < this.allwallets.length ; coin++ ){
+          arrMarketPairs.push( { text: this.allwallets[coin].ticker + " / " + this.myCoin })
+          arrInvertedPairs.push( { text: this.myCoin + " / " + this.allwallets[coin].ticker })
+        }
+      }
+      arrMarketPairs.sort((a,b) => a.text.localeCompare(b.text))
+      arrInvertedPairs.sort((a,b) => a.text.localeCompare(b.text))
+      return arrMarketPairs.concat(arrInvertedPairs)
     }
   }
-};
+}
 </script>
 <style scoped>
 .top-spaced {
