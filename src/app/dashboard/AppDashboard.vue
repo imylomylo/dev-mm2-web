@@ -2,13 +2,20 @@
   <div>
     <h2>{{ appName }}  {{ myCoin }} </h2>
     <v-layout>
-      <v-flex md6 lg6>
+      <v-flex md12 lg12>
         <v-row class="px-4">
+          <v-col>
+              <MyOrders v-bind:myOrders="myCoinOrders" v-bind:myOrdersThisMarket="myOrdersThisMarket" v-on:refresh-myorders="handleRefreshMyOrders" 
+                        v-on:cancel-order="handleCancelOrder" 
+                        v-on:cancel-all-orders="handleCancelAllOrders" 
+                        v-on:myOrdersResponse="handleMyOrders" ref="myordersref" />
+          </v-col>
           <v-col>
             <DashboardWalletInfo v-bind:wallets="allwallets" ref="dashboardWallets" v-bind:myCoin="myCoin"/>
           </v-col>
         </v-row>
       </v-flex>
+<!--
       <v-flex md6 lg6>
         <v-row class="px-4">
           <v-col>
@@ -22,27 +29,14 @@
         </v-row>
         <v-row class="px-4">
           <v-col>
-<!--
-not sure if something needed from this definition of component, keeping as comment for now
-              <MyOrders v-bind:myOrders="myOrders" v-bind:myOrdersThisMarket="myOrdersThisMarket" v-on:refresh-myorders="handleRefreshMyOrders" 
+              <MyOrders v-bind:myOrders="myCoinOrders" v-bind:myOrdersThisMarket="myOrdersThisMarket" v-on:refresh-myorders="handleRefreshMyOrders" 
                         v-on:cancel-order="handleCancelOrder" 
                         v-on:cancel-all-orders="handleCancelAllOrders" 
                         v-on:myOrdersResponse="handleMyOrders" ref="myordersref" />
--->
-              <MyOrders v-bind:myOrders="myOrders" v-bind:myOrdersThisMarket="[]" v-on:refresh-myorders="handleRefreshMyOrders" 
-                        v-on:cancel-order="handleCancelOrder" 
-                        v-on:cancel-all-orders="handleCancelAllOrders" 
-                        ref="myordersref" />
           </v-col>
         </v-row>
-<!--
-        <v-row class="px-4">
-          <v-col>
-            <NewComponent />
-          </v-col>
-        </v-row>
--->
       </v-flex>
+-->
     </v-layout>
   </div>
 </template>
@@ -62,9 +56,13 @@ export default {
       appName: "Dashboard",
       recentSwaps: [],
       myCoin: process.env.VUE_APP_MYCOIN,
+      isMyCoinBase: false,
+      isMyCoinRel: false,
       customerrors: [],
       allwallets: [],
-      myOrders: []
+      myOrders: [],
+      myOrdersThisMarket: [],
+      myCoinOrders: []
     };
   },
   methods: {
@@ -102,9 +100,23 @@ export default {
       console.log("AppTraderView.handleCancelAllOrders")
     },
     handleMyOrders: function(){
+      let tmp_myCoin = this.myCoin
+// set flag for myCoin app circuitry
+      if(tmp_myCoin != undefined){
+        this.isMyCoinBase = true
+        this.isMyCoinRel = true
+      }
       mm2.getMyOrders().then( response => {
         // because working with an object of objects in js sucks, convert to array
         this.myOrders = Object.values(response.data.result.maker_orders)
+        if( this.isMyCoinBase || this.isMyCoinRel ) {
+          this.myCoinOrders = this.myOrders.filter(function (x_order) {
+            if (( x_order.base == tmp_myCoin ||
+                      x_order.rel == tmp_myCoin )){
+              return x_order
+            }
+          })
+        }
       }).then( () => {
         console.log("AppDashboard.myOrders -> highlightOrders")
       })

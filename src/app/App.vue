@@ -60,10 +60,12 @@
         <h3>Dashboard</h3>
         <v-icon class="px-2">ballot</v-icon>
       </v-btn>
+<!--
       <v-btn rounded depressed dark large color="indigo" @click="dialog = !dialog">
         <h3>Markets</h3>
         <v-icon class="px-2">apps</v-icon>
       </v-btn>
+-->
     </v-app-bar>
 
     <v-dialog v-model="dialog" fullscreen hide-overlay transition="dialog-bottom-transition">
