@@ -58,7 +58,13 @@
           </v-row>
           <v-row class="px-4 pb-6">
             <v-col>
-              <MyOrders v-bind:myOrders="myOrders" v-bind:myOrdersThisMarket="myOrdersThisMarket" v-on:refresh-myorders="handleRefreshMyOrders" 
+              <MyOrders v-if="isMyCoinBase || isMyCoinRel" 
+                        v-bind:myOrders="myCoinOrders" v-bind:myOrdersThisMarket="myOrdersThisMarket" v-on:refresh-myorders="handleRefreshMyOrders" 
+                        v-on:cancel-order="handleCancelOrder" 
+                        v-on:cancel-all-orders="handleCancelAllOrders" 
+                        v-on:myOrdersResponse="handleMyOrders" ref="myordersref" />
+              <MyOrders v-else
+                        v-bind:myOrders="myOrders" v-bind:myOrdersThisMarket="myOrdersThisMarket" v-on:refresh-myorders="handleRefreshMyOrders" 
                         v-on:cancel-order="handleCancelOrder" 
                         v-on:cancel-all-orders="handleCancelAllOrders" 
                         v-on:myOrdersResponse="handleMyOrders" ref="myordersref" />
@@ -160,6 +166,7 @@ export default {
       mePrivate: process.env.VUE_APP_MEPRIVATE,
       mePublic: process.env.VUE_APP_MEPUBLIC,
       myOrders: [],
+      myCoinOrders: [],
       myCoin: process.env.VUE_APP_MYCOIN,
       myOrdersThisMarket: [],
       priceuuid: [],
@@ -349,6 +356,7 @@ export default {
       })
     },
     handleMyOrders: function(){
+      let tmp_myCoin = this.myCoin
       mm2.getMyOrders().then( response => {
         // because working with an object of objects in js sucks, convert to array
         this.myOrders = Object.values(response.data.result.maker_orders)
@@ -382,6 +390,14 @@ export default {
             return x_order
           }
         })
+        if( this.isMyCoinBase || this.isMyCoinRel ) {
+          this.myCoinOrders = this.myOrders.filter(function (x_order) {
+            if (( x_order.base == tmp_myCoin ||
+                      x_order.rel == tmp_myCoin )){
+              return x_order
+            }
+          })
+        }
 //        console.log("AppTraderview.myOrdersThisMarket: " + JSON.stringify(this.myOrdersThisMarket,null,2))
       })
     },
