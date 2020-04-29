@@ -1,11 +1,11 @@
 <template>
   <div>
-    <h2>{{ appName }}</h2>
+    <h2>{{ appName }}  {{ myCoin }} </h2>
     <v-layout>
       <v-flex md6 lg6>
         <v-row class="px-4">
           <v-col>
-            <DashboardWalletInfo v-bind:wallets="allwallets" ref="dashboardWallets" />
+            <DashboardWalletInfo v-bind:wallets="allwallets" ref="dashboardWallets" v-bind:myCoin="myCoin"/>
           </v-col>
         </v-row>
       </v-flex>
@@ -61,6 +61,7 @@ export default {
     return {
       appName: "Dashboard",
       recentSwaps: [],
+      myCoin: process.env.VUE_APP_MYCOIN,
       customerrors: [],
       allwallets: [],
       myOrders: []

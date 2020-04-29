@@ -26,6 +26,7 @@
           <th class="text-left">Balance</th>
           <th class="text-left">Address</th>
           <th class="text-left">Actions</th>
+          <th class="text-left">Market</th>
         </tr>
       </thead>
       <tbody v-if="allwallets">
@@ -52,6 +53,17 @@
 </div>
             </div>
           </td>
+          <td>
+              <v-chip
+                class="ma-2"
+                color="purple"
+                outlined
+                @click="toTraderView(myCoin, row.ticker)"
+              >
+                <v-icon left>mdi-server-plus</v-icon>{{ myCoin }}/{{row.ticker}}
+              </v-chip>
+
+          </td>
         </tr>
         </template>
         <template v-else >
@@ -77,6 +89,16 @@
 </div>
             </div>
           </td>
+          <td>
+              <v-chip
+                class="ma-2"
+                color="purple"
+                outlined
+                @click="toTraderView(myCoin, row.ticker)"
+              >
+                <v-icon left>mdi-server-plus</v-icon>{{ myCoin }}/{{row.ticker}}
+              </v-chip>
+          </td>
         </tr>
         </template>
       </tbody>
@@ -99,7 +121,7 @@ import QrcodeVue from "qrcode.vue";
 
 export default {
   components: { QrcodeVue },
-  props: [ 'wallets' ],
+  props: [ 'wallets', 'myCoin' ],
   data: function() {
     return {
       mePrivate: process.env.VUE_APP_MEPRIVATE,
@@ -111,8 +133,8 @@ export default {
       depositAddress: "",
       hideZero: false,
       hideZeroDisable: true,
-      customerrors: [],
-    };
+      customerrors: []
+    }
   },
   methods: {
     isEnabled: function(ticker) {
@@ -162,6 +184,11 @@ export default {
     },
     withdraw: function(ticker) {
       console.log("Withdraw: " + ticker);
+    },
+    toTraderView: function(base, rel){
+      console.log("Invert base " + base);
+      window.location.href = "/#/traderview/" + base + "/" + rel
+      this.$router.go(this.$router.currentRoute);
     }
   },
   computed:  {
