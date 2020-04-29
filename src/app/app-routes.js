@@ -21,8 +21,7 @@ export default new Router({
   // mode: 'history',
   routes: [{
       path: '/',
-      name: 'AppHome',
-      component: AppHome
+      redirect: '/dashboard'
     },
     {
       path: '/dashboard',
