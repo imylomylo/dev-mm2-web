@@ -1,0 +1,9 @@
+{
+  "name": "orderbook-web-atomicDEX",
+  "version": "0.1.0",
+  "description": "Middleware example for atomicDEX API showing orderbook and some trading functions",
+  "apidoc": {
+    "title": "atomicDEX middleware example",
+    "url" : "https://orderbook.live"
+  }
+}

@@ -8,7 +8,7 @@
  *   );
  * })
  * @apiName axiosGET
- * @apiGroup BotUtility
+ * @apiGroup BotDataUtils
  *
  * @apiDescription Re-usable utility method.
  *
@@ -25,7 +25,7 @@ function axiosGET(url) {
  * @apiExample {internal} Example usage:
  *   await sleep(2000);
  * @apiName sleep
- * @apiGroup BotUtility
+ * @apiGroup BotDataUtils
  *
  * @apiDescription A way to make nodejs sleep.
  *
@@ -47,7 +47,7 @@ function sleep(ms) {
  *   bringOrdersToIntegrity()
  * }
  * @apiName runloop
- * @apiGroup BotOrchestration
+ * @apiGroup BotLogic
  *
  * @apiDescription Runnable method that loops ad-infinitum keeping marketmaking user activities running.
  *
@@ -80,7 +80,7 @@ async function runloop() {
  *     i = 0
  *   }
  * @apiName saveLiveConfig
- * @apiGroup BotUtility
+ * @apiGroup BotDataUtils
  *
  * @apiDescription Writes the live config to a file so for persistence.
  *
@@ -100,7 +100,7 @@ function saveLiveConfig() {
 /**
  * @api {BOT} bringOrdersToIntegrity() bringOrdersToIntegrity() 
  * @apiName bringOrdersToIntegrity
- * @apiGroup BotOrchestration
+ * @apiGroup BotLogic
  *
  * @apiDescription Stub method that would normally call updated prices then apply the marketmaking strategy on live orders by adjusting prices.
  *
@@ -119,7 +119,7 @@ function bringOrdersToIntegrity() {
  * }
  * 
  * @apiName getCEXPrices
- * @apiGroup BotUtility
+ * @apiGroup BotDataUtils
  *
  * @apiDescription Gets the price of the configured CEX & aggregator feeds, updating the live config to reflect market changes.
  */
@@ -179,7 +179,7 @@ function getCEXPrices() {
  *   let contents = getLiveConfig()
  * 
  * @apiName getLiveConfig
- * @apiGroup BotUtility
+ * @apiGroup BotDataUtils
  *
  * @apiDescription Safely gets the currently used configuration
  */
@@ -199,11 +199,10 @@ function fsGetConfig() {
 /**
  * @api {get} /config /config
  * @apiName config
- * @apiGroup URLRoutes
+ * @apiGroup MiddlewareServerURLs
  *
  * @apiDescription Gets the config file for the network client/tui/gui/app
  * 
- * @deprecated
  */
 app.options("/config", cors())
 app.get("/config", cors(), (req, res) => {
@@ -221,7 +220,7 @@ app.get("/config", cors(), (req, res) => {
 /**
  * @api {get} /config2 /config2 
  * @apiName config2
- * @apiGroup URLRoutes
+ * @apiGroup MiddlewareServerURLs
  *
  * @apiDescription Gets the config file for the network client/tui/gui/app using the safer getLiveConfig method
  * 
@@ -242,7 +241,7 @@ app.get("/config2", cors(), (req, res) => {
 /**
  * @api {post} /config /config 
  * @apiName config
- * @apiGroup URLRoutes
+ * @apiGroup MiddlewareServerURLs
  *
  * @apiDescription Saves the updated config submission from the client
  * 
@@ -271,7 +270,7 @@ app.post("/config", cors(), (req, res) => {
 /**
  * @api {get} /coinconfig /coinconfig 
  * @apiName coinconfig
- * @apiGroup URLRoutes
+ * @apiGroup MiddlewareServerURLs
  *
  * @apiParam {String} coin as a ticker symbol, e.g. KMD, BTC etc.
  * @apiDescription Gets the coin configuration (which for this PoC was a separate file to the app config file)
@@ -295,7 +294,7 @@ app.get("/coinconfig", cors(), (req, res) => {
 /**
  * @api {get} /coinsenabled /coinsenabled 
  * @apiName coinsenabled
- * @apiGroup URLRoutes
+ * @apiGroup MiddlewareServerURLs
  *
  * @apiDescription Calls marketmaker method to get information or perform action of AtomicDEX API
  * 
@@ -313,7 +312,7 @@ app.get("/coinsenabled", cors(), (req, res) => {
 /**
  * @api {post} /connectcoin /connectcoin 
  * @apiName connectcoin
- * @apiGroup URLRoutes
+ * @apiGroup MiddlewareServerURLs
  *
  * @apiParam {String} coin as a ticker symbol, e.g. KMD, BTC etc.
  * @apiParam {String[]} server information for connecting using marketmaker2.electrum method
@@ -334,7 +333,7 @@ app.post("/connectcoin", cors(), (req, res) => {
 /**
  * @api {get} /recentswaps /recentswaps 
  * @apiName recentswaps
- * @apiGroup URLRoutes
+ * @apiGroup MiddlewareServerURLs
  *
  * @apiDescription Calls marketmaker method to get information or perform action of AtomicDEX API
  * 
@@ -352,7 +351,7 @@ app.get("/recentswaps", cors(), (req, res) => {
 /**
  * @api {get} /getBalance /getBalance 
  * @apiName getBalance
- * @apiGroup URLRoutes
+ * @apiGroup MiddlewareServerURLs
  *
  * @apiParam {String} coin as a ticker symbol, e.g. KMD, BTC etc.
  * @apiDescription Calls marketmaker method to get information or perform action of AtomicDEX API
@@ -371,7 +370,7 @@ app.get("/getBalance", cors(), (req, res) => {
 /**
  * @api {get} /getOrders /getOrders 
  * @apiName getOrders
- * @apiGroup URLRoutes
+ * @apiGroup MiddlewareServerURLs
  *
  * @apiDescription Calls marketmaker method to get information or perform action of AtomicDEX API
  * 
@@ -517,7 +516,7 @@ app.get("/getOrders", cors(), (req, res) => {
 /**
  * @api {post} /doTaker /doTaker 
  * @apiName doTaker
- * @apiGroup URLRoutes
+ * @apiGroup MiddlewareServerURLs
  *
  * @apiParam {String} base as a ticker symbol, e.g. KMD, BTC etc.
  * @apiParam {String} rel as a ticker symbol, e.g. KMD, BTC etc.
@@ -547,7 +546,7 @@ app.post("/doTaker", cors(), (req, res) => {
 /**
  * @api {post} /doMaker /doMaker 
  * @apiName doMaker
- * @apiGroup URLRoutes
+ * @apiGroup MiddlewareServerURLs
  *
  * @apiParam {String} base as a ticker symbol, e.g. KMD, BTC etc.
  * @apiParam {String} rel as a ticker symbol, e.g. KMD, BTC etc.
@@ -577,7 +576,7 @@ app.post("/doMaker", cors(), (req, res) => {
 /**
  * @api {post} /getMarket /getMarket 
  * @apiName getMarket
- * @apiGroup URLRoutes
+ * @apiGroup MiddlewareServerURLs
  *
  * @apiParam {String} base as a ticker symbol, e.g. KMD, BTC etc.
  * @apiParam {String} rel as a ticker symbol, e.g. KMD, BTC etc.
@@ -598,7 +597,7 @@ app.post("/getMarket", cors(), (req, res) => {
 /**
  * @api {get} /getbittrexmarketprice /getbittrexmarketprice 
  * @apiName getbittrexmarketprice
- * @apiGroup URLRoutes
+ * @apiGroup MiddlewareServerURLs
  *
  * @apiParam {String} base as a ticker symbol, e.g. KMD, BTC etc.
  * 
@@ -619,7 +618,7 @@ app.get("/getbittrexmarketprice", cors(), (req, res) => {
 /**
  * @api {get} /getbinancemarketprice /getbinancemarketprice 
  * @apiName getbinancemarketprice
- * @apiGroup URLRoutes
+ * @apiGroup MiddlewareServerURLs
  *
  * @apiParam {String} base as a ticker symbol, e.g. KMD, BTC etc.
  * 
@@ -640,7 +639,7 @@ app.get("/getbinancemarketprice", cors(), (req, res) => {
 /**
  * @api {get} /getbinancemarketdepth /getbinancemarketdepth 
  * @apiName getbinancemarketdepth
- * @apiGroup URLRoutes
+ * @apiGroup MiddlewareServerURLs
  *
  * @apiParam {String} base as a ticker symbol, e.g. KMD, BTC etc.
  * 
@@ -659,7 +658,7 @@ app.get("/getbinancemarketdepth", cors(), (req, res) => {
 /**
  * @api {get} /getpaprikaprice /getpaprikaprice 
  * @apiName getpaprikaprice
- * @apiGroup URLRoutes
+ * @apiGroup MiddlewareServerURLs
  *
  * @apiParam {String} base as a ticker symbol, e.g. KMD, BTC etc.
  * 
@@ -697,9 +696,9 @@ app.get("/getpaprikaprice", cors(), (req, res) => {
 
 
 /**
- * @api {MM2} getOrders(userpass) getOrders(userpass)
+ * @api {NodeJSMM2} getOrders(userpass) getOrders(userpass)
  * @apiName getOrders
- * @apiGroup MarketmakerRequest
+ * @apiGroup MiddlewareAtomicDEX
  *
  * @apiParam {String} userpass default up set in config
  * 
@@ -724,9 +723,9 @@ function getOrders(userpass = up) {
 }
 
 /**
- * @api {MM2} getRecentSwaps(uuid,userpass) getRecentSwaps(uuid, userpass)
+ * @api {NodeJSMM2} getRecentSwaps(uuid,userpass) getRecentSwaps(uuid, userpass)
  * @apiName getRecentSwaps
- * @apiGroup MarketmakerRequest
+ * @apiGroup MiddlewareAtomicDEX
  *
  * @apiParam {String} userpass default up set in config
  * @apiParam {String} uuid  default is null to get all
@@ -753,9 +752,9 @@ function getRecentSwaps(uuid = null, userpass = up) {
 }
 
 /**
- * @api {MM2} getEnabledCoins(userpass) getEnabledCoins(userpass)
+ * @api {NodeJSMM2} getEnabledCoins(userpass) getEnabledCoins(userpass)
  * @apiName getEnabledCoins
- * @apiGroup MarketmakerRequest
+ * @apiGroup MiddlewareAtomicDEX
  *
  * @apiParam {String} userpass default up set in config
  * 
@@ -780,9 +779,9 @@ function getEnabledCoins(userpass = up) {
 }
 
 /**
- * @api {MM2} connectCoin(coin,servers,userpass) connectCoin(coin, servers, userpass)
+ * @api {NodeJSMM2} connectCoin(coin,servers,userpass) connectCoin(coin, servers, userpass)
  * @apiName connectCoin
- * @apiGroup MarketmakerRequest
+ * @apiGroup MiddlewareAtomicDEX
  *
  * @apiParam {String} coin default up set in config
  * @apiParam {Object[]} servers passed from previous lookup
@@ -822,9 +821,9 @@ function connectCoin(coin, servers, userpass = up) {
 }
 
 /**
- * @api {MM2} buy(base,rel,price,volume,userpass) buy(base, rel, price, volume, userpass)
+ * @api {NodeJSMM2} buy(base,rel,price,volume,userpass) buy(base, rel, price, volume, userpass)
  * @apiName buy
- * @apiGroup MarketmakerRequest
+ * @apiGroup MiddlewareAtomicDEX
  *
  * @apiParam {String} base
  * @apiParam {String} rel
@@ -857,9 +856,9 @@ function buy(base, rel, price, volume, userpass = up){
 }
 
 /**
- * @api {MM2} setPrice(base,rel,price,volume,userpass) setPrice(base, rel, price, volume, userpass)
+ * @api {NodeJSMM2} setPrice(base,rel,price,volume,userpass) setPrice(base, rel, price, volume, userpass)
  * @apiName setPrice
- * @apiGroup MarketmakerRequest
+ * @apiGroup MiddlewareAtomicDEX
  *
  * @apiParam {String} base
  * @apiParam {String} rel
@@ -893,9 +892,9 @@ function setPrice(base, rel, price, volume, userpass = up){
 }
 
 /**
- * @api {MM2} getBalance(coin) getBalance(coin)
+ * @api {NodeJSMM2} getBalance(coin) getBalance(coin)
  * @apiName getBalance
- * @apiGroup MarketmakerRequest
+ * @apiGroup MiddlewareAtomicDEX
  *
  * @apiParam {String} coin
  * @apiParam {String} userpass default up set in config
@@ -922,9 +921,9 @@ function getBalance(coin, userpass = up) {
 }
 
 /**
- * @api {MM2} getMarket(base,rel,userpass) getMarket(base, rel, userpass) 
+ * @api {NodeJSMM2} getMarket(base,rel,userpass) getMarket(base, rel, userpass) 
  * @apiName getMarket
- * @apiGroup MarketmakerRequest
+ * @apiGroup MiddlewareAtomicDEX
  *
  * @apiParam {String} base
  * @apiParam {String} rel
@@ -952,3 +951,250 @@ function getMarket(base, rel, userpass = up) {
     .catch(err => console.error(err))
 
 }
+
+/**
+ * @api {FrontEnd} cancelAllOrders() cancelAllOrders() 
+ * @apiExample {vueJS} AppTraderview.vue usage:
+ * 
+ *     // MyOrders.vue component emits an event handled like this
+ *     handleCancelAllOrders: function() {
+ *     console.log("AppTraderView.handleCancelAllOrders")
+ *   }
+ *
+ * @apiName cancelAllOrders
+ * @apiGroup MiddlewareClientLibrary
+ *
+ * @apiDescription cancels orders
+ */
+function cancelAllOrders() {
+}
+
+/**
+ * @api {FrontEnd} cancelOrder(uuid) cancelOrder(uuid)
+ * @apiExample {vueJS} AppTraderview.vue usage:
+ * 
+ *     // MyOrders.vue component emits an event handled like this
+ *    handleCancelOrder: function(uuid) {
+ *      console.log("AppTraderView.handleCancelOrder: " + uuid)
+ *      mm2.cancelOrder(uuid).then( response => {
+ *         console.log("Cancel order response: " + response)
+ *      }).catch((reason) => {
+ *        console.log("Could not cancel order " + uuid)
+ *      })
+ *      this.handleMyOrders()
+ *    }
+ *
+ * @apiName cancelOrder
+ * @apiGroup MiddlewareClientLibrary
+ *
+ * @apiDescription cancels order identified by UUID
+ */
+function cancelOrder(uuid) {
+}
+
+/**
+ * @api {FrontEnd} getFiatCoinGecko() getFiatCoinGecko()
+ * @apiExample {vueJS} AppTraderview.vue usage:
+ * 
+ *     // for the banner showing fiat usd price
+ *   handleRefreshFiat: function() {
+ *     console.log("AppTraderView.handleRefreshFiat")
+ *     let refreshFiatBase = mm2.getFiatCoinGecko(this.wallets.base.ticker).then( response => {
+ *       this.wallets.base.fiat = response.data.current_prices.usd
+ *     }).catch((reason) => {
+ *       console.log(reason)
+ *     })
+ *     let refreshFiatRel = mm2.getFiatCoinGecko(this.wallets.rel.ticker).then( response => {
+ *       this.wallets.rel.fiat = response.data.current_prices.usd
+ *     }).catch((reason) => {
+ *       console.log("caught: " + reason)
+ *     })
+ *   }
+ *
+ * @apiName getFiatCoinGecko
+ * @apiGroup MiddlewareClientLibrary
+ *
+ * @apiDescription description goes here
+ */
+function getFiatCoinGecko() {
+}
+
+/**
+ * @api {FrontEnd} getMyOrders() getMyOrders()
+ * @apiExample {vueJS} AppTraderview.vue usage:
+ * 
+ *     // MyOrders.vue component emits an event handled like this
+ *   handleMyOrders: function(){
+ *     mm2.getMyOrders().then( response => {
+ *       // because working with an object of objects in js sucks, convert to array
+ *       this.myOrders = Object.values(response.data.result.maker_orders)
+ *     }).then( () => {
+ *       console.log("AppTraderview.myOrders -> highlightOrders")
+ *       ...
+ *       ...
+ *       ...
+ *     })
+ *   }
+ *
+ * @apiName getMyOrders
+ * @apiGroup MiddlewareClientLibrary
+ *
+ * @apiDescription description goes here
+ */
+function getMyOrders() {
+}
+
+/**
+ * @api {FrontEnd} getMarket() getMarket()
+ * @apiExample {vueJS} AppTraderview.vue usage:
+ * 
+ *     // MarketData.vue component emits an event handle refresh
+ *   handleRefreshMarket: function() {
+ *     console.log("Refresh Market")
+ *     mm2.getMarket(this.wallets.base.ticker, this.wallets.rel.ticker).then( response => {
+ * //          console.log("Market data: " + JSON.stringify(response.data,null,2))
+ *         let marketdataraw = response.data
+ *         this.marketOrders = marketdataraw
+ *         this.marketOrders.asks = this.groupByPrice(marketdataraw.asks, "price")
+ *         this.marketOrders.bids = this.groupByPrice(marketdataraw.bids, "price")
+ *     }).catch((reason) => {
+ *       console.log(reason)
+ *     })
+ *   }
+ *
+ * @apiName getMarket
+ * @apiGroup MiddlewareClientLibrary
+ *
+ * @apiDescription description goes here
+ */
+function getMarket() {
+}
+
+/**
+ * @api {FrontEnd} getWalletBalance(coin) getWalletBalance(coin)
+ * @apiExample {vueJS} AppTraderview.vue usage:
+ * 
+ *   handleRefreshBalances: function() {
+ *     console.log("AppTraderView.handleRefreshBalances")
+ *     let refreshBase = mm2.getWalletBalance(this.wallets.base.ticker).then( response => {
+ *       this.wallets.base.balance = response.data.balance 
+ *       this.wallets.base.address = response.data.address
+ *     })
+ *     let refreshRel = mm2.getWalletBalance(this.wallets.rel.ticker).then( response => {
+ *       this.wallets.rel.balance = response.data.balance 
+ *       this.wallets.rel.address = response.data.address
+ *     })
+ *     Promise.all([refreshBase, refreshRel]).then( function() {
+ * //        console.log("AppTraderView.handleRefreshBalance: Update child component")
+ * //        this.$refs.refWalletInfo(balanceFromParent, this.wallets)
+ *     })
+ *   }
+ *
+ * @apiName getWalletBalance
+ * @apiGroup MiddlewareClientLibrary
+ *
+ * @apiDescription get balance of the wallet
+ */
+function getWalletBalance(coin) {
+}
+
+/**
+ * @api {FrontEnd} buyBase(orderDetails) buyBase(orderDetails)
+ * @apiExample {vueJS} AppTraderview.vue usage:
+ * 
+ *  // SingleOrder.vue emits an event to be handled
+ *   handleBuyBase: function(orderDetails){
+ *     console.log(
+ *       "SingleOrder buy base: " +
+ *         this.wallets.base.ticker +
+ *         ", amount: " +
+ *         orderDetails.amount +
+ *         " @ " +
+ *         orderDetails.price +
+ *         " = " +
+ *         orderDetails.amount * orderDetails.price
+ *     )
+ *     mm2.buyBase(this.wallets.base.ticker, this.wallets.rel.ticker, orderDetails.price, orderDetails.amount).then( response => {
+ *       console.log("Response to buy base: " + JSON.stringify(response,null,2))
+ *       this.$refs.refSingleOrder.handleOrderResponse()
+ *       this.handleMyOrders()
+ *     }).catch((reason) => {
+ *         console.log(reason)
+ *     })
+ *   }
+ *
+ * @apiName buyBase
+ * @apiGroup MiddlewareClientLibrary
+ *
+ * @apiDescription base coin bid/buy order
+ */
+function buyBase(orderDetails) {
+}
+
+/**
+ * @api {FrontEnd} sellBase(orderDetails) sellBase(orderDetails)
+ * @apiExample {vueJS} AppTraderview.vue usage:
+ * 
+ *  // SingleOrder.vue emits an event to be handled
+ *   handleSellBase: function(orderDetails) {
+ *     console.log(
+ *       "SingleOrder sell base: " +
+ *         this.wallets.base.ticker +
+ *         ", amount: " +
+ *         orderDetails.amount +
+ *         " @ " +
+ *         orderDetails.price +
+ *         " = " +
+ *         orderDetails.amount * orderDetails.price
+ *     )
+ *     mm2.sellBase(this.wallets.base.ticker, this.wallets.rel.ticker, orderDetails.price, orderDetails.amount).then( response => {
+ *       console.log("Response to sell base: " + JSON.stringify(response,null,2))
+ *       this.$refs.refSingleOrder.handleOrderResponse()
+ *       this.handleMyOrders()
+ *     }).catch((reason) => {
+ *         console.log(reason)
+ *     })
+ *   }
+ *
+ * @apiName sellBase
+ * @apiGroup MiddlewareClientLibrary
+ *
+ * @apiDescription base coin ask/sell order
+ */
+function sellBase(orderDetails) {
+}
+
+/**
+ * @api {FrontEnd} recentSwaps() recentSwaps()
+ * @apiExample {vueJS} AppDashboard.vue usage:
+ * 
+ *     // Export.vue component emits an event handled like this
+ *   handleGetSwapHistory: function() {
+ *      console.log("AppDashboard.handleGetSwapHistory")
+ *      mm2.recentSwaps().then( response => {
+ *        this.recentSwaps = response.data.result
+ *      })
+ *   }
+ *
+ * @apiName recentSwaps
+ * @apiGroup MiddlewareClientLibrary
+ *
+ * @apiDescription get the recent swaps for this atomicDEX marketmaker node
+ */
+function recentSwaps() {
+}
+
+/**
+ * @api {FrontEnd} withdraw() withdraw()
+ * @apiExample {vueJS} AppTraderview.vue usage:
+ * 
+ * Not implemented!!
+ *
+ * @apiName withdraw
+ * @apiGroup MiddlewareClientLibrary
+ *
+ * @apiDescription not implemented
+ */
+function withdraw() {
+}
+
