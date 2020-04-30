@@ -701,8 +701,26 @@ app.get("/getpaprikaprice", cors(), (req, res) => {
  * @apiGroup MiddlewareAtomicDEX
  *
  * @apiParam {String} userpass default up set in config
+ *
+ * @apiExample {NodeJS} mm2-middleware.js 
+ * export function getOrders(userpass = UP) {
+ * console.log("getOrders")
+ * const requestData = {
+ *   jsonrpc: "2.0",
+ *   method: "my_orders",
+ *   userpass: userpass,
+ *   id: Date.now(),
+ *   timeout: 3000
+ * };
+ * return axios.post("http://127.0.0.1:7783", requestData)
+ *   .then(res => {
+ *     console.log(res.data)
+ *     return res.data
+ *   })
+ *   .catch(err => console.error(err))
+ * }
  * 
- * @apiDescription mm2 my_orders to get current orders
+ * @apiDescription mm2 <a href="https://developers.komodoplatform.com/basic-docs/atomicdex/atomicdex-api.html#my-orders">my_orders</a> to get current orders 
  * 
  */
 function getOrders(userpass = up) {
@@ -726,11 +744,29 @@ function getOrders(userpass = up) {
  * @api {NodeJSMM2} getRecentSwaps(uuid,userpass) getRecentSwaps(uuid, userpass)
  * @apiName getRecentSwaps
  * @apiGroup MiddlewareAtomicDEX
+ * @apiExample {NodeJS} mm2-middleware.js
+ * export function getRecentSwaps(uuid = null, userpass = UP) {
+ *   console.log("getRecentSwaps")
+ *   const requestData = {
+ *     jsonrpc: "2.0",
+ *     method: "my_recent_swaps",
+ *     uuid: uuid,
+ *     userpass: userpass,
+ *     id: Date.now(),
+ *     timeout: 3000
+ *   };
+ *   return axios.post("http://127.0.0.1:7783", requestData)
+ *     .then(res => {
+ *       console.log(res.data)
+ *       return res.data
+ *     })
+ *     .catch(err => console.error(err))
+ * }
  *
  * @apiParam {String} userpass default up set in config
  * @apiParam {String} uuid  default is null to get all
  * 
- * @apiDescription mm2 my_recent_swaps to get current orders
+ * @apiDescription mm2 <a href="https://developers.komodoplatform.com/basic-docs/atomicdex/atomicdex-api.html#my-recent-swaps">my_recent_swaps</a> to get current orders
  * 
  */
 function getRecentSwaps(uuid = null, userpass = up) {
@@ -755,10 +791,26 @@ function getRecentSwaps(uuid = null, userpass = up) {
  * @api {NodeJSMM2} getEnabledCoins(userpass) getEnabledCoins(userpass)
  * @apiName getEnabledCoins
  * @apiGroup MiddlewareAtomicDEX
- *
+ * @apiExample {NodeJS} mm2-middleware.js
+ * export function getEnabledCoins(userpass = UP) {
+ *   console.log("GetEnabledCoins")
+ *   const requestData = {
+ *     jsonrpc: "2.0",
+ *     method: "get_enabled_coins",
+ *     userpass: userpass,
+ *     id: Date.now(),
+ *     timeout: 3000
+ *   };
+ *   return axios.post("http://127.0.0.1:7783", requestData)
+ *     .then(res => {
+ *       console.log(res.data)
+ *       return res.data
+ *     })
+ *     .catch(err => console.error(err))
+ * }
  * @apiParam {String} userpass default up set in config
  * 
- * @apiDescription mm2 get_enabled_coins to get current state of enabled coins
+ * @apiDescription mm2 <a href="https://developers.komodoplatform.com/basic-docs/atomicdex/atomicdex-api.html#get-enabled-coins">get_enabled_coins</a> to get current state of enabled coins
  * 
  */
 function getEnabledCoins(userpass = up) {
@@ -782,12 +834,31 @@ function getEnabledCoins(userpass = up) {
  * @api {NodeJSMM2} connectCoin(coin,servers,userpass) connectCoin(coin, servers, userpass)
  * @apiName connectCoin
  * @apiGroup MiddlewareAtomicDEX
+ * @apiExample {NodeJS} mm2-middleware.js
+ * export function connectCoin(coin, servers, userpass = UP) {
+ *   console.log("connect coin: " + coin + " with servers " + servers)
+ *   const requestData = {
+ *     jsonrpc: "2.0",
+ *     method: "electrum",
+ *     coin: coin,
+ *     servers: JSON.parse(servers),
+ *     userpass: userpass,
+ *     id: Date.now(),
+ *     timeout: 3000
+ *   };
+ *   return axios.post("http://127.0.0.1:7783", requestData)
+ *     .then(res => {
+ *       console.log(res.data)
+ *       return res.data
+ *     })
+ *     .catch(err => console.error(err))
+ * }
  *
  * @apiParam {String} coin default up set in config
  * @apiParam {Object[]} servers passed from previous lookup
  * @apiParam {String} userpass default up set in config
  * 
- * @apiDescription mm2 connect coin with electrum server
+ * @apiDescription mm2 connect coin with electrum server using <a href="https://developers.komodoplatform.com/basic-docs/atomicdex/atomicdex-api.html#electrum">electrum</a>
  * 
  */
 function connectCoin(coin, servers, userpass = up) {
@@ -824,6 +895,28 @@ function connectCoin(coin, servers, userpass = up) {
  * @api {NodeJSMM2} buy(base,rel,price,volume,userpass) buy(base, rel, price, volume, userpass)
  * @apiName buy
  * @apiGroup MiddlewareAtomicDEX
+ * @apiExample {NodeJS} mm2-middleware.js
+ * export function buy(base, rel, price, volume, userpass = UP){
+ *   console.log("buy (base,rel,price,volume): (" + base + "," + rel + "," + price + "," + volume + ")")
+ *   const requestData = {
+ *     jsonrpc: "2.0",
+ *     method: "buy",
+ *     base: base,
+ *     rel: rel,
+ *     price: price,
+ *     volume: volume,
+ *     userpass: userpass,
+ *     id: Date.now(),
+ *     timeout: 3000
+ *   };
+ *   return axios.post("http://127.0.0.1:7783", requestData)
+ *     .then(res => {
+ *       console.log(res.data)
+ *       return res.data
+ *     })
+ *     .catch(err => console.error(err))
+ * }
+ * 
  *
  * @apiParam {String} base
  * @apiParam {String} rel
@@ -831,7 +924,7 @@ function connectCoin(coin, servers, userpass = up) {
  * @apiParam {String} volume
  * @apiParam {String} userpass default up set in config
  * 
- * @apiDescription mm2 be an alice (taker) by calling mm2 buy method
+ * @apiDescription mm2 be an alice (taker) by calling mm2 <a href="https://developers.komodoplatform.com/basic-docs/atomicdex/atomicdex-api.html#buy">buy</a> method
  * 
  */
 function buy(base, rel, price, volume, userpass = up){
@@ -859,6 +952,29 @@ function buy(base, rel, price, volume, userpass = up){
  * @api {NodeJSMM2} setPrice(base,rel,price,volume,userpass) setPrice(base, rel, price, volume, userpass)
  * @apiName setPrice
  * @apiGroup MiddlewareAtomicDEX
+ * @apiExample {NodeJS} mm2-middleware.js
+ * export function setPrice(base, rel, price, volume, userpass = UP){
+ *   console.log("buy (base,rel,price,volume): (" + base + "," + rel + "," + price + "," + volume + ")")
+ *   const requestData = {
+ *     jsonrpc: "2.0",
+ *     method: "setprice",
+ *     base: base,
+ *     rel: rel,
+ *     price: price,
+ *     volume: volume,
+ *     cancel_previous: false,
+ *     userpass: userpass,
+ *     id: Date.now(),
+ *     timeout: 3000
+ *   };
+ *   return axios.post("http://127.0.0.1:7783", requestData)
+ *     .then(res => {
+ *       console.log(res.data)
+ *       return res.data
+ *     })
+ *     .catch(err => console.error(err))
+ * }
+ * 
  *
  * @apiParam {String} base
  * @apiParam {String} rel
@@ -866,7 +982,7 @@ function buy(base, rel, price, volume, userpass = up){
  * @apiParam {String} volume
  * @apiParam {String} userpass default up set in config
  * 
- * @apiDescription mm2 be a bob (maker) by calling mm2 setprice method
+ * @apiDescription mm2 be a bob (maker) by calling mm2 <a href="https://developers.komodoplatform.com/basic-docs/atomicdex/atomicdex-api.html#setprice">setprice</a> method
  * 
  */
 function setPrice(base, rel, price, volume, userpass = up){
@@ -895,11 +1011,30 @@ function setPrice(base, rel, price, volume, userpass = up){
  * @api {NodeJSMM2} getBalance(coin) getBalance(coin)
  * @apiName getBalance
  * @apiGroup MiddlewareAtomicDEX
+ * @apiExample {NodeJS} mm2-middleware.js
+ * export function getBalance(coin, userpass = UP) {
+ *   console.log("getBalance coin: " + coin)
+ *   const requestData = {
+ *     jsonrpc: "2.0",
+ *     method: "my_balance",
+ *     coin: coin,
+ *     userpass: userpass,
+ *     id: Date.now(),
+ *     timeout: 3000
+ *   };
+ *   return axios.post("http://127.0.0.1:7783", requestData)
+ *     .then(res => {
+ *       console.log(res.data)
+ *       return res.data
+ *     })
+ *     .catch(err => console.error(err))
+ * }
+ * 
  *
  * @apiParam {String} coin
  * @apiParam {String} userpass default up set in config
  * 
- * @apiDescription mm2 my_balance to get current balance of coin
+ * @apiDescription mm2 <a href="https://developers.komodoplatform.com/basic-docs/atomicdex/atomicdex-api.html#my-balance">my_balance</a> to get current balance of coin
  * 
  */
 function getBalance(coin, userpass = up) {
@@ -924,12 +1059,31 @@ function getBalance(coin, userpass = up) {
  * @api {NodeJSMM2} getMarket(base,rel,userpass) getMarket(base, rel, userpass) 
  * @apiName getMarket
  * @apiGroup MiddlewareAtomicDEX
+ * @apiExample {NodeJS} mm2-middleware.js
+ * export function getMarket(base, rel, userpass = UP) {
+ *   console.log("market data: " + base + " / " + rel)
+ *   const requestData = {
+ *     jsonrpc: "2.0",
+ *     method: "orderbook",
+ *     base: base,
+ *     rel: rel,
+ *     userpass: userpass,
+ *     id: Date.now(),
+ *     timeout: 3000
+ *   };
+ *   return axios.post("http://127.0.0.1:7783", requestData)
+ *     .then(res => {
+ *       console.log(res.data)
+ *       return res.data
+ *     })
+ *     .catch(err => console.error(err))
+ * }
  *
  * @apiParam {String} base
  * @apiParam {String} rel
  * @apiParam {String} userpass default up set in config
  * 
- * @apiDescription mm2 orderbook method to get market data (orderbooks) for base/rel
+ * @apiDescription mm2 <a href="https://developers.komodoplatform.com/basic-docs/atomicdex/atomicdex-api.html#orderbook">orderbook</a> method to get market data (orderbooks) for base/rel
  * 
  */
 function getMarket(base, rel, userpass = up) {
