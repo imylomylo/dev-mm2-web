@@ -1,5 +1,8 @@
 # dev-mm2-web
 
+## Update preparations
+* (openssl-legacy)[https://github.com/vuejs/vue-cli/issues/6770#issuecomment-961307401]
+
 ## Project setup
 ```
 npm install
