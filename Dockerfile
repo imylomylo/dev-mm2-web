@@ -9,5 +9,5 @@ RUN curl -sL https://deb.nodesource.com/setup_13.x -o nodesource_setup.sh && \
   npm config set prefix ~/.local && \
   echo "PATH=~/.local/bin/:\$PATH" >> ~/.bashrc
 
-COPY entrypoint.sh /usr/local/bin/
+COPY start-webapp.sh /usr/local/bin/entrypoint.sh
 CMD ["/usr/local/bin/entrypoint.sh"]
